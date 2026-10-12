@@ -1,0 +1,158 @@
+{
+  "title": "Spencer’s portfolio · fresh technical concepts",
+  "question": "Your earlier note was saved: you liked C and wanted it more technical. These fresh image concepts keep soft charcoal/red and portfolio-first hierarchy. Choose a draft or steer again; no previous selection is binding.",
+  "options": [
+    {
+      "id": "workbench-v2",
+      "label": "1 · Spatial workbench",
+      "thesis": "Project navigation becomes a precise field of dimensional planes.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "flat tile planes",
+        "charcoal",
+        "muted red"
+      ],
+      "viewport": "Introduction left, project destinations in perspective right; a work gallery follows.",
+      "risk": "The tile structure can feel too product-like without excellent portfolio content.",
+      "comp": ".impeccable/mocks/workbench-v2.png",
+      "raised": [
+        {
+          "from": "Parametric atlas",
+          "raise": "Interactive depth is purposeful and remains bounded to the opening."
+        }
+      ]
+    },
+    {
+      "id": "parametric-v2",
+      "label": "2 · Parametric atlas",
+      "verdict": "competitive",
+      "thesis": "A mathematical red surface makes the interactive field feel engineered.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "parametric surface",
+        "contour lines",
+        "diffuse studio light"
+      ],
+      "viewport": "Stable introduction left, dimensional red topology right, work immediately beneath.",
+      "risk": "The surface must remain subordinate to real projects.",
+      "case": "Closest to your preference for C; stronger technical structure while keeping its depth.",
+      "comp": ".impeccable/mocks/parametric-v2.png"
+    },
+    {
+      "id": "procedural-v2",
+      "label": "3 · Procedural studio",
+      "verdict": "competitive",
+      "thesis": "A visible illustrative shader connects code to a precise living graphic.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "projected line field",
+        "small code strip",
+        "clear grotesk"
+      ],
+      "viewport": "Professional introduction beside a procedural field and its small illustrative code strip.",
+      "risk": "The demonstration must be clearly labeled and never imply unverified experience.",
+      "case": "Technical character comes from a real code/visual relationship.",
+      "comp": ".impeccable/mocks/procedural-v2.png"
+    },
+    {
+      "id": "sleeve-v2",
+      "label": "Sleeve band",
+      "verdict": "declined",
+      "thesis": "A dealt visual system evaluated against your technical portfolio brief.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into this reference system.",
+      "case": "Weaker professional identification and clarity than the leading concepts.",
+      "kept": "Contrast in content density helps pace professional and creative material.",
+      "risk": "Moving bands obscure the work."
+    },
+    {
+      "id": "station-v2",
+      "label": "Narrative tile hall",
+      "verdict": "declined",
+      "thesis": "A dealt visual system evaluated against your technical portfolio brief.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into this reference system.",
+      "case": "Weaker professional identification and clarity than the leading concepts.",
+      "kept": "Sections carry whole, deliberate compositions.",
+      "risk": "Literal ceramic ornament competes with the modern technical brief."
+    },
+    {
+      "id": "rhythm-v2",
+      "label": "Rhythm instrument",
+      "verdict": "declined",
+      "thesis": "A dealt visual system evaluated against your technical portfolio brief.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into this reference system.",
+      "case": "Weaker professional identification and clarity than the leading concepts.",
+      "kept": "Interaction timing stays coherent and purposeful.",
+      "risk": "Music-first controls reverse the professional-first priority."
+    }
+  ],
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "Familiar portfolio",
+    "thesis": "A straightforward portfolio with the same palette and one restrained interactive background.",
+    "palette": [
+      "#252629",
+      "#303135",
+      "#bd777b",
+      "#e7e4e2"
+    ],
+    "materials": [
+      "clean project layout",
+      "muted red"
+    ],
+    "viewport": "Introduction then project evidence, with a simpler graphic.",
+    "risk": "Less distinctive interaction."
+  },
+  "steer": true
+}

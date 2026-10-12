@@ -42,6 +42,8 @@ Professional portfolio first, creative content afterwards. Modern, reactive, flu
 
 Confirmed visual constraints: soft dark gray and soft muted red, avoiding stark black/crimson contrast. Draft image concepts before implementation. Blank portrait placeholders are permitted. A background graphic or 3D object responding to mouse movement is desired.
 
+Additional user steering from the concept chooser: likes the interactive-field concept C, wants it more technical while still visually cool; requested a bolder exploration. The earlier re-roll was an exploration request, not approval to implement a design.
+
 ## Product Principles
 
 - Real work and truthful content establish credibility.
