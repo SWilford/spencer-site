@@ -4,19 +4,45 @@ import { useEffect, useRef } from "react";
 
 type Point = { x: number; y: number; z: number };
 type ScreenPoint = Point & { scale: number; visible: boolean };
-const count = 27;
+const count = 12;
+const shapeNames = ["icosahedron", "cuboctahedron", "twisted-prism", "bipyramid", "stellated-prism"];
 function target(i: number, shape: number): Point {
-  const x = i % 3 - 1;
-  const y = Math.floor(i / 3) % 3 - 1;
-  const z = Math.floor(i / 9) - 1;
-  if (shape === 0) return { x: x * 1.25, y: y * .9, z };
-  if (shape === 1) {
-    const length = Math.abs(x) + Math.abs(y) + Math.abs(z) || 1;
-    return { x: x / length * 1.75, y: y / length * 1.75, z: z / length * 1.75 };
+  const phi = (1 + Math.sqrt(5)) / 2;
+  if (shape === 0) {
+    const a = i % 2 ? 1 : -1, b = Math.floor(i / 2) % 2 ? phi : -phi;
+    return i < 4 ? {x:0,y:a,z:b} : i < 8 ? {x:a,y:b,z:0} : {x:b,y:0,z:a};
   }
-  const angle = (i % 9) / 9 * Math.PI * 2;
-  return { x: Math.cos(angle) * 1.3, y: Math.floor(i / 9) - 1, z: Math.sin(angle) * 1.3 };
+  if (shape === 1) {
+    const a = i % 2 ? 1.4 : -1.4, b = Math.floor(i / 2) % 2 ? 1.4 : -1.4;
+    return i < 4 ? {x:0,y:a,z:b} : i < 8 ? {x:a,y:b,z:0} : {x:b,y:0,z:a};
+  }
+  if (shape === 3 && i > 9) return {x:0,y:i === 10 ? -2 : 2,z:0};
+  const ring = shape === 3 ? 10 : 6;
+  const upper = i >= 6;
+  const angle = (i % ring) / ring * Math.PI * 2 + (shape === 2 && upper ? .65 : 0);
+  const radius = shape === 4 && i % 2 ? .65 : 1.55;
+  return {x:Math.cos(angle)*radius + (shape === 2 && upper ? .4 : 0), y:shape === 3 ? 0 : upper ? 1 : -1, z:Math.sin(angle)*radius};
 }
+// Supporting planes supply actual closed polygon faces, computed once per target.
+function hull(shape: number): number[][] {
+  const vertices = Array.from({length:count},(_,i)=>target(i,shape));
+  const faces = new Map<string,number[]>();
+  for(let a=0;a<count;a++) for(let b=a+1;b<count;b++) for(let c=b+1;c<count;c++) {
+    const p=vertices[a], u={x:vertices[b].x-p.x,y:vertices[b].y-p.y,z:vertices[b].z-p.z}, v={x:vertices[c].x-p.x,y:vertices[c].y-p.y,z:vertices[c].z-p.z};
+    const n={x:u.y*v.z-u.z*v.y,y:u.z*v.x-u.x*v.z,z:u.x*v.y-u.y*v.x};
+    if(Math.hypot(n.x,n.y,n.z)<.001) continue;
+    const distances=vertices.map(q=>(q.x-p.x)*n.x+(q.y-p.y)*n.y+(q.z-p.z)*n.z);
+    if(distances.some(d=>d>.001)&&distances.some(d=>d<-.001)) continue;
+    const ids=distances.flatMap((d,i)=>Math.abs(d)<.001?[i]:[]);
+    const center=ids.reduce((s,i)=>({x:s.x+vertices[i].x/ids.length,y:s.y+vertices[i].y/ids.length,z:s.z+vertices[i].z/ids.length}),{x:0,y:0,z:0});
+    const axis={x:vertices[ids[0]].x-center.x,y:vertices[ids[0]].y-center.y,z:vertices[ids[0]].z-center.z};
+    const cross={x:n.y*axis.z-n.z*axis.y,y:n.z*axis.x-n.x*axis.z,z:n.x*axis.y-n.y*axis.x};
+    const angle=(i:number)=>{const q=vertices[i];return Math.atan2(((q.x-center.x)*cross.x+(q.y-center.y)*cross.y+(q.z-center.z)*cross.z)/Math.hypot(cross.x,cross.y,cross.z),((q.x-center.x)*axis.x+(q.y-center.y)*axis.y+(q.z-center.z)*axis.z)/Math.hypot(axis.x,axis.y,axis.z));};
+    faces.set(ids.join(','),[...ids].sort((i,j)=>angle(i)-angle(j)));
+  }
+  return [...faces.values()];
+}
+const shapeFaces = shapeNames.map((_,i)=>hull(i));
 function rotate(p: Point, yaw: number, pitch: number): Point {
   const x = p.x * Math.cos(yaw) - p.z * Math.sin(yaw);
   const z = p.x * Math.sin(yaw) + p.z * Math.cos(yaw);
@@ -78,7 +104,7 @@ export function WireframeBackground() {
         if (!a.visible || !b.visible) return;
         context.beginPath();
         context.moveTo(a.x, a.y); context.lineTo(b.x, b.y);
-        context.strokeStyle = `rgba(189,119,123,${alpha})`;
+        context.strokeStyle = `rgba(199,115,112,${alpha})`;
         context.lineWidth = 1; context.stroke();
       };
       for (let i = -9; i <= 9; i++) {
@@ -98,35 +124,42 @@ export function WireframeBackground() {
         line(field[a],field[b],.25);
       }
       for (const p of field) {
-        context.strokeStyle = "rgba(189,119,123,.65)";
+        context.strokeStyle = "rgba(221,139,135,.8)";
         context.strokeRect(p.x-2,p.y-2,4,4);
       }
-      const phase = elapsed / 13;
-      const shape = Math.floor(phase) % 3;
-      const rawBlend = Math.max(0, (phase % 1 - .2) / .8);
-      const blend = rawBlend * rawBlend * (3 - 2 * rawBlend);
       for (let layer = 0; layer < 3; layer++) {
+      const travel = (elapsed / 38 + layer / 3) % 1;
+      const phase = elapsed / 9 + layer * 1.7;
+      const shape = Math.floor(phase) % shapeNames.length;
+      const rawBlend = Math.max(0, Math.min(1,(phase % 1 - .35) / .5));
+      const blend = rawBlend * rawBlend * (3 - 2 * rawBlend);
+      const fade = Math.min(1,travel/.12,(1-travel)/.12);
       const points: Point[] = [];
       const screens: ScreenPoint[] = [];
-      const size = Math.min(width * [ .27, .16, .2 ][layer], height * [ .34, .23, .26 ][layer]);
+      const size = Math.min(width * .25, height * .29) * (.35 + travel * 1.25);
+      const centerX = width * (1.14 - travel * 1.40);
+      const centerY = height * (.02 + travel * 1.14) + Math.sin(layer * 2) * height * .08;
+      let disruption = 0;
       for (let i = 0; i < count; i++) {
-        const a = target(i, shape), b = target(i, (shape + 1) % 3);
+        const a = target(i, shape), b = target(i, (shape + 1) % shapeNames.length);
         const p = rotate({ x: a.x + (b.x - a.x) * blend, y: a.y + (b.y - a.y) * blend, z: a.z + (b.z - a.z) * blend }, yaw * (layer % 2 ? -1 : 1) + .4 + layer * .7, pitch + layer * .15);
         points.push(p);
-        const screen = project(p, width * [ .72, .15, .48 ][layer], height * [ .32, .62, .91 ][layer], size);
+        const screen = project(p, centerX, centerY, size);
         const dx = screen.x - px, dy = screen.y - py;
         const distance = Math.hypot(dx, dy);
         const influence = Math.max(0, 1 - distance / 230) * smooth.strength;
-        screen.x += dx * influence * .12;
-        screen.y += dy * influence * .12;
+        disruption = Math.max(disruption,influence);
+        screen.x += (dx * .38 + Math.sin(i*2.7+elapsed)*30) * influence;
+        screen.y += (dy * .38 + Math.cos(i*1.8+elapsed)*30) * influence;
         screens.push(screen);
       }
-      for (const indices of [[0,2,8,6],[18,20,26,24],[2,20,26,8]]) {
+      const completion = 1 - Math.sin(blend * Math.PI);
+      for (const indices of shapeFaces[blend < .5 ? shape : (shape+1)%shapeNames.length]) {
         const face = indices.map(i => screens[i]);
         if (face.every(p => p.visible)) {
           context.beginPath(); context.moveTo(face[0].x,face[0].y);
           face.slice(1).forEach(p => context.lineTo(p.x,p.y));
-          context.closePath(); context.fillStyle = "rgba(189,119,123,.04)"; context.fill();
+          context.closePath(); context.fillStyle = `rgba(199,115,112,${(.015 + completion*.04)*(1-disruption*.85)*fade})`; context.fill();
         }
       }
       for (let i = 0; i < count; i++) {
@@ -136,20 +169,23 @@ export function WireframeBackground() {
           if (n.j < i) continue;
           const a = screens[i], b = screens[n.j];
           const cursorLight = Math.max(0, 1 - Math.hypot((a.x+b.x)/2-px, (a.y+b.y)/2-py)/260) * smooth.strength;
-          line(a, b, .42 + cursorLight * .3);
+          line(a, b, (.55 + cursorLight * .3)*fade);
         }
         const p = screens[i];
         const near = Math.max(0, 1 - Math.hypot(p.x-px, p.y-py)/220) * smooth.strength;
         const half = near > .3 ? 3 : 1.8;
-        context.strokeStyle = `rgba(189,119,123,${.7 + near * .25})`;
+        context.strokeStyle = `rgba(221,139,135,${(.75 + near * .25)*fade})`;
         context.strokeRect(p.x-half, p.y-half, half*2, half*2);
+        const beacon = .5 + .5*Math.sin(elapsed*.7+i*2+layer);
+        if(beacon>.7) {context.fillStyle=`rgba(239,174,165,${beacon*fade})`;context.fillRect(p.x-1,p.y-1,2,2);}
         if (i % 9 === 0) {
           line({ ...p, x:p.x-7 }, { ...p, x:p.x+7 }, .32);
           line({ ...p, y:p.y-7 }, { ...p, y:p.y+7 }, .32);
         }
       }
       }
-      canvas.dataset.shape = ["cuboid", "octahedral", "prismatic"][shape];
+      canvas.dataset.shape = shapeNames[Math.floor(elapsed/9)%shapeNames.length];
+      canvas.dataset.travel = ((elapsed/38)%1).toFixed(3);
       canvas.dataset.motion = reduced ? "reduced" : "running";
       if (!reduced) frame = requestAnimationFrame(draw);
     }

@@ -2,19 +2,19 @@
 name: Spencer Wilford
 description: Open professional content over a responsive angular spatial field.
 colors:
-  background: "#2a292a"
-  surface: "#333133"
+  background: "#242426"
+  surface: "#303033"
   foreground: "#ede8e8"
   muted: "#b7b3b3"
-  accent: "#bd777b"
-  accent-light: "#d59b9e"
+  accent: "#c77370"
+  accent-light: "#dd8b87"
 typography:
   display:
-    fontFamily: "Manrope, sans-serif"
+    fontFamily: "Chakra Petch, sans-serif"
     fontSize: "clamp(65px,6.25vw,96px)"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 0.9
-    letterSpacing: "-.035em"
+    letterSpacing: "-.025em"
   headline:
     fontFamily: "Manrope, sans-serif"
     fontSize: "clamp(45px,6.25vw,80px)"
@@ -94,7 +94,7 @@ components:
 
 The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site’s identity.
 
-Movement belongs to the spatial field and the name’s first entrance. Three projected angular volumes morph autonomously while an architectural field spans the viewport. Pointer influence blends into this motion; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.
+Movement belongs to the spatial field and the name’s first entrance. Three projected angular volumes travel from the back right toward the front left, growing with depth and morphing through five geometric targets while an architectural field spans the viewport. Pointer influence blends into this motion; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.
 
 **Key Characteristics:**
 - Open typography and asymmetric whitespace.
@@ -121,7 +121,7 @@ The palette combines warm dark neutrals with one muted red accent family. Frontm
 
 ## Typography
 
-Manrope supplies both display and body text, loaded through Next.js with a sans-serif fallback. Heavy, tightly tracked names contrast with medium headings and regular supporting copy; no monospace or editor-style text treatment is implemented.
+Chakra Petch supplies the homepage name at weight (600), with tracking (-.025em). Manrope supplies the remaining headings, navigation, and body text. Both load through Next.js with sans-serif fallbacks. The angular name contrasts with the quieter supporting type; no monospace or editor-style text treatment is implemented.
 
 - **Display:** the two-line name, using the frontmatter display role on desktop. The letters are real text with one accessible full-name label.
 - **Headline:** interior page headings, with a short muted introduction beneath.
@@ -154,7 +154,7 @@ The desktop “For fun” disclosure is the sole recurring raised UI surface. It
 
 ## Shapes
 
-Background geometry is angular: cuboid, octahedral, and prismatic targets with straight connectors and square nodes. The foreground uses plain text and rectangular media spaces. Small rounding is limited to focus outlines, the print button, and the desktop disclosure; it does not establish a rounded-card system.
+Background geometry is angular: icosahedron, cuboctahedron, twisted-prism, bipyramid, and stellated-prism targets with straight connectors and square nodes. Supporting-plane hull computation supplies closed polygon faces; completion shading fades during morphing and cursor disruption. The foreground uses plain text and rectangular media spaces. Small rounding is limited to focus outlines, the print button, and the desktop disclosure; it does not establish a rounded-card system.
 
 ## Components
 
@@ -176,11 +176,11 @@ Project and photo preview rectangles are intentional placeholders for assets tha
 
 ### Animated name
 
-Each letter cycles through slide, turn, and clipped resolve entrances. The entrance lasts (1.1s), with `cubic-bezier(.16,1,.3,1)` easing; letter delays begin at (100ms) and increase by (65ms). A brief accent scan lasts (900ms). Reduced-motion disables these effects.
+Each of the (14) letters has its own entrance: print-up, typed, fizzle, extrude, fold-in, stencil, assemble, print-down, decoded, ignite, depth-in, hinge, scan-across, and converge. Entrances last (1.1s), using `cubic-bezier(.16,1,.3,1)` or per-letter stepped timing. Delays begin at (80ms) and increase by (50ms). A brief accent scan or type cursor lasts (900ms); transient extrusion shadows settle away. Reduced-motion disables these effects.
 
 ### Spatial background
 
-Three volumes each contain (27) points. Their target shapes progress on a (13s) phase with a smooth transition, and rendering is capped near (30fps) with pixel ratio capped at (1.75). Pointer proximity changes line brightness and point displacement; influence decays on exit or window blur. Touch does not activate pointer influence. Reduced-motion draws a settled frame, hidden tabs stop rendering, and a missing canvas context leaves the text and controls usable.
+Three volumes each contain (12) vertices. Each follows a (38s) travel cycle from back right to front left with depth growth and faded recycling; their travel phases are staggered by one third. Five target shapes progress on (9s) stages, staggered by (1.7) stages per volume, with a smoothstep transition. Closed faces gain restrained shading when complete and fade that shading during morphing or cursor disruption. Rendering is capped near (30fps) with pixel ratio capped at (1.75). Pointer proximity changes line brightness and disrupts point positions; influence decays on exit or window blur. Touch does not activate pointer influence. Reduced-motion draws a settled frame, hidden tabs stop rendering, and a missing canvas context leaves the text and controls usable.
 
 ### Keyboard focus
 
@@ -190,7 +190,7 @@ Links and buttons share a Light Dusty Red outline (2px) with offset (6px). The s
 
 ### Do:
 - **Do** keep text and navigation readable and stable above the reactive background.
-- **Do** use Manrope and the existing charcoal/red palette across routes.
+- **Do** use Chakra Petch for the homepage name, Manrope for supporting type, and the existing charcoal/red palette across routes.
 - **Do** preserve keyboard focus, expanded control states, and reduced-motion behavior.
 - **Do** keep unsupplied media visibly identified as placeholders.
 - **Do** place each navigation destination on its own page and keep Home as the introduction.

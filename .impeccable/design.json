@@ -1,37 +1,37 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-12T22:55:28.765Z",
+  "generatedAt": "2026-10-12T23:02:15.293198+00:00",
   "title": "Design System: Spencer Wilford",
   "extensions": {
     "colorMeta": {
       "background": {
         "role": "neutral",
         "displayName": "Warm Charcoal",
-        "canonical": "#2a292a",
+        "canonical": "#242426",
         "tonalRamp": [
-          "oklch(15% 0.0023 325.64)",
-          "oklch(26% 0.0023 325.64)",
-          "oklch(37% 0.0023 325.64)",
-          "oklch(48% 0.0023 325.64)",
-          "oklch(59% 0.0023 325.64)",
-          "oklch(70% 0.0023 325.64)",
-          "oklch(82% 0.0023 325.64)",
-          "oklch(95% 0.0023 325.64)"
+          "oklch(15% 0.0037 286.14)",
+          "oklch(26% 0.0037 286.14)",
+          "oklch(37% 0.0037 286.14)",
+          "oklch(48% 0.0037 286.14)",
+          "oklch(59% 0.0037 286.14)",
+          "oklch(70% 0.0037 286.14)",
+          "oklch(82% 0.0037 286.14)",
+          "oklch(95% 0.0037 286.14)"
         ]
       },
       "surface": {
         "role": "neutral",
         "displayName": "Raised Charcoal",
-        "canonical": "#333133",
+        "canonical": "#303033",
         "tonalRamp": [
-          "oklch(15% 0.0045 325.68)",
-          "oklch(26% 0.0045 325.68)",
-          "oklch(37% 0.0045 325.68)",
-          "oklch(48% 0.0045 325.68)",
-          "oklch(59% 0.0045 325.68)",
-          "oklch(70% 0.0045 325.68)",
-          "oklch(82% 0.0045 325.68)",
-          "oklch(95% 0.0045 325.68)"
+          "oklch(15% 0.0053 286.09)",
+          "oklch(26% 0.0053 286.09)",
+          "oklch(37% 0.0053 286.09)",
+          "oklch(48% 0.0053 286.09)",
+          "oklch(59% 0.0053 286.09)",
+          "oklch(70% 0.0053 286.09)",
+          "oklch(82% 0.0053 286.09)",
+          "oklch(95% 0.0053 286.09)"
         ]
       },
       "foreground": {
@@ -67,38 +67,38 @@
       "accent": {
         "role": "primary",
         "displayName": "Dusty Red",
-        "canonical": "#bd777b",
+        "canonical": "#c77370",
         "tonalRamp": [
-          "oklch(15% 0.0881 16.10)",
-          "oklch(26% 0.0881 16.10)",
-          "oklch(37% 0.0881 16.10)",
-          "oklch(48% 0.0881 16.10)",
-          "oklch(59% 0.0881 16.10)",
-          "oklch(70% 0.0881 16.10)",
-          "oklch(82% 0.0881 16.10)",
-          "oklch(95% 0.0881 16.10)"
+          "oklch(15% 0.1065 22.60)",
+          "oklch(26% 0.1065 22.60)",
+          "oklch(37% 0.1065 22.60)",
+          "oklch(48% 0.1065 22.60)",
+          "oklch(59% 0.1065 22.60)",
+          "oklch(70% 0.1065 22.60)",
+          "oklch(82% 0.1065 22.60)",
+          "oklch(95% 0.1065 22.60)"
         ]
       },
       "accent-light": {
         "role": "primary",
         "displayName": "Light Dusty Red",
-        "canonical": "#d59b9e",
+        "canonical": "#dd8b87",
         "tonalRamp": [
-          "oklch(15% 0.0697 15.44)",
-          "oklch(26% 0.0697 15.44)",
-          "oklch(37% 0.0697 15.44)",
-          "oklch(48% 0.0697 15.44)",
-          "oklch(59% 0.0697 15.44)",
-          "oklch(70% 0.0697 15.44)",
-          "oklch(82% 0.0697 15.44)",
-          "oklch(95% 0.0697 15.44)"
+          "oklch(15% 0.1010 22.90)",
+          "oklch(26% 0.1010 22.90)",
+          "oklch(37% 0.1010 22.90)",
+          "oklch(48% 0.1010 22.90)",
+          "oklch(59% 0.1010 22.90)",
+          "oklch(70% 0.1010 22.90)",
+          "oklch(82% 0.1010 22.90)",
+          "oklch(95% 0.1010 22.90)"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Animated name",
-        "purpose": "Two-line homepage name; desktop defaults with responsive CSS overrides."
+        "purpose": "Chakra Petch 600 homepage name with 14 individual entrances; desktop defaults with responsive overrides."
       },
       "headline": {
         "displayName": "Interior page heading",
@@ -140,23 +140,23 @@
       },
       {
         "name": "name-entrance",
-        "value": "1.1s cubic-bezier(.16,1,.3,1)",
-        "purpose": "Alternating slide, turn, and resolve letter entrances."
+        "value": "1.1s cubic-bezier(.16,1,.3,1), with per-letter steps overrides",
+        "purpose": "14 distinct printing, typing, fizzle, extrusion, fold, stencil, assembly, decode, ignition, depth, hinge, scan, and convergence entrances."
       },
       {
         "name": "letter-stagger",
-        "value": "100ms + index * 65ms",
+        "value": "80ms + index * 50ms",
         "purpose": "Name letter entrance delay."
       },
       {
         "name": "letter-scan",
         "value": "900ms ease-out",
-        "purpose": "Brief accent scan beneath each entering letter."
+        "purpose": "Brief accent scan or type cursor accompanying individual entrances."
       },
       {
         "name": "shape-phase",
-        "value": "13s",
-        "purpose": "Autonomous cuboid/octahedral/prismatic progression with smoothstep blend."
+        "value": "9s; layer offset 1.7 stages",
+        "purpose": "Five geometric targets with staggered smoothstep morphing; closed-face completion shade fades during transition and cursor disruption."
       },
       {
         "name": "pointer-smoothing",
@@ -167,6 +167,11 @@
         "name": "motion-accessibility",
         "value": "prefers-reduced-motion: reduce",
         "purpose": "Disable CSS animation/transitions and settle the canvas; hidden tabs stop rendering."
+      },
+      {
+        "name": "volume-travel",
+        "value": "38s; layer offset 1/3 cycle",
+        "purpose": "Back-right to front-left travel with depth growth and faded recycling."
       }
     ],
     "breakpoints": [
@@ -191,15 +196,15 @@
       "refersTo": "text-link",
       "description": "Unboxed navigation action; anchor semantics retained.",
       "html": "<a class=\"ds-link\" href=\"#experience\">View experience</a>",
-      "css": ".ds-link { display:inline-flex;align-items:center;gap:18px;color:var(--accent-light,#d59b9e);font:400 16px/1.6 Manrope,sans-serif;text-decoration:none;transition:color .2s; } .ds-link:hover { color:var(--accent-light,#d59b9e); } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#d59b9e);outline-offset:6px;border-radius:2px; }"
+      "css": ".ds-link { display:inline-flex;align-items:center;gap:18px;color:var(--accent-light,#dd8b87);font:400 16px/1.6 Manrope,sans-serif;text-decoration:none;transition:color .2s; } .ds-link:hover { color:var(--accent-light,#dd8b87); } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#dd8b87);outline-offset:6px;border-radius:2px; }"
     },
     {
       "name": "Text navigation",
       "kind": "nav",
       "refersTo": "navigation",
       "description": "Compact desktop text links with current-route color. Preview omits functional icon links.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"#home\" aria-current=\"page\">Home</a><a href=\"#experience\">Experience</a><a href=\"#projects\">Projects</a><a href=\"#resume\">Résumé</a><a href=\"#contact\">Contact</a></nav>",
-      "css": ".ds-nav { display:flex;gap:clamp(18px,2.2vw,34px);align-items:center;font:400 15px/1.6 Manrope,sans-serif; } .ds-nav a { color:var(--foreground,#ede8e8);text-decoration:none;white-space:nowrap;transition:color 160ms; } .ds-nav a:hover,.ds-nav a[aria-current=page] { color:var(--accent-light,#d59b9e); } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#d59b9e);outline-offset:6px;border-radius:2px; }"
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"#home\" aria-current=\"page\">Home</a><a href=\"#experience\">Experience</a><a href=\"#projects\">Projects</a><a href=\"#resume\">R\u00e9sum\u00e9</a><a href=\"#contact\">Contact</a></nav>",
+      "css": ".ds-nav { display:flex;gap:clamp(18px,2.2vw,34px);align-items:center;font:400 15px/1.6 Manrope,sans-serif; } .ds-nav a { color:var(--foreground,#ede8e8);text-decoration:none;white-space:nowrap;transition:color 160ms; } .ds-nav a:hover,.ds-nav a[aria-current=page] { color:var(--accent-light,#dd8b87); } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#dd8b87);outline-offset:6px;border-radius:2px; }"
     },
     {
       "name": "For fun disclosure",
@@ -207,15 +212,15 @@
       "refersTo": "fun-disclosure",
       "description": "Standalone native-details preview of desktop disclosure styling; application uses a controlled React button with Escape and outside-click dismissal.",
       "html": "<details class=\"ds-disclosure\"><summary>For fun</summary><ul><li><a href=\"#music\">Music &amp; guitar</a></li><li><a href=\"#photos\">Photos</a></li><li><a href=\"#journal\">Journal</a></li></ul></details>",
-      "css": ".ds-disclosure { position:relative;font:400 15px/1.6 Manrope,sans-serif;color:var(--foreground,#ede8e8); } .ds-disclosure summary { cursor:pointer;width:fit-content;transition:color 160ms; } .ds-disclosure summary:hover { color:var(--accent-light,#d59b9e); } .ds-disclosure ul { list-style:none;width:182px;padding:10px 0;background:var(--surface,#333133);border-radius:6px;box-shadow:0 16px 32px rgba(16,17,19,.3); } .ds-disclosure a { display:block;padding:10px 18px;color:inherit;text-decoration:none; } .ds-disclosure a:hover { color:var(--accent-light,#d59b9e);background:#bd777b12; } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#d59b9e);outline-offset:6px;border-radius:2px; }"
+      "css": ".ds-disclosure { position:relative;font:400 15px/1.6 Manrope,sans-serif;color:var(--foreground,#ede8e8); } .ds-disclosure summary { cursor:pointer;width:fit-content;transition:color 160ms; } .ds-disclosure summary:hover { color:var(--accent-light,#dd8b87); } .ds-disclosure ul { list-style:none;width:182px;padding:10px 0;background:var(--surface,#303033);border-radius:6px;box-shadow:0 16px 32px rgba(16,17,19,.3); } .ds-disclosure a { display:block;padding:10px 18px;color:inherit;text-decoration:none; } .ds-disclosure a:hover { color:var(--accent-light,#dd8b87);background:#bd777b12; } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#dd8b87);outline-offset:6px;border-radius:2px; }"
     },
     {
       "name": "Print button",
       "kind": "button",
       "refersTo": "print-button",
-      "description": "Résumé print/save control visual specimen; preview has no print handler.",
+      "description": "R\u00e9sum\u00e9 print/save control visual specimen; preview has no print handler.",
       "html": "<button class=\"ds-print\" type=\"button\">Print / save PDF</button>",
-      "css": ".ds-print { border:0;border-radius:4px;background:var(--surface,#333133);padding:10px 18px;color:var(--foreground,#ede8e8);font:400 14px/1.6 Manrope,sans-serif;cursor:pointer; } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#d59b9e);outline-offset:6px;border-radius:2px; }"
+      "css": ".ds-print { border:0;border-radius:4px;background:var(--surface,#303033);padding:10px 18px;color:var(--foreground,#ede8e8);font:400 14px/1.6 Manrope,sans-serif;cursor:pointer; } .ds-link:focus-visible,.ds-nav a:focus-visible,.ds-disclosure summary:focus-visible,.ds-disclosure a:focus-visible,.ds-print:focus-visible { outline:2px solid var(--accent-light,#dd8b87);outline-offset:6px;border-radius:2px; }"
     },
     {
       "name": "Photo placeholder",
@@ -223,19 +228,19 @@
       "refersTo": "photo-placeholder",
       "description": "Intentional blank media rectangle for an unsupplied image; copy remains outside it.",
       "html": "<div class=\"ds-preview\">Photo to come</div>",
-      "css": ".ds-preview { aspect-ratio:1.4;background:var(--surface,#333133);display:flex;align-items:flex-end;padding:20px;font:400 14px/1.6 Manrope,sans-serif;color:var(--muted,#b7b3b3); }"
+      "css": ".ds-preview { aspect-ratio:1.4;background:var(--surface,#303033);display:flex;align-items:flex-end;padding:20px;font:400 14px/1.6 Manrope,sans-serif;color:var(--muted,#b7b3b3); }"
     },
     {
       "name": "Name typography",
       "kind": "custom",
-      "description": "Static settled name specimen. The production component animates individual letters and provides a single accessible full-name label.",
+      "description": "Static settled Chakra Petch name specimen. Production gives all 14 letters unique entrances and provides one accessible full-name label.",
       "html": "<h1 class=\"ds-name\">Spencer<br>Wilford</h1>",
-      "css": ".ds-name { margin:0;width:fit-content;font:700 clamp(65px,6.25vw,96px)/.90 Manrope,sans-serif;letter-spacing:-.035em;color:var(--foreground,#ede8e8); } @media(max-width:850px) { .ds-name { font-size:clamp(61px,11vw,86px);line-height:.98; } } @media(max-width:580px) { .ds-name { font-size:clamp(57px,15.5vw,82px);line-height:1.03; } }"
+      "css": ".ds-name { margin:0;width:fit-content;font:600 clamp(65px,6.25vw,96px)/.90 \"Chakra Petch\",sans-serif;letter-spacing:-.025em;color:var(--foreground,#ede8e8); } @media(max-width:850px) { .ds-name { font-size:clamp(61px,11vw,86px);line-height:.98; } } @media(max-width:580px) { .ds-name { font-size:clamp(57px,15.5vw,82px);line-height:1.03; } }"
     }
   ],
   "narrative": {
     "northStar": "Open content over a tactical graph",
-    "overview": "The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site’s identity.\n\nMovement belongs to the spatial field and the name’s first entrance. Three projected angular volumes morph autonomously while an architectural field spans the viewport. Pointer influence blends into this motion; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.",
+    "overview": "The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site\u2019s identity.\n\nMovement belongs to the spatial field and the name\u2019s first entrance. Three projected angular volumes travel from the back right toward the front left, growing with depth and morphing through five geometric targets while an architectural field spans the viewport. Pointer influence blends into this motion; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.",
     "keyCharacteristics": [
       "Open typography and asymmetric whitespace.",
       "Soft charcoal, dusty red, and warm gray.",
@@ -262,7 +267,7 @@
     ],
     "dos": [
       "Do keep text and navigation readable and stable above the reactive background.",
-      "Do use Manrope and the existing charcoal/red palette across routes.",
+      "Do use Chakra Petch for the homepage name, Manrope for supporting type, and the existing charcoal/red palette across routes.",
       "Do preserve keyboard focus, expanded control states, and reduced-motion behavior.",
       "Do keep unsupplied media visibly identified as placeholders.",
       "Do place each navigation destination on its own page and keep Home as the introduction."

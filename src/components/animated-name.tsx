@@ -6,8 +6,8 @@ export function AnimatedName() {
     {["Spencer", "Wilford"].map(word => <span className="name-word" aria-hidden="true" key={word}>
       {[...word].map((letter, index) => {
         const number = sequence++;
-        return <span className={`name-letter entrance-${number % 3}`} key={index}
-          style={{ "--letter-delay": `${100 + number * 65}ms` } as CSSProperties}>{letter}</span>;
+        return <span className={`name-letter entrance-${number}`} data-letter={letter} key={index}
+          style={{ "--letter-delay": `${80 + number * 50}ms` } as CSSProperties}>{letter}</span>;
       })}
     </span>)}
   </h1>;
