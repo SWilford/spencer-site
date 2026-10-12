@@ -1,0 +1,31 @@
+{
+  "title": "Spencer’s portfolio · open layout, reactive wireframes",
+  "question": "Only the background carries the tactical grid. Foreground text has an open, flowing layout. Planned wireframe behavior: autonomous shape changes at rest, layered cursor response, then a smooth return to idle motion. The image is a static composition draft.",
+  "options": [
+    {
+      "id": "open-layout-v6",
+      "label": "Open typography over living wireframes",
+      "thesis": "A free-flowing personal portfolio over a precise technical background.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "angular wireframe background",
+        "unframed typography",
+        "asymmetric negative space"
+      ],
+      "viewport": "Name and experience breathe independently of the background grid; projects and creative links follow.",
+      "risk": "Moving graph detail must stay subdued beneath reading content.",
+      "comp": ".impeccable/mocks/open-layout-v6.png"
+    }
+  ],
+  "steer": true,
+  "reroll": true,
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  }
+}
