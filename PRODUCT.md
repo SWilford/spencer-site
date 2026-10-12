@@ -34,7 +34,7 @@ Development and testing happen locally before publishing. GitHub repository: htt
 
 ## Evidence on Hand
 
-The scope and priorities are confirmed in chat. No résumé, real project descriptions, photos, portraits, guitar recordings, or playback exports have been supplied. Do not invent employers, degrees, job titles, accomplishments, testimonials, or real listening statistics.
+The user supplied a Word résumé, LinkedIn profile, and public email. Experience, education, and project summaries are based on that résumé. The original Word file, phone number, and clearance detail stay out of the repository. Photos, portraits, guitar recordings, and playback exports have not been supplied; do not invent them.
 
 ## Brand Commitments
 
@@ -62,4 +62,4 @@ The background is the only gridded/tactical layer. Foreground text layout should
 
 ## Open Decisions
 
-Visual concept, content-editing workflow, real content/assets, public contact channels, domain, monthly budget, stream threshold, listening timezone, and public statistics selection are undecided. Do not treat the operating system's timezone as an approved statistics preference.
+The open-layout-v6 visual concept is approved for a first code draft. Latest user correction: match the reference first, Home is separate from all navigation pages, and remove decorative content icons. Keep the requested GitHub/LinkedIn/email header icons. Content-editing workflow, remaining assets, domain, monthly budget, stream threshold, listening timezone, and public statistics selection remain undecided. Do not treat the operating system's timezone as an approved statistics preference.

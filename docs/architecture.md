@@ -2,7 +2,7 @@
 
 ## Initial decisions
 
-Start with one Next.js application. React Server Components render content; small client components own interactive navigation, motion, and optional 3D. TypeScript and Tailwind provide a maintainable foundation. Avoid a monorepo and unnecessary infrastructure until the second server-backed project is understood.
+Start with one Next.js application. React Server Components render content; small client components own interactive navigation and projected 3D canvas motion. TypeScript and native CSS provide the current foundation. Avoid a monorepo and unnecessary infrastructure until the second server-backed project is understood.
 
 Use repository-backed Markdown/MDX and typed metadata for the first content workflow. This is a recommendation, not yet a confirmed authoring preference. An authenticated editor can follow if browser-based publishing is desired. Only trusted owner-authored MDX may execute; never compile uploaded visitor MDX.
 
@@ -12,16 +12,18 @@ The core website needs no database. Later, use Supabase's established Postgres d
 
 | Route | Purpose | Access |
 | --- | --- | --- |
-| / | Professional introduction, experience and résumé first, selected work, creative discovery | Public |
-| /about | About and experience; résumé download when supplied | Public |
-| /projects and /projects/[slug] | Real project index and case studies | Public |
-| /journal and /journal/[slug] | Blog, experiments, works in progress | Public published content only |
+| / | Standalone professional introduction and interactive background | Public |
+| /experience | Experience and education | Public |
+| /resume | Printable web résumé summary | Public |
+| /contact | Email and social links | Public |
+| /projects | Project index; individual case studies planned | Public |
+| /journal | Writing placeholder; individual posts planned | Public published content only |
 | /photos | Photography and other visual material | Public selected media |
 | /music | Guitar/music content, later selected listening summaries | Public selected content |
 | /admin | Owner editing, uploads, catalog corrections, private dashboard | Owner only; not built yet |
 | /api/internal/music/collect | Scheduled Spotify ingestion | Server secret; not built yet |
 
-Do not add empty navigation destinations or fabricated content just to fill this map. Add routes as real content becomes available. Contact can start as a verified email/social link rather than a spam-prone form.
+The user requested separate tab pages and permits filler for the visual draft. Creative routes explicitly identify their unfinished state; Home does not stack the other routes' content. Contact uses supplied email/social links.
 
 ## Phases and acceptance gates
 

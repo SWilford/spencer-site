@@ -1,0 +1,3 @@
+import { profile } from "@/content/profile";
+export const metadata = { title: "Contact · Spencer Wilford" };
+export default function ContactPage() { return <main id="main" className="page-content interior-page contact-page"><div className="page-heading"><h1>Let’s talk.</h1><p>For a project, an idea, or just to say hello.</p></div><a className="contact-email" href={`mailto:${profile.email}`}>{profile.email}</a><div className="contact-links"><a href={profile.github} target="_blank" rel="noreferrer">GitHub</a><a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn</a></div></main>; }
