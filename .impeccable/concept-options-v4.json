@@ -1,0 +1,31 @@
+{
+  "title": "Spencer’s portfolio · interactive background",
+  "question": "Revised composition: the red geometry is the page background behind the content, with mouse-responsive deformation planned. Experience and résumé remain before projects. Review the new image and choose it or describe a refinement.",
+  "options": [
+    {
+      "id": "background-v4",
+      "label": "Living geometric background",
+      "thesis": "The portfolio sits over a full-width responsive geometric field.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "subdued parametric red field",
+        "soft charcoal",
+        "clear foreground type"
+      ],
+      "viewport": "Geometry extends across the full opening behind the name and continues faintly behind lower content; experience comes first.",
+      "risk": "Contrast and animation must stay restrained beneath reading content.",
+      "comp": ".impeccable/mocks/background-v4.png"
+    }
+  ],
+  "steer": true,
+  "reroll": true,
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  }
+}

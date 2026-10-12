@@ -46,6 +46,8 @@ Additional user steering from the concept chooser: likes the interactive-field c
 
 Latest confirmed refinement: precise 3D geometry and responsive motion lead the technical feel. Animated typography is desired. Experience and résumé should appear before projects; creative content follows professional content. Code/editor-style decoration is not the selected direction.
 
+The geometric graphic must form the background behind the page content, not sit in a separate side panel. It should remain responsive to mouse movement. Keep foreground text/navigation readable and stable while the background responds.
+
 ## Product Principles
 
 - Real work and truthful content establish credibility.
