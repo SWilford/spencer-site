@@ -1,0 +1,66 @@
+{
+  "title": "Spencer’s portfolio · geometry and motion",
+  "question": "Confirmed direction: precise 3D geometry, animated typography, soft charcoal/red, and experience before projects. These three images compare compositions within that direction. Pick one or describe what to combine.",
+  "options": [
+    {
+      "id": "field-a-v3",
+      "label": "A · Balanced surface",
+      "thesis": "A clear professional introduction beside a responsive parametric surface.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "matte contour surface",
+        "calm typography"
+      ],
+      "viewport": "Introduction left, surface right; experience and résumé immediately beneath, projects later.",
+      "risk": "The surface needs careful scale to keep experience prominent.",
+      "comp": ".impeccable/mocks/field-a-v3.png"
+    },
+    {
+      "id": "field-b-v3",
+      "label": "B · Panoramic field",
+      "thesis": "A broad geometric landscape adds depth above an experience-led layout.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "panoramic contour geometry",
+        "quiet text regions"
+      ],
+      "viewport": "Short broad spatial hero, prominent wide experience section, then projects.",
+      "risk": "The immersive background needs a clear quiet region behind text.",
+      "comp": ".impeccable/mocks/field-b-v3.png"
+    },
+    {
+      "id": "field-c-v3",
+      "label": "C · Spatial viewport",
+      "thesis": "An engineered 3D loop gives the introduction a defined focal point.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "ruled geometric surfaces",
+        "contained spatial viewport"
+      ],
+      "viewport": "Introduction beside geometric sculpture; experience first, project previews below.",
+      "risk": "A contained object feels less immersive than a full background.",
+      "comp": ".impeccable/mocks/field-c-v3.png"
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  }
+}

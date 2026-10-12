@@ -44,6 +44,8 @@ Confirmed visual constraints: soft dark gray and soft muted red, avoiding stark 
 
 Additional user steering from the concept chooser: likes the interactive-field concept C, wants it more technical while still visually cool; requested a bolder exploration. The earlier re-roll was an exploration request, not approval to implement a design.
 
+Latest confirmed refinement: precise 3D geometry and responsive motion lead the technical feel. Animated typography is desired. Experience and résumé should appear before projects; creative content follows professional content. Code/editor-style decoration is not the selected direction.
+
 ## Product Principles
 
 - Real work and truthful content establish credibility.

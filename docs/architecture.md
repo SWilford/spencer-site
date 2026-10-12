@@ -12,7 +12,7 @@ The core website needs no database. Later, use Supabase's established Postgres d
 
 | Route | Purpose | Access |
 | --- | --- | --- |
-| / | Professional introduction, selected work, experience preview, creative discovery | Public |
+| / | Professional introduction, experience and résumé first, selected work, creative discovery | Public |
 | /about | About and experience; résumé download when supplied | Public |
 | /projects and /projects/[slug] | Real project index and case studies | Public |
 | /journal and /journal/[slug] | Blog, experiments, works in progress | Public published content only |
