@@ -1,0 +1,31 @@
+{
+  "title": "Spencer’s portfolio · tactical graph background",
+  "question": "Refined direction: angular graph geometry, rigid grids, and a restrained tactical/future feel. The full-page background remains mouse-responsive in the planned build; soft charcoal/red and experience-first content stay in place.",
+  "options": [
+    {
+      "id": "tactical-v5",
+      "label": "Tactical plotting field",
+      "thesis": "A professional portfolio over an angular spatial graph.",
+      "palette": [
+        "#252629",
+        "#303135",
+        "#bd777b",
+        "#e7e4e2"
+      ],
+      "materials": [
+        "rectilinear plotting grid",
+        "muted-red wireframes",
+        "square controls"
+      ],
+      "viewport": "Graph geometry spans behind the name and content; experience and résumé come before projects.",
+      "risk": "Grid detail must remain faint enough for comfortable reading.",
+      "comp": ".impeccable/mocks/tactical-v5.png"
+    }
+  ],
+  "steer": true,
+  "reroll": true,
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  }
+}

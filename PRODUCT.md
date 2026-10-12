@@ -48,6 +48,8 @@ Latest confirmed refinement: precise 3D geometry and responsive motion lead the 
 
 The geometric graphic must form the background behind the page content, not sit in a separate side panel. It should remain responsive to mouse movement. Keep foreground text/navigation readable and stable while the background responds.
 
+Latest visual correction: less flowing; more graph-like, militaristic, and futuristic. Use rigid/angular graph geometry and restrained tactical framing, replacing waves/ribbons. Keep the earlier soft charcoal/red palette, background placement, mouse response, animated typography, and experience-first order.
+
 ## Product Principles
 
 - Real work and truthful content establish credibility.
