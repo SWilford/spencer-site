@@ -94,7 +94,7 @@ components:
 
 The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site’s identity.
 
-Movement belongs to the spatial field and the name’s first entrance. Three projected angular volumes travel from the back right toward the front left, growing with depth and morphing through five geometric targets while an architectural field spans the viewport. Pointer influence blends into this motion; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.
+Movement belongs to the spatial field and the name’s first entrance. A shared world-space projection carries a five-plane lattice and three angular clusters from back left toward front right, advancing rightward and nearer the camera. Shape nodes begin at snapped lattice intersections, assemble into rotating forms, grow, morph, split, and dissolve back into the lattice with anchor tethers. Bright beacons pulse at intersections. Pointer influence bends both grid and forms while fading disrupted faces; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.
 
 **Key Characteristics:**
 - Open typography and asymmetric whitespace.
@@ -146,7 +146,7 @@ At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At
 
 ## Elevation & Depth
 
-Foreground content is flat. Depth comes from the fixed canvas beneath semantic content: perspective projection, angular morphing volumes, faint filled faces, square nodes, and overlapping architectural lines. The canvas is noninteractive in the document hit-test layer and hidden from assistive technology; a subtle reading scrim sits above it.
+Foreground content is flat. Depth comes from the fixed canvas beneath semantic content: one shared perspective projection for grid and forms, a five-plane advancing lattice, angular cluster lifecycles, faint filled faces, square nodes, and bright intersection beacons. The canvas is noninteractive in the document hit-test layer and hidden from assistive technology; a subtle reading scrim sits above it.
 
 The desktop “For fun” disclosure is the sole recurring raised UI surface. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. There are no card shadows.
 
@@ -180,7 +180,9 @@ Each of the (14) letters has its own entrance: print-up, typed, fizzle, extrude,
 
 ### Spatial background
 
-Three volumes each contain (12) vertices. Each follows a (38s) travel cycle from back right to front left with depth growth and faded recycling; their travel phases are staggered by one third. Five target shapes progress on (9s) stages, staggered by (1.7) stages per volume, with a smoothstep transition. Closed faces gain restrained shading when complete and fade that shading during morphing or cursor disruption. Rendering is capped near (30fps) with pixel ratio capped at (1.75). Pointer proximity changes line brightness and disrupts point positions; influence decays on exit or window blur. Touch does not activate pointer influence. Reduced-motion draws a settled frame, hidden tabs stop rendering, and a missing canvas context leaves the text and controls usable.
+Three clusters each contain (12) vertices and share the lattice’s world-space perspective projection. A five-plane lattice advances rightward and toward the camera; bright intersection beacons pulse across its depth. Clusters travel from back left to front right over (42s), with travel phases staggered by one third and faded recycling. Their (14s) lifecycles are offset by (1.7) stages: nodes rest at actual snapped lattice anchors, assemble and rotate, grow and morph through five targets, split, then dissolve back into the lattice. Faint tethers connect displaced vertices to their anchors. Closed-face shading strengthens with assembly and completion, then fades during splitting, morphing, and pointer disruption.
+
+Rendering is capped near (30fps) with pixel ratio capped at (1.75). Pointer proximity bends the shared lattice projection and further disrupts form vertices, changing edge brightness and fading faces; influence decays on exit or window blur. Touch does not activate pointer influence. Reduced-motion draws a settled frame, hidden tabs stop rendering, and a missing canvas context leaves the text and controls usable.
 
 ### Keyboard focus
 

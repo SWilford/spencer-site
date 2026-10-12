@@ -96,10 +96,15 @@ export function WireframeBackground() {
       smooth.strength += (pointer.strength - smooth.strength) * ease;
       context.clearRect(0, 0, width, height);
       const px = smooth.x * width, py = smooth.y * height;
-      const yaw = elapsed * .027 + (smooth.x - .5) * .17 * smooth.strength;
-      const pitch = -.15 + (smooth.y - .5) * .1 * smooth.strength;
-      const gridSize = Math.max(width / 9, 100);
-      const gridProject = (p: Point) => project(rotate(p, yaw * .3 + .3, -.24 + pitch * .15), width * .48, height * .65, gridSize);
+      const worldSize = Math.min(width * .16, height * .21);
+      const worldProject = (p: Point) => {
+        const screen = project(p, width * .30, height * .28, worldSize);
+        const dx = screen.x-px, dy = screen.y-py;
+        const influence = Math.max(0,1-Math.hypot(dx,dy)/210)*smooth.strength;
+        screen.x += dx*influence*.30;
+        screen.y += dy*influence*.30;
+        return screen;
+      };
       const line = (a: ScreenPoint, b: ScreenPoint, alpha: number) => {
         if (!a.visible || !b.visible) return;
         context.beginPath();
@@ -107,59 +112,73 @@ export function WireframeBackground() {
         context.strokeStyle = `rgba(199,115,112,${alpha})`;
         context.lineWidth = 1; context.stroke();
       };
-      for (let i = -9; i <= 9; i++) {
-        line(gridProject({x:i,y:2.8,z:-4}), gridProject({x:i,y:2.8,z:7}), .22);
-        line(gridProject({x:-9,y:2.8,z:i}), gridProject({x:9,y:2.8,z:i}), .22);
-        line(gridProject({x:i,y:-4,z:3}), gridProject({x:i,y:5,z:3}), .14);
-        line(gridProject({x:-9,y:i*.55,z:3}), gridProject({x:9,y:i*.55,z:3}), .14);
+      // The entire lattice advances rightward and toward the camera in world space.
+      const driftX = (elapsed*.14)%1, driftZ = (elapsed*.11)%1;
+      for(let plane=0;plane<5;plane++) for(let x=-6;x<=6;x++) for(let z=-1;z<=7;z++) {
+        const point = {x:(x+driftX)*1.25,y:plane*1.8-1.2,z:(z-driftZ)*1.6};
+        const p = worldProject(point);
+        const depthFade = Math.max(.15,Math.min(1,p.scale));
+        line(p,worldProject({...point,x:point.x+1.25}),.18*depthFade);
+        line(p,worldProject({...point,z:point.z+1.6}),.18*depthFade);
+        if(plane===0 && x%3===0 && z%3===0) line(p,worldProject({...point,y:6}),.13*depthFade);
+        if(!p.visible) continue;
+        const light = Math.pow(.5+.5*Math.sin(x*7.13+z*4.7+plane+elapsed*.8),12);
+        context.fillStyle = `rgba(239,174,165,${(.12+light*.8)*depthFade})`;
+        const radius = (1+light)*Math.min(1.5,p.scale);
+        context.fillRect(p.x-radius,p.y-radius,radius*2,radius*2);
+        if(light>.75) {
+          context.strokeStyle=`rgba(221,139,135,${light*.6*depthFade})`;
+          context.strokeRect(p.x-4,p.y-4,8,8);
+        }
       }
-      // A sparse architectural field spans the viewport independently of the volumes.
-      const anchors = [[-.08,.08],[.25,.04],[.62,-.04],[1.08,.12],[-.08,.38],[.35,.32],[.76,.42],[1.08,.62],[.08,.72],[.43,.83],[.83,.94],[1.08,1.08]];
-      const field = anchors.map(([x,y],i): ScreenPoint => ({
-        x: x * width + Math.sin(elapsed * .035 + i) * 9 + (smooth.x-.5) * smooth.strength * 14,
-        y: y * height + Math.cos(elapsed * .03 + i) * 7 + (smooth.y-.5) * smooth.strength * 10,
-        z: 0, scale: 1, visible: true,
-      }));
-      for (const [a,b] of [[0,3],[0,9],[1,8],[1,10],[2,4],[2,9],[3,8],[4,7],[4,10],[5,11],[6,8],[7,9],[8,11]]) {
-        line(field[a],field[b],.25);
-      }
-      for (const p of field) {
-        context.strokeStyle = "rgba(221,139,135,.8)";
-        context.strokeRect(p.x-2,p.y-2,4,4);
-      }
+      const smoothstep = (v:number) => {const t=Math.max(0,Math.min(1,v));return t*t*(3-2*t);};
       for (let layer = 0; layer < 3; layer++) {
-      const travel = (elapsed / 38 + layer / 3) % 1;
-      const phase = elapsed / 9 + layer * 1.7;
+      const travel = (elapsed / 42 + layer / 3) % 1;
+      const phase = elapsed / 14 + layer * 1.7;
       const shape = Math.floor(phase) % shapeNames.length;
-      const rawBlend = Math.max(0, Math.min(1,(phase % 1 - .35) / .5));
-      const blend = rawBlend * rawBlend * (3 - 2 * rawBlend);
+      const stage = phase%1;
+      const assembly = smoothstep(stage/.18)*(1-smoothstep((stage-.76)/.18));
+      const split = smoothstep((stage-.53)/.18)*(1-smoothstep((stage-.85)/.15));
+      const blend = smoothstep((stage-.3)/.22);
       const fade = Math.min(1,travel/.12,(1-travel)/.12);
       const points: Point[] = [];
       const screens: ScreenPoint[] = [];
-      const size = Math.min(width * .25, height * .29) * (.35 + travel * 1.25);
-      const centerX = width * (1.14 - travel * 1.40);
-      const centerY = height * (.02 + travel * 1.14) + Math.sin(layer * 2) * height * .08;
+      // All nodes and forms use the same projection and back-left → front-right flow.
+      const center = {x:-2.8+travel*8,y:.6+travel*1.3+layer*1.8,z:8-travel*10};
       let disruption = 0;
       for (let i = 0; i < count; i++) {
         const a = target(i, shape), b = target(i, (shape + 1) % shapeNames.length);
-        const p = rotate({ x: a.x + (b.x - a.x) * blend, y: a.y + (b.y - a.y) * blend, z: a.z + (b.z - a.z) * blend }, yaw * (layer % 2 ? -1 : 1) + .4 + layer * .7, pitch + layer * .15);
+        const formed = rotate({ x:a.x+(b.x-a.x)*blend,y:a.y+(b.y-a.y)*blend,z:a.z+(b.z-a.z)*blend },elapsed*.16+layer,-.25+elapsed*.055);
+        const rest = {x:(i%3-1)*1.25,y:Math.floor(i/3)%2 ? 1.2 : -1.2,z:Math.floor(i/6)*1.6-.8};
+        const anchor = {
+          x:(Math.round((center.x+rest.x)/1.25-driftX)+driftX)*1.25,
+          y:Math.round((center.y+rest.y+1.2)/1.8)*1.8-1.2,
+          z:(Math.round((center.z+rest.z)/1.6+driftZ)-driftZ)*1.6,
+        };
+        const growth = .72+.18*Math.sin(stage*Math.PI);
+        const p = {
+          x:anchor.x-center.x+(formed.x*growth-(anchor.x-center.x))*assembly+(i<6 ? -1 : 1)*split*.9,
+          y:anchor.y-center.y+(formed.y*growth-(anchor.y-center.y))*assembly,
+          z:anchor.z-center.z+(formed.z*growth-(anchor.z-center.z))*assembly+(i%2 ? -1 : 1)*split*.35,
+        };
         points.push(p);
-        const screen = project(p, centerX, centerY, size);
+        const screen = worldProject({x:center.x+p.x,y:center.y+p.y,z:center.z+p.z});
         const dx = screen.x - px, dy = screen.y - py;
         const distance = Math.hypot(dx, dy);
         const influence = Math.max(0, 1 - distance / 230) * smooth.strength;
         disruption = Math.max(disruption,influence);
         screen.x += (dx * .38 + Math.sin(i*2.7+elapsed)*30) * influence;
         screen.y += (dy * .38 + Math.cos(i*1.8+elapsed)*30) * influence;
+        line(worldProject(anchor),screen,.12*assembly*fade);
         screens.push(screen);
       }
-      const completion = 1 - Math.sin(blend * Math.PI);
+      const completion = assembly*assembly*(1-split)*(1-Math.sin(blend*Math.PI)*.7);
       for (const indices of shapeFaces[blend < .5 ? shape : (shape+1)%shapeNames.length]) {
         const face = indices.map(i => screens[i]);
         if (face.every(p => p.visible)) {
           context.beginPath(); context.moveTo(face[0].x,face[0].y);
           face.slice(1).forEach(p => context.lineTo(p.x,p.y));
-          context.closePath(); context.fillStyle = `rgba(199,115,112,${(.015 + completion*.04)*(1-disruption*.85)*fade})`; context.fill();
+          context.closePath(); context.fillStyle = `rgba(199,115,112,${completion*.055*(1-disruption*.85)*fade})`; context.fill();
         }
       }
       for (let i = 0; i < count; i++) {
@@ -169,7 +188,7 @@ export function WireframeBackground() {
           if (n.j < i) continue;
           const a = screens[i], b = screens[n.j];
           const cursorLight = Math.max(0, 1 - Math.hypot((a.x+b.x)/2-px, (a.y+b.y)/2-py)/260) * smooth.strength;
-          line(a, b, (.55 + cursorLight * .3)*fade);
+          line(a, b, (.18 + assembly*.4 + cursorLight*.3)*fade);
         }
         const p = screens[i];
         const near = Math.max(0, 1 - Math.hypot(p.x-px, p.y-py)/220) * smooth.strength;
@@ -184,8 +203,11 @@ export function WireframeBackground() {
         }
       }
       }
-      canvas.dataset.shape = shapeNames[Math.floor(elapsed/9)%shapeNames.length];
-      canvas.dataset.travel = ((elapsed/38)%1).toFixed(3);
+      canvas.dataset.shape = shapeNames[Math.floor(elapsed/14)%shapeNames.length];
+      canvas.dataset.travel = ((elapsed/42)%1).toFixed(3);
+      canvas.dataset.flow = "back-left-to-front-right";
+      canvas.dataset.gridPhase = driftX.toFixed(3);
+      canvas.dataset.pointer = smooth.strength.toFixed(2);
       canvas.dataset.motion = reduced ? "reduced" : "running";
       if (!reduced) frame = requestAnimationFrame(draw);
     }
