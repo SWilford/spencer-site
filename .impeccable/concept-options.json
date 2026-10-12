@@ -1,0 +1,212 @@
+{
+  "title": "Spencer's portfolio · image concepts",
+  "question": "Three soft charcoal/red directions. Choose one, combine details, or steer another round. These are static proposals; mouse response comes in implementation.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "A · Sculpture studio",
+      "kicker": "SCULPTURE STUDIO",
+      "thesis": "A professional introduction with one tactile 3D focal point.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "matte red sculpture",
+        "soft charcoal",
+        "clean typography"
+      ],
+      "viewport": "Introduction left, interactive sculpture right, selected work immediately beneath.",
+      "risk": "The sculpture must stay subordinate to real work.",
+      "comp": ".impeccable/mocks/sculpture.png",
+      "raised": [
+        {
+          "from": "Teletext",
+          "raise": "All destinations are explicit and navigation stays familiar."
+        },
+        {
+          "from": "Data portraits",
+          "raise": "Every graphic carries an intentional geometry."
+        },
+        {
+          "from": "Designers Republic",
+          "raise": "The palette and typography stay consistent throughout."
+        },
+        {
+          "from": "Glazier partition",
+          "raise": "Content proportions govern the full page."
+        },
+        {
+          "from": "Bioluminescent wake",
+          "raise": "Pointer-responsive depth returns to a quiet rest."
+        }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "B · Project gallery",
+      "kicker": "PROJECT GALLERY",
+      "thesis": "The work itself becomes the opening visual.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "layered project planes",
+        "soft charcoal",
+        "muted red edges"
+      ],
+      "viewport": "Large project previews share the first viewport with the introduction; experience follows.",
+      "risk": "A familiar portfolio structure needs strong real project imagery.",
+      "comp": ".impeccable/mocks/gallery.png"
+    },
+    {
+      "id": "webgl-shader-portal",
+      "label": "C · Interactive field",
+      "verdict": "competitive",
+      "thesis": "A responsive red surface brings depth behind a stable professional layout.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "parametric red surface",
+        "diffuse light",
+        "quiet text"
+      ],
+      "viewport": "Clear introduction left, a deforming field right, work beneath.",
+      "case": "Expressive and responsive, but less direct than Sculpture studio.",
+      "risk": "GPU cost and distraction need a fallback and strict bounds.",
+      "comp": ".impeccable/mocks/field.png"
+    },
+    {
+      "id": "teletext",
+      "label": "Teletext service",
+      "verdict": "declined",
+      "thesis": "A reference system evaluated for this portfolio.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into the reference system.",
+      "case": "Weaker professional identification and clarity than the main concepts.",
+      "kept": "Explicit navigation and state.",
+      "risk": "Retro page grammar interrupts professional reading."
+    },
+    {
+      "id": "data-portraits",
+      "label": "Data portraits",
+      "verdict": "declined",
+      "thesis": "A reference system evaluated for this portfolio.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into the reference system.",
+      "case": "Weaker professional identification and clarity than the main concepts.",
+      "kept": "Purposeful chart forms in the future dashboard.",
+      "risk": "No factual statistics exist for a data-led introduction."
+    },
+    {
+      "id": "info-sleeve",
+      "label": "Information sleeve",
+      "verdict": "declined",
+      "thesis": "A reference system evaluated for this portfolio.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into the reference system.",
+      "case": "Weaker professional identification and clarity than the main concepts.",
+      "kept": "Palette and typography discipline.",
+      "risk": "Visual noise competes with project evidence."
+    },
+    {
+      "id": "partition",
+      "label": "Glass partition",
+      "verdict": "declined",
+      "thesis": "A reference system evaluated for this portfolio.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into the reference system.",
+      "case": "Weaker professional identification and clarity than the main concepts.",
+      "kept": "Clear proportions and section boundaries.",
+      "risk": "Rigid panes over-structure the introduction."
+    },
+    {
+      "id": "wake",
+      "label": "Pointer wake",
+      "verdict": "declined",
+      "thesis": "A reference system evaluated for this portfolio.",
+      "palette": [
+        "#242426",
+        "#303033",
+        "#b97173",
+        "#e6e3e1"
+      ],
+      "materials": [
+        "translated charcoal/red"
+      ],
+      "viewport": "Professional content translated into the reference system.",
+      "case": "Weaker professional identification and clarity than the main concepts.",
+      "kept": "Depth reacts then settles.",
+      "risk": "Trails attract attention away from professional work."
+    }
+  ],
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "Familiar portfolio",
+    "thesis": "A conventional professional layout with the same soft charcoal/red palette.",
+    "palette": [
+      "#242426",
+      "#303033",
+      "#b97173",
+      "#e6e3e1"
+    ],
+    "materials": [
+      "clean project grid",
+      "readable typography"
+    ],
+    "viewport": "Introduction and work grid with quieter visual expression.",
+    "risk": "Less memorable; craft and real content must carry the identity."
+  },
+  "steer": true
+}
