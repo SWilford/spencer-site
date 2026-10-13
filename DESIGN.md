@@ -85,7 +85,7 @@ components:
     padding: "10px 18px"
     size: "14px"
   hero-button:
-    backgroundColor: "rgba(36,36,38,.72)"
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.foreground}"
     rounded: "{rounded.print-button}"
     padding: "9px 20px"
@@ -159,7 +159,7 @@ At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At
 
 Foreground content is flat. Depth comes from the fixed canvas beneath semantic content: one shared perspective projection for grid and forms, a five-plane advancing lattice, one-time angular body formation, faint filled faces, square nodes, and bright intersection beacons. The canvas is noninteractive in the document hit-test layer and hidden from assistive technology; a subtle reading scrim sits above it.
 
-The desktop “For fun” disclosure is the sole recurring raised UI surface. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. There are no card shadows.
+The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. Route faces use `0 5px 8px rgba(13,13,15,.38),0 2px 0 #161619`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
 
 **The Background Geometry Rule.** Keep tactical lines and grids behind the content. Foreground sections remain open and unboxed.
 
@@ -179,7 +179,9 @@ Actions are unboxed text in Light Dusty Red. The base link size is (16px), while
 
 ### Home route buttons
 
-Four small outlined links lead to Experience, Projects, Résumé, and Contact. They have minimum height (46px), padding (9px 20px), radius (4px), a low-opacity accent border, and a translucent background. Hover shifts to the surface fill and Light Dusty Red text/border. They remain static while surrounding copy types. No portrait is currently included.
+Four magnetic links lead to Experience, Projects, Résumé, and Contact. The link hit area stays fixed while an inner face attracts toward a mouse pointer by up to (7px) horizontally and (5px) vertically, with tilt up to (5deg)/(7deg). Faces use the surface fill, radius (4px), minimum height (46px), padding (9px 20px), and a soft depth shadow. The outer link has minimum height (48px) and perspective (650px).
+
+On hover, keyboard focus, or press, twelve accent blocks in six columns and two rows scale in from the left; each column adds (42ms) and the second row adds (20ms). The readable label stays unchanged, shifting to dark text over the red fill. Pressing moves the face down (4px), back (-10px), and scales it to (.975) with a flatter shadow and (70ms) response. Pointer/touch and Enter press states reset on release, cancel, pointer leave, or blur. Reduced-motion removes face transforms and the global rule makes fill transitions instant. No portrait is currently included. The footer checks the active pathname and returns no footer on Home, avoiding the repeated name and Contact action; interior pages retain it. Button text disables selection during interaction.
 
 ### Print button
 
