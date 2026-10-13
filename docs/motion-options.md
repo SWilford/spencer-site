@@ -1,6 +1,6 @@
-# Motion explorations - proposals, not implemented
+# Motion choices and implementation status
 
-Approved baseline: checkpoint-home-magnetic-v1 at d057f7e. Current trial adds glass navigation and viewport-sized grid coverage. Name and page-transition proposals below remain choices for Spencer.
+Approved baseline: checkpoint-home-magnetic-v1 at d057f7e. Current implementation adds transparent glass navigation and viewport-sized grid coverage. The user approved individual-letter replay, summary-word emphasis, and a foreground door transition. The remaining alternatives below remain proposals.
 
 ## Ten hero text effects
 1. Individual letter replay: hovering a letter replays its existing authored effect; brief cooldown avoids constant restarting.
@@ -14,7 +14,7 @@ Approved baseline: checkpoint-home-magnetic-v1 at d057f7e. Current trial adds gl
 9. Word emphasis: hovered summary words brighten and lift by 1px.
 10. Depth drift: a very slow, tiny shadow/depth change during idle; avoid continuous moving body copy.
 
-Preferred starting set: 1 on the name and 9 on summary words. Leave idle motion off initially. Keep complete text readable, touch usable, and reduced-motion alternatives.
+Implemented: option 1 on the name (mouse entry/touch tap,4200ms initial guard,duration+750ms per-letter cooldown,zero-delay replay) and option9 on summary words (foreground emphasis/1px lift over180ms). Reduced motion disables replay and lift. Idle motion remains off.
 
 ## Page transition options
 1. Foreground crossfade: old/new content fades while header and canvas continue.
@@ -28,4 +28,8 @@ Preferred starting set: 1 on the name and 9 on summary words. Leave idle motion 
 9. Masked slide: content passes through a fixed invisible aperture.
 10. Shared media: a project thumbnail expands into its detail-page media.
 
-Preferred starting set: 1 with a restrained amount of 2; reserve 10 for project details. Target 220-300ms for routine navigation, preserve keyboard focus and browser history, and never hold navigation waiting for a flourish. Avoid new loops or replaying the entire name on every page change. Actual implementation must follow installed Next/React support rather than assuming a transition API.
+Implemented transition: a stable React19.3 ViewTransition named page-content wraps foreground children only. Header and canvas continue outside; html has no root snapshot. The left45% pivot uses160vw perspective. Exit rotates-52deg/translates16vw and fades over280ms (opacity1 initially,.1 at40%,0 by60%); arrival starts48deg/-10vw and completes over400ms after150ms (total550ms). Reduced motion uses no animation; unsupported browsers navigate normally. Other listed options are unimplemented alternatives. Validation passed: full lint, TypeScript checks, and production build. Browser checks confirmed all 14 letters and both typed strings complete; returning to Home preserves the final character at opacity 1. S replay increments only its own counter, summary hover reaches foreground color with a -1px Y transform, and door pseudo-animation names appear during navigation. No browser errors were observed; a 390px mobile viewport had no overflow and computed blur(16px) saturate(1.1).
+
+The stable page-content ViewTransition uses update="door" without a pathname key, preserving cached child state. Replay readiness initializes only while empty, so cached-page Activity visibility does not restart the name’s introduction guard. Browser observation confirmed actual door-depart/door-arrive pseudo animations during navigation; the latest timings reduce overlap.
+
+Completed animations remain settled across cached-page visibility changes. TypedText records completion on its last character’s animation end and disables later typing animations. AnimatedName tracks completion separately for all 14 letters: the final raster/search piece, final binary column, or solid glyph is the terminal event. Completed letters hide decorative animation and keep the solid glyph visible; intentional replay clears only that letter’s completion and increments its key. This preserves full staggered-piece durations while preventing CSS animation restarts when a cached Activity becomes visible.

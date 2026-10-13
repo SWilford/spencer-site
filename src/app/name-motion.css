@@ -43,3 +43,7 @@
 .typed-character{animation:character-type 1ms var(--type-delay) step-end backwards}
 @keyframes character-type{from{opacity:.04}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.letter-piece,.growing-edges,.glyph-outline,.binary-rain,.radar-sweep,.print-head{display:none}.glyph-solid,.typed-character{animation:none!important;opacity:1;clip-path:none}}
+
+.type-complete .typed-character { animation:none; opacity:1; }
+.letter-complete :is(.glyph-solid,.letter-piece,.glyph-outline,.growing-edges,.growing-edges path,.growing-edges circle,.binary-rain>span,.radar-sweep,.print-head) { animation:none; }
+.letter-complete .glyph-solid { opacity:1; clip-path:none; transform:none; }
