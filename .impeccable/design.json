@@ -156,12 +156,12 @@
       {
         "name": "shape-phase",
         "value": "2.52s one-time smoothstep formation",
-        "purpose": "Five-body cap: two medium and three small; births by index 0/1/2/3/4 at 0/9/3.5/7/12s. Each spawn selects shuffled order[0], assembles once, then retains its rotating solid until fracture or exit. Geometry scale is fixed at .9 \u00d7 body size. Anchors are set once per spawn and cleared on replacement; no periodic morph or dissolution."
+        "purpose": "Five-body cap: two medium and three small; births by index 0/1/2/3/4 at 0/9/3.5/7/12s. Each spawn selects shuffled order[0], assembles once, then retains its rotating solid until fracture or exit. Geometry scale is fixed at .9 \u00d7 body size. Anchors are set once per spawn and cleared on replacement; no periodic morph or dissolution. Construction assigns every vertex a distinct nearest unused grid intersection from a 3\u00d73\u00d73 candidate neighborhood, independent of final size. Anchors remain fixed for the spawn; true edges draw as staggered partial segments during formation and tethers fade at completion."
       },
       {
         "name": "pointer-smoothing",
         "value": "1 - exp(-dt * 5)",
-        "purpose": "Rigid cursor impulses and spin, damped flight, and mass-weighted approximate spherical collision impulses. Body mass equals size cubed; small sizes .18\u2013.26, medium bodies .62. Grid-seed anchor offsets scale with size. Collision/wall stress drives breakup without vertex deformation. Grid stays pointer-independent."
+        "purpose": "Rigid cursor impulses and spin, damped flight, and mass-weighted approximate spherical collision impulses. Body mass equals size cubed; small sizes .18\u2013.26, medium bodies .62. Construction anchors are distinct grid intersections independent of final size. Collision/wall stress drives breakup without vertex deformation. Grid stays pointer-independent."
       },
       {
         "name": "motion-accessibility",

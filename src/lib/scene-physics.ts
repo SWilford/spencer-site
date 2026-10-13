@@ -19,3 +19,22 @@ export function confine(bounds:{left:number;right:number;top:number;bottom:numbe
     exit:bounds.left>width,
   };
 }
+
+// Pick distinct lattice intersections, independent of the solid's small final size.
+export function constructionAnchors(center:Vector, vertices:Vector[], time:number):Vector[] {
+  const flowX=time*.14,flowZ=time*.11;
+  const origin={x:Math.round(center.x/1.25-flowX),y:Math.round((center.y+1.2)/1.8),z:Math.round(center.z/1.6+flowZ)};
+  const available:Vector[]=[];
+  for(let x=-1;x<=1;x++) for(let y=-1;y<=1;y++) for(let z=-1;z<=1;z++) {
+    available.push({x:origin.x+x,y:(origin.y+y)*1.8-1.2,z:origin.z+z});
+  }
+  return vertices.map(vertex=>{
+    const desired={x:center.x+vertex.x,y:center.y+vertex.y,z:center.z+vertex.z};
+    let best=0,distance=Infinity;
+    available.forEach((anchor,index)=>{
+      const next=Math.hypot((anchor.x+flowX)*1.25-desired.x,anchor.y-desired.y,(anchor.z-flowZ)*1.6-desired.z);
+      if(next<distance) {best=index;distance=next;}
+    });
+    return available.splice(best,1)[0];
+  });
+}

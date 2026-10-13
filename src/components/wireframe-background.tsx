@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, formationProgress, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
-import { collide, confine, gridCell } from "@/lib/scene-physics";
+import { collide, confine, gridCell, constructionAnchors } from "@/lib/scene-physics";
 
 export function WireframeBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -178,11 +178,7 @@ export function WireframeBackground() {
       // All nodes and forms use the same projection and back-left → front-right flow.
       const center = centers[layer].center;
       if(body.anchors.length===0) {
-        body.anchors=Array.from({length:count},(_,i)=>({
-          x:Math.round((center.x+(i%3-1)*1.25*body.size)/1.25-flowX),
-          y:Math.round((center.y+(Math.floor(i/3)%2 ? 1.2 : -1.2)*body.size+1.2)/1.8)*1.8-1.2,
-          z:Math.round((center.z+(Math.floor(i/6)*1.6-.8)*body.size)/1.6+flowZ),
-        }));
+        body.anchors=constructionAnchors(center,Array.from({length:count},(_,i)=>target(i,shape)),elapsed);
       }
       for (let i = 0; i < count; i++) {
         const formed = rotate(target(i,shape),elapsed*.16+body.spin,-.25+elapsed*.055);
@@ -197,7 +193,7 @@ export function WireframeBackground() {
           z:anchor.z-center.z+(formed.z*growth-(anchor.z-center.z))*assembly,
         };
         const screen = worldProject({x:center.x+p.x,y:center.y+p.y,z:center.z+p.z});
-        line(worldProject(anchor),screen,.12*assembly*fade);
+        line(worldProject(anchor),screen,.12*assembly*(1-assembly)*fade);
         screens.push(screen);
       }
       const bounds={left:Math.min(...screens.map(p=>p.x)),right:Math.max(...screens.map(p=>p.x)),top:Math.min(...screens.map(p=>p.y)),bottom:Math.max(...screens.map(p=>p.y))};
@@ -220,7 +216,11 @@ export function WireframeBackground() {
           context.closePath(); context.fillStyle = `rgba(199,115,112,${completion*.055*fade})`; context.fill();
         }
       }
-      for(const [a,b] of shapeEdges[shape]) line(screens[a],screens[b],(.18+assembly*.4)*fade);
+      for(const [index,[a,b]] of shapeEdges[shape].entries()) {
+        const progress=smoothstep(assembly*1.6-index/shapeEdges[shape].length*.6);
+        const start=screens[a],end=screens[b];
+        line(start,{...end,x:start.x+(end.x-start.x)*progress,y:start.y+(end.y-start.y)*progress},(.18+assembly*.4)*fade);
+      }
       for (let i = 0; i < count; i++) {
         const p = screens[i];
         const half = 1.8;
