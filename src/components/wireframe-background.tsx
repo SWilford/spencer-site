@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, formationProgress, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
-import { collide, confine, gridNodes, gridNodePosition, constructionAnchors, type GridNode } from "@/lib/scene-physics";
+import { collide, confine, gridNodes, gridExtent, gridNodePosition, constructionAnchors, type GridNode } from "@/lib/scene-physics";
 
 export function WireframeBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -85,7 +85,7 @@ export function WireframeBackground() {
       // Grid projection is deliberately independent of the pointer.
       const worldProject = (p: Point) => project(p,width*.30,height*.28,worldSize);
       const line = (a: ScreenPoint, b: ScreenPoint, alpha: number) => {
-        if (!a.visible || !b.visible) return;
+        if (!a.visible || !b.visible || (a.x<0 && b.x<0) || (a.x>width && b.x>width) || (a.y<0 && b.y<0) || (a.y>height && b.y>height)) return;
         context.beginPath();
         context.moveTo(a.x, a.y); context.lineTo(b.x, b.y);
         context.strokeStyle = `rgba(199,115,112,${alpha})`;
@@ -93,7 +93,7 @@ export function WireframeBackground() {
       };
       // The entire lattice advances rightward and toward the camera in world space.
       const driftX=(elapsed*.14)%1;
-      const lattice=gridNodes(elapsed);
+      const lattice=gridNodes(elapsed,gridExtent(width,height));
       const visibleNodes=lattice.filter(node=>{const p=worldProject(node.position);return node.fade>.35 && p.visible && p.x>12 && p.x<width-12 && p.y>12 && p.y<height-12;});
       for(const node of lattice) {
         const {plane,idX,idZ}=node;
@@ -103,7 +103,7 @@ export function WireframeBackground() {
         const depthFade = Math.max(.15,Math.min(1,p.scale))*edgeFade;
         line(p,worldProject({...point,x:point.x+1.25}),.18*depthFade);
         line(p,worldProject({...point,z:point.z+1.6}),.18*depthFade);
-        if(plane===0 && idX%3===0 && idZ%3===0) line(p,worldProject({...point,y:6}),.13*depthFade);
+        if(plane<4 && idX%3===0 && idZ%2===0) line(p,worldProject({...point,y:point.y+1.8}),.16*depthFade);
         if(!p.visible) continue;
         const light = Math.pow(.5+.5*Math.sin(idX*7.13+idZ*4.7+plane+elapsed*.8),12);
         context.fillStyle = `rgba(239,174,165,${(.12+light*.8)*depthFade})`;

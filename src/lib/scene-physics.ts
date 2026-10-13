@@ -25,11 +25,15 @@ export type GridNode={idX:number;idZ:number;plane:number;position:Vector;fade:nu
 export function gridNodePosition(node:Pick<GridNode,'idX'|'idZ'|'plane'>,time:number):Vector {
   return {x:(node.idX+time*.14)*1.25,y:node.plane*1.8-1.2,z:(node.idZ-time*.11)*1.6};
 }
-export function gridNodes(time:number):GridNode[] {
+export function gridExtent(width:number,height:number):number {
+  const worldSize=Math.min(width*.16,height*.21);
+  return Math.max(6,Math.ceil(width*.7/worldSize*(7+11.2)/7/1.25)+2);
+}
+export function gridNodes(time:number,xRadius=6):GridNode[] {
   const nodes:GridNode[]=[],driftX=(time*.14)%1,driftZ=(time*.11)%1;
-  for(let plane=0;plane<5;plane++) for(let x=-6;x<=6;x++) for(let z=-1;z<=7;z++) {
+  for(let plane=0;plane<5;plane++) for(let x=-xRadius;x<=xRadius;x++) for(let z=-1;z<=7;z++) {
     const cell=gridCell(x,z,time);
-    nodes.push({idX:cell.idX,idZ:cell.idZ,plane,position:{x:cell.x,y:plane*1.8-1.2,z:cell.z},fade:Math.max(0,Math.min(1,6-Math.abs(x+driftX),z-driftZ+1,7-z+driftZ))});
+    nodes.push({idX:cell.idX,idZ:cell.idZ,plane,position:{x:cell.x,y:plane*1.8-1.2,z:cell.z},fade:Math.max(0,Math.min(1,xRadius-Math.abs(x+driftX),z-driftZ+1,7-z+driftZ))});
   }
   return nodes;
 }

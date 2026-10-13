@@ -56,6 +56,7 @@ rounded:
   focus: "2px"
   print-button: "4px"
   disclosure: "6px"
+  route-face: "8px"
 spacing:
   content-gutter: "6vw"
   content-gap: "7vw"
@@ -85,10 +86,10 @@ components:
     padding: "10px 18px"
     size: "14px"
   hero-button:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "rgba(48,48,51,.38)"
     textColor: "{colors.foreground}"
-    rounded: "{rounded.print-button}"
-    padding: "9px 20px"
+    rounded: "{rounded.route-face}"
+    padding: "15px 24px"
     size: "15px"
   photo-placeholder:
     backgroundColor: "{colors.surface}"
@@ -159,7 +160,7 @@ At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At
 
 Foreground content is flat. Depth comes from the fixed canvas beneath semantic content: one shared perspective projection for grid and forms, a five-plane advancing lattice, one-time angular body formation, faint filled faces, square nodes, and bright intersection beacons. The canvas is noninteractive in the document hit-test layer and hidden from assistive technology; a subtle reading scrim sits above it.
 
-The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. Route faces use `0 5px 8px rgba(13,13,15,.38),0 2px 0 #161619`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
+The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. The current glass trial uses a translucent route face with blur (10px), a faint accent border, and inset upper rim. Route faces use `0 7px 16px rgba(13,13,15,.26),0 2px 0 rgba(17,17,20,.5),inset 0 1px 0 rgba(237,232,232,.08)`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
 
 **The Background Geometry Rule.** Keep tactical lines and grids behind the content. Foreground sections remain open and unboxed.
 
@@ -179,7 +180,7 @@ Actions are unboxed text in Light Dusty Red. The base link size is (16px), while
 
 ### Home route buttons
 
-Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. Faces use the surface fill, radius (4px), minimum height (46px), padding (9px 20px), and a soft depth shadow. The outer link has minimum height (48px) and perspective (650px).
+Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use `rgba(48,48,51,.38)`, blur (10px), a `rgba(221,139,135,.18)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(48,48,51,.92)`. The outer link has minimum height (64px) and perspective (650px).
 
 On hover, keyboard focus, or press, thirty accent blocks in ten columns and three rows scale in from the left; each column adds (24ms) and each row adds (16ms), reaching a maximum stagger (248ms). The readable label stays unchanged, shifting to dark text over the red fill. Pressing moves the face down (4px), back (-10px), and scales it to (.975) with a flatter shadow and (70ms) response. Pointer/touch and Enter press states reset on release, cancel, pointer leave, or blur. Reduced-motion removes face transforms and the global rule makes fill transitions instant. No portrait is currently included. The footer checks the active pathname and returns no footer on Home, avoiding the repeated name and Contact action; interior pages retain it. Button text disables selection during interaction.
 
@@ -203,7 +204,7 @@ Only Home credentials and the four-sentence summary type beneath the approved na
 
 ### Spatial background
 
-The scene is capped at (5) bodies: two large and three small. Their initial births occur at (0s), (9s), (3.5s), (7s), and (12s) by body index, keeping entries staggered. The two larger bodies use medium size (.62); small sizes vary from (.18) to (.26), with mass proportional to size cubed. Each vertex starts at a distinct actual visible member of the same finite lattice used for drawing. Construction selects nearest unused nodes with fade above (.35), visible projection, and positions more than (12px) inside viewport edges. Stored identities contain `idX`, `idZ`, and `plane`; their positions reconstruct continuous grid movement, including recycling, independently of final size. Formation uses fixed geometry scale (.9 × body size); collision stress does not deform vertices. Shared perspective places all bodies within the same five-plane advancing lattice. Grid projection remains pointer-independent; cells keep continuous identities and fade near recycling edges. Each body stores these anchors once per spawn; respawn clears them. After (.55s) of source-node activation, the (2.52s) assembly draws true face edges progressively as staggered partial segments. Anchor tethers remain visible throughout construction at alpha (.24 × birth fade), then are removed only when assembly is complete.
+The scene is capped at (5) bodies: two large and three small. Their initial births occur at (0s), (9s), (3.5s), (7s), and (12s) by body index, keeping entries staggered. The two larger bodies use medium size (.62); small sizes vary from (.18) to (.26), with mass proportional to size cubed. Each vertex starts at a distinct actual visible member of the same finite lattice used for drawing. Construction selects nearest unused nodes with fade above (.35), visible projection, and positions more than (12px) inside viewport edges. Stored identities contain `idX`, `idZ`, and `plane`; their positions reconstruct continuous grid movement, including recycling, independently of final size. Formation uses fixed geometry scale (.9 × body size); collision stress does not deform vertices. Shared perspective places all bodies within the same five-plane advancing lattice. Grid projection remains pointer-independent; cells keep continuous identities and fade near recycling edges. Horizontal extent adapts to viewport width and projection depth with a minimum radius (6), keeping the grid across the full viewport. Vertical connectors join every adjacent plane at every third X identity and every second Z identity, using alpha (.16 × depth fade). Drawing and construction share the expanded node set; lines with both endpoints outside the same viewport side are culled. Each body stores these anchors once per spawn; respawn clears them. After (.55s) of source-node activation, the (2.52s) assembly draws true face edges progressively as staggered partial segments. Anchor tethers remain visible throughout construction at alpha (.24 × birth fade), then are removed only when assembly is complete.
 
 Bodies flow from back left to front right with randomized rate scales: (42–56s) for large forms and (22–32s) for small ones. These scales do not define lifetimes. Each body activates its source nodes for (.55s), then assembles once over (2.52s), using smoothstep formation that then remains complete. A shuffled shape order selects its first entry for the whole spawn: larger bodies select from five complex solids and smaller bodies from five simple solids. The selected solid rotates and travels without periodic morphing or dissolution; only fracture or exit respawn selects again. Closed hull faces and cached true face edges define each shape. Shape order, lane variation, spin, and flow rates use crypto randomness; formation age starts with each scheduled birth. Root-layout mounting preserves the scene across client-side page changes.
 

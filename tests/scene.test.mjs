@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces, formationProgress } from '../src/lib/scene-geometry.ts';
-import { collide, confine, gridCell, gridNodes, gridNodePosition, constructionAnchors } from '../src/lib/scene-physics.ts';
+import { collide, confine, gridCell, gridNodes, gridExtent, gridNodePosition, constructionAnchors } from '../src/lib/scene-physics.ts';
 test('grid recycling preserves node identities and continuous world positions',()=>{
   const epsilon=.00001;
   const before=gridCell(0,0,1/.14-epsilon),after=gridCell(1,0,1/.14+epsilon);
@@ -67,5 +67,14 @@ test('construction seeds are distinct members of the rendered finite grid, inclu
       assert.ok(later);
       for(const axis of ['x','y','z']) assert.ok(Math.abs(gridNodePosition(anchor,time+.1)[axis]-later.position[axis])<1e-10);
     }
+  }
+});
+
+test('grid extends past both viewport sides at its furthest plane on wide displays',()=>{
+  for(const [width,height] of [[1536,1024],[2560,1440],[3440,1440],[3840,1080],[5120,1440]]) {
+    const radius=gridExtent(width,height),size=Math.min(width*.16,height*.21);
+    const scale=7/(7+11.2);
+    assert.ok(width*.3+(radius-1)*1.25*size*scale>width);
+    assert.ok(width*.3-(radius-1)*1.25*size*scale<0);
   }
 });
