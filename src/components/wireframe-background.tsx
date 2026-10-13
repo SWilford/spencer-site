@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
+import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, formationProgress, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
 import { collide, confine, gridCell } from "@/lib/scene-physics";
 
 export function WireframeBackground() {
@@ -20,10 +20,10 @@ export function WireframeBackground() {
       const birth=[0,9,3.5,7,12][index];
       const period=small ? 22+random()*10 : 42+random()*14;
       return {
-      small,size,mass:size**3,period,phase:-birth/14,lane:[.6,3.2,1.2,2.4,3.8][index]+(random()-.5)*.5,
+      small,size,mass:size**3,period,lane:[.6,3.2,1.2,2.4,3.8][index]+(random()-.5)*.5,
       order:Array.from({length:5},(_,i)=>small ? i+5 : i), offset:{x:0,y:0,z:0},velocity:{x:0,y:0,z:0},
       spin:random()*Math.PI*2, strain:0, cooldown:0,birth,
-      anchors:[] as Point[], anchorCycle:-1,
+      anchors:[] as Point[],
     };});
     for(const body of bodies) for(let i=body.order.length-1;i>0;i--) {
       const j=Math.floor(random()*(i+1)); [body.order[i],body.order[j]]=[body.order[j],body.order[i]];
@@ -31,8 +31,8 @@ export function WireframeBackground() {
     let kicks=0, collisions=0, wallHits=0, replacements=0;
     const fragments:Array<{position:Point;velocity:Point;life:number;angle:number;spin:number;cooldown:number}>=[];
     const respawn = (body:(typeof bodies)[number]) => {
-      body.birth=elapsed+1.5+random()*2.5; body.phase=-body.birth/14; body.offset={x:0,y:0,z:0};
-      body.velocity={x:0,y:0,z:0}; body.strain=0; body.anchorCycle=-1;
+      body.birth=elapsed+1.5+random()*2.5; body.offset={x:0,y:0,z:0};
+      body.velocity={x:0,y:0,z:0}; body.strain=0; body.anchors=[];
       body.lane=random()*3.8; body.spin=random()*Math.PI*2;
       body.period=body.small ? 22+random()*10 : 42+random()*14;
       for(let i=body.order.length-1;i>0;i--) {
@@ -119,7 +119,7 @@ export function WireframeBackground() {
         const travel=(elapsed-body.birth)/body.period;
         const base={x:-2.8+travel*8,y:.6+travel*1.3+body.lane,z:Math.max(0,8-travel*10)};
         if(body.strain>=1.4 && !reduced) {
-          const shape=body.order[Math.floor(elapsed/14+body.phase)%body.order.length];
+          const shape=body.order[0];
           for(let i=0;i<shapeVertexCounts[shape];i++) {
             const p=target(i,shape);
             fragments.push({position:{x:base.x+body.offset.x+p.x*.4*body.size,y:base.y+body.offset.y+p.y*.4*body.size,z:Math.max(0,base.z+body.offset.z+p.z*.4*body.size)},velocity:{x:1+random()*2,y:(random()-.5)*2,z:(random()-.5)},life:7,angle:random()*6.28,spin:(random()-.5)*8,cooldown:0});
@@ -130,8 +130,7 @@ export function WireframeBackground() {
         }
         const center={x:base.x+body.offset.x,y:base.y+body.offset.y,z:base.z+body.offset.z};
         const screen=worldProject(center);
-        const phase=(elapsed/14+body.phase)%1;
-        const formed=smoothstep(phase/.18)*(1-smoothstep((phase-.76)/.18));
+        const formed=formationProgress(reduced ? 2.52 : elapsed-body.birth);
         const dx=screen.x-pointer.x*width,dy=screen.y-pointer.y*height;
         if(!reduced && pointer.strength>0 && elapsed>body.cooldown && formed>.45 && screen.visible && Math.hypot(dx,dy)<worldSize*screen.scale*1.15*body.size+12) {
           const speed=Math.hypot(pointer.vx,pointer.vy);
@@ -171,20 +170,14 @@ export function WireframeBackground() {
       const body=bodies[layer];
       const travel = centers[layer].travel;
       if(travel<0) continue;
-      const phase = elapsed / 14 + body.phase;
-      const shape = body.order[Math.floor(phase)%body.order.length];
-      const nextShape = body.small ? shape : body.order[(Math.floor(phase)+1)%body.order.length];
+      const shape = body.order[0];
       const count=shapeVertexCounts[shape];
-      const stage = phase%1;
-      const assembly = smoothstep(stage/.18)*(1-smoothstep((stage-.76)/.18));
-      const blend = smoothstep((stage-.44)/.14);
-      const fade = Math.min(1,travel/.06)*smoothstep(stage/.06)*(1-smoothstep((stage-.94)/.06));
+      const assembly = centers[layer].formed;
+      const fade = reduced ? 1 : smoothstep((elapsed-body.birth)/.84);
       const screens: ScreenPoint[] = [];
       // All nodes and forms use the same projection and back-left → front-right flow.
       const center = centers[layer].center;
-      const cycle=Math.floor(phase);
-      if(body.anchorCycle!==cycle) {
-        body.anchorCycle=cycle;
+      if(body.anchors.length===0) {
         body.anchors=Array.from({length:count},(_,i)=>({
           x:Math.round((center.x+(i%3-1)*1.25*body.size)/1.25-flowX),
           y:Math.round((center.y+(Math.floor(i/3)%2 ? 1.2 : -1.2)*body.size+1.2)/1.8)*1.8-1.2,
@@ -192,17 +185,16 @@ export function WireframeBackground() {
         }));
       }
       for (let i = 0; i < count; i++) {
-        const a = target(i, shape), b = target(i, nextShape);
-        const formed = rotate({ x:a.x+(b.x-a.x)*blend,y:a.y+(b.y-a.y)*blend,z:a.z+(b.z-a.z)*blend },elapsed*.16+body.spin,-.25+elapsed*.055+body.strain*.3);
+        const formed = rotate(target(i,shape),elapsed*.16+body.spin,-.25+elapsed*.055);
         const rest = body.anchors[i];
         const anchor = {
           x:(rest.x+flowX)*1.25,y:rest.y,z:(rest.z-flowZ)*1.6,
         };
-        const growth = (.72+.18*Math.sin(stage*Math.PI))*body.size;
+        const growth = .9*body.size;
         const p = {
-          x:anchor.x-center.x+(formed.x*growth-(anchor.x-center.x))*assembly+Math.sin(i*2.7)*body.strain*.08*body.size*assembly,
+          x:anchor.x-center.x+(formed.x*growth-(anchor.x-center.x))*assembly,
           y:anchor.y-center.y+(formed.y*growth-(anchor.y-center.y))*assembly,
-          z:anchor.z-center.z+(formed.z*growth-(anchor.z-center.z))*assembly+Math.cos(i*1.8)*body.strain*.08*body.size*assembly,
+          z:anchor.z-center.z+(formed.z*growth-(anchor.z-center.z))*assembly,
         };
         const screen = worldProject({x:center.x+p.x,y:center.y+p.y,z:center.z+p.z});
         line(worldProject(anchor),screen,.12*assembly*fade);
@@ -219,8 +211,8 @@ export function WireframeBackground() {
         if(wall.y) {if(body.velocity.y*wall.y<0) body.strain+=Math.abs(body.velocity.y)*.15;body.velocity.y=(wall.y>0 ? 1 : -1)*Math.max(.25,Math.abs(body.velocity.y)*.75);}
         wallHits++;
       }
-      const completion = assembly*assembly*(1-Math.sin(blend*Math.PI)*.7);
-      for (const indices of shapeFaces[blend < .5 ? shape : nextShape]) {
+      const completion = assembly*assembly;
+      for (const indices of shapeFaces[shape]) {
         const face = indices.map(i => screens[i]);
         if (face.every(p => p.visible)) {
           context.beginPath(); context.moveTo(face[0].x,face[0].y);
@@ -228,7 +220,7 @@ export function WireframeBackground() {
           context.closePath(); context.fillStyle = `rgba(199,115,112,${completion*.055*fade})`; context.fill();
         }
       }
-      for(const [a,b] of shapeEdges[blend<.5 ? shape : nextShape]) line(screens[a],screens[b],(.18+assembly*.4)*fade);
+      for(const [a,b] of shapeEdges[shape]) line(screens[a],screens[b],(.18+assembly*.4)*fade);
       for (let i = 0; i < count; i++) {
         const p = screens[i];
         const half = 1.8;
@@ -278,7 +270,9 @@ export function WireframeBackground() {
         });
         for(let vertex=0;vertex<3;vertex++) line(triangle[vertex],triangle[(vertex+1)%3],piece.life*.08);
       }
-      canvas.dataset.shape = shapeNames[bodies[0].order[Math.max(0,Math.floor(elapsed/14+bodies[0].phase))%bodies[0].order.length]];
+      canvas.dataset.shape = shapeNames[bodies[0].order[0]];
+      canvas.dataset.shapes=bodies.map(body=>shapeNames[body.order[0]]).join(',');
+      canvas.dataset.births=bodies.map(body=>body.birth.toFixed(2)).join(',');
       canvas.dataset.population=String(bodies.length);
       canvas.dataset.active=String(bodies.filter(body=>elapsed>=body.birth).length);
       canvas.dataset.sizes=bodies.map(body=>body.size.toFixed(2)).join(',');

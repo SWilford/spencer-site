@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces } from '../src/lib/scene-geometry.ts';
+import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces, formationProgress } from '../src/lib/scene-geometry.ts';
 import { collide, confine, gridCell } from '../src/lib/scene-physics.ts';
 test('grid recycling preserves node identities and continuous world positions',()=>{
   const epsilon=.00001;
@@ -43,4 +43,11 @@ test('shape collisions separate overlap and exchange approaching momentum',()=>{
   assert.equal(afterA+afterB,1);
   assert.ok(afterA*afterA+afterB*afterB<=5);
   assert.equal(collide({x:0,y:0,z:0},{x:4,y:0,z:0},{x:0,y:0,z:0},{x:0,y:0,z:0},1),null);
+});
+
+test('formation completes once and never restarts or dissolves during travel',()=>{
+  assert.equal(formationProgress(-2),0);
+  assert.equal(formationProgress(0),0);
+  assert.ok(formationProgress(1)>0 && formationProgress(1)<1);
+  for(const age of [2.52,7,14,28,56,120]) assert.equal(formationProgress(age),1);
 });

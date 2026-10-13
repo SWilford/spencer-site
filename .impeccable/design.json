@@ -155,13 +155,13 @@
       },
       {
         "name": "shape-phase",
-        "value": "14s lifecycle",
-        "purpose": "Five-body cap: two large and three small; births by index 0/1/2/3/4 at 0/9/3.5/7/12s. Stable lattice anchors support assembly, rotation, holds, and dissolution. Large forms morph through five complex solids; small forms select among five simple solids between cycles."
+        "value": "2.52s one-time smoothstep formation",
+        "purpose": "Five-body cap: two medium and three small; births by index 0/1/2/3/4 at 0/9/3.5/7/12s. Each spawn selects shuffled order[0], assembles once, then retains its rotating solid until fracture or exit. Geometry scale is fixed at .9 \u00d7 body size. Anchors are set once per spawn and cleared on replacement; no periodic morph or dissolution."
       },
       {
         "name": "pointer-smoothing",
         "value": "1 - exp(-dt * 5)",
-        "purpose": "Rigid cursor impulses and spin, damped flight, and mass-weighted approximate spherical collision impulses. Body mass equals size cubed; small sizes .18\u2013.26, medium bodies .62. Grid-seed anchor offsets and collision deformation scale with body size. Collision/wall stress drives breakup. Grid stays pointer-independent."
+        "purpose": "Rigid cursor impulses and spin, damped flight, and mass-weighted approximate spherical collision impulses. Body mass equals size cubed; small sizes .18\u2013.26, medium bodies .62. Grid-seed anchor offsets scale with size. Collision/wall stress drives breakup without vertex deformation. Grid stays pointer-independent."
       },
       {
         "name": "motion-accessibility",
@@ -171,7 +171,7 @@
       {
         "name": "volume-travel",
         "value": "Large 42\u201356s; small 22\u201332s flow-rate scales",
-        "purpose": "Randomized rates without timed lifetime reset; full right exit or stress >= 1.4 schedules an independent left replacement after 1.5\u20134s. No companion waves. One fragment per vertex spins, receives cursor/body impulses, and fades over 7s; cap 60. Left/top/bottom bounce, right open; continuous grid identities and stable cycle anchors."
+        "purpose": "Randomized rates without timed lifetime reset; full right exit or stress >= 1.4 schedules an independent left replacement after 1.5\u20134s. No companion waves. One fragment per vertex spins, receives cursor/body impulses, and fades over 7s; cap 60. Left/top/bottom bounce, right open; continuous grid identities and stable per-spawn anchors."
       }
     ],
     "breakpoints": [
@@ -240,7 +240,7 @@
   ],
   "narrative": {
     "northStar": "Open content over a tactical graph",
-    "overview": "The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site\u2019s identity.\n\nMovement belongs to the spatial field and the name\u2019s first entrance. A shared world-space projection carries a five-plane lattice and a restrained mix of large and small angular bodies from back left toward front right, advancing rightward and nearer the camera. Shape nodes begin at snapped lattice intersections, assemble into rotating forms, grow, hold, morph, and dissolve back into the lattice with anchor tethers. Bright beacons pulse at intersections. The lattice projection stays independent of the pointer. Forms receive rigid cursor impulses and spin, followed by damped flight. Only body and wall collisions accumulate stress; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.",
+    "overview": "The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site\u2019s identity.\n\nMovement belongs to the spatial field and the name\u2019s first entrance. A shared world-space projection carries a five-plane lattice and a restrained mix of large and small angular bodies from back left toward front right, advancing rightward and nearer the camera. Shape nodes begin at snapped lattice intersections, assemble once into rotating forms with anchor tethers, then keep their selected shape until fracture or right-edge exit. Bright beacons pulse at intersections. The lattice projection stays independent of the pointer. Forms receive rigid cursor impulses and spin, followed by damped flight. Only body and wall collisions accumulate stress; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.",
     "keyCharacteristics": [
       "Open typography and asymmetric whitespace.",
       "Soft charcoal, dusty red, and warm gray.",

@@ -60,3 +60,9 @@ export function rotate(p: Point, yaw: number, pitch: number): Point {
   const z = p.x * Math.sin(yaw) + p.z * Math.cos(yaw);
   return { x, y: p.y * Math.cos(pitch) - z * Math.sin(pitch), z: p.y * Math.sin(pitch) + z * Math.cos(pitch) };
 }
+
+// Assembly happens once after birth; a completed solid stays intact until exit or fracture.
+export function formationProgress(age: number): number {
+  const progress=Math.max(0,Math.min(1,age/2.52));
+  return progress*progress*(3-2*progress);
+}
