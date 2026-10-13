@@ -1,0 +1,45 @@
+.animated-name .name-letter{animation:none}
+.animated-name .name-letter::after{display:none}
+.name-letter>.name-glyph{opacity:0}
+.letter-art{position:absolute;inset:-.142em 0 auto;width:100%;height:1.3em;overflow:visible;pointer-events:none}
+.glyph-solid{animation:materialize var(--letter-duration) var(--letter-delay) ease-out backwards}
+@keyframes materialize{0%,60%{opacity:.04}100%{opacity:1}}
+.letter-piece{position:absolute;inset:0;opacity:0;pointer-events:none;animation:piece-lock var(--letter-duration) var(--letter-delay) cubic-bezier(.16,1,.3,1) backwards}
+@keyframes piece-lock{0%{opacity:0;transform:translate(var(--piece-x),var(--piece-y)) rotate(var(--piece-turn)) scale(.65)}25%{opacity:1}72%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+.effect-sand .letter-piece{mask-image:radial-gradient(circle,#000 1.8px,transparent 2px);mask-size:4px 4px}
+.effect-dots .letter-piece{mask-image:radial-gradient(circle,#000 2px,transparent 2.5px);mask-size:6px 6px;animation-name:dot-lock}
+@keyframes dot-lock{0%{opacity:0;transform:scale(.2)}35%{opacity:1;transform:scale(.9)}75%{opacity:1;transform:none}100%{opacity:0}}
+.glyph-outline,.growing-edges{opacity:0;color:var(--accent-light);animation:contour-trace var(--letter-duration) var(--letter-delay) linear backwards}
+.glyph-outline path{stroke-dasharray:1;animation:outline-grow var(--letter-duration) var(--letter-delay) ease-out backwards}
+@keyframes outline-grow{0%{stroke-dashoffset:1}45%,100%{stroke-dashoffset:0}}
+@keyframes contour-trace{0%{opacity:0}10%,65%{opacity:.8}100%{opacity:0}}
+.growing-edges path{fill:none;stroke:currentColor;stroke-width:10;stroke-dasharray:1;animation:edge-grow calc(var(--letter-duration)*.62) calc(var(--letter-delay) + var(--edge)*70ms) cubic-bezier(.16,1,.3,1) backwards}
+.growing-edges circle{fill:currentColor;animation:node-light 500ms calc(var(--letter-delay) + var(--edge)*70ms) ease-out backwards}
+@keyframes edge-grow{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes node-light{from{opacity:0}to{opacity:1}}
+.effect-water .glyph-solid{animation-name:water-fill}
+@keyframes water-fill{0%,35%{opacity:.05;clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%)}48%{opacity:1;clip-path:polygon(0 83%,25% 79%,50% 83%,75% 87%,100% 83%,100% 100%,0 100%)}70%{opacity:1;clip-path:polygon(0 43%,25% 48%,50% 43%,75% 39%,100% 43%,100% 100%,0 100%)}100%{opacity:1;clip-path:polygon(0 0,25% 0,50% 0,75% 0,100% 0,100% 100%,0 100%)}}
+.effect-print .glyph-solid{animation-name:sideways-print}
+.print-head{position:absolute;left:0;top:.12em;height:.65em;width:2px;background:var(--accent-light);animation:print-pass var(--letter-duration) var(--letter-delay) linear backwards;opacity:0}
+@keyframes sideways-print{0%{opacity:.08;clip-path:inset(0 100% 0 0)}85%,100%{opacity:1;clip-path:inset(0)}}
+@keyframes print-pass{0%{opacity:0;transform:translateX(0)}10%{opacity:.8}85%{opacity:.8;transform:translateX(.72em)}100%{opacity:0;transform:translateX(.72em)}}
+.effect-decode .glyph-solid{animation-name:signal-decode}
+@keyframes signal-decode{0%{opacity:.08;transform:skewX(18deg)}30%{opacity:.45;transform:skewX(-10deg)}60%{opacity:.8;transform:skewX(4deg)}100%{opacity:1;transform:none}}
+.binary-rain{position:absolute;inset:0;display:flex;justify-content:space-around;overflow:hidden;color:var(--accent-light);font:12px/1.3 monospace;pointer-events:none}
+.binary-rain>span{writing-mode:vertical-rl;animation:matrix-column var(--letter-duration) calc(var(--letter-delay) + var(--column)*90ms) linear backwards;opacity:0}
+@keyframes matrix-column{0%{opacity:0;transform:translateY(-100%)}15%,55%{opacity:.85}100%{opacity:0;transform:translateY(100%)}}
+.effect-binary .glyph-solid{animation-name:binary-resolve}
+@keyframes binary-resolve{0%,45%{opacity:.04;clip-path:inset(0 0 100%)}100%{opacity:1;clip-path:inset(0)}}
+.effect-radar .glyph-solid{animation:radar-bands var(--letter-duration) var(--letter-delay) linear backwards}
+.radar-sweep{position:absolute;inset:0 0 auto;height:1px;background:var(--accent-light);opacity:0;animation:sweep-pass calc(var(--letter-duration)/3) var(--letter-delay) linear 3 backwards}
+@keyframes sweep-pass{0%{opacity:0;transform:translateY(0)}10%,85%{opacity:.8}100%{opacity:0;transform:translateY(.85em)}}
+@keyframes radar-bands{0%{opacity:.04;clip-path:inset(0 0 100%)}33%{opacity:1;clip-path:inset(0 0 66%)}66%{opacity:1;clip-path:inset(0 0 33%)}100%{opacity:1;clip-path:inset(0)}}
+.effect-search .letter-piece{animation-name:search-lock;animation-delay:calc(var(--letter-delay) + var(--piece)*180ms)}
+@keyframes search-lock{0%{opacity:0;transform:scaleX(.1)}60%{opacity:1;transform:none}100%{opacity:0}}
+.effect-raster .letter-piece{animation-name:raster-column;animation-delay:calc(var(--letter-delay) + var(--piece)*60ms)}
+@keyframes raster-column{0%{opacity:0;transform:translateY(-12px)}60%{opacity:1;transform:none}100%{opacity:0}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.typed-word{display:inline-block;white-space:nowrap}
+.typed-character{animation:character-type 1ms var(--type-delay) step-end backwards}
+@keyframes character-type{from{opacity:.04}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.letter-piece,.growing-edges,.glyph-outline,.binary-rain,.radar-sweep,.print-head{display:none}.glyph-solid,.typed-character{animation:none!important;opacity:1;clip-path:none}}

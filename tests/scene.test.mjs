@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { count, target, shapeNames, shapeEdges, shapeFaces } from '../src/lib/scene-geometry.ts';
+import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces } from '../src/lib/scene-geometry.ts';
 import { collide, confine, gridCell } from '../src/lib/scene-physics.ts';
 test('grid recycling preserves node identities and continuous world positions',()=>{
   const epsilon=.00001;
@@ -10,8 +10,9 @@ test('grid recycling preserves node identities and continuous world positions',(
   assert.equal(far.idZ,near.idZ);assert.ok(Math.abs(far.z-near.z)<.0001);
 });
 test('completed solids have unique vertices, closed convex topology, and expected edges',()=>{
-  const expected=[30,24,24,30,18];
+  const expected=[30,24,24,30,18,12,12,9,12,6];
   shapeNames.forEach((name,shape)=>{
+    const count=shapeVertexCounts[shape];
     const vertices=Array.from({length:count},(_,i)=>target(i,shape));
     assert.equal(new Set(vertices.map(v=>JSON.stringify(v))).size,count,name);
     assert.equal(shapeEdges[shape].length,expected[shape],name);
@@ -20,6 +21,14 @@ test('completed solids have unique vertices, closed convex topology, and expecte
       assert.equal(shapeFaces[shape].filter(face=>face.some((v,i)=>v===a&&face[(i+1)%face.length]===b || v===b&&face[(i+1)%face.length]===a)).length,2,name);
     }
   });
+});
+test('lighter shapes change velocity more while conserving mass-weighted momentum',()=>{
+  const smallMass=.05,largeMass=1;
+  const hit=collide({x:0,y:0,z:0},{x:1,y:0,z:0},{x:3,y:0,z:0},{x:0,y:0,z:0},.3,1,smallMass,largeMass);
+  assert.ok(hit);
+  const smallAfter=3-hit.impulse/smallMass,largeAfter=hit.impulse/largeMass;
+  assert.ok(Math.abs((smallAfter-3))>Math.abs(largeAfter));
+  assert.ok(Math.abs(smallMass*smallAfter+largeMass*largeAfter-smallMass*3)<1e-10);
 });
 test('left, top and bottom confine; right is the only exit',()=>{
   assert.deepEqual(confine({left:-10,right:20,top:-8,bottom:25},100,80),{x:10,y:8,exit:false});

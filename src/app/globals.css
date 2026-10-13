@@ -1,3 +1,4 @@
+@import "./name-motion.css";
 :root { --background: #242426; --surface: #303033; --foreground: #ede8e8; --muted: #b7b3b3; --accent: #c77370; --accent-light: #dd8b87; --page-width: 1324px; --font-display: var(--font-body); color-scheme: dark; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 106px; }
@@ -40,46 +41,7 @@ section[id],article[id] { scroll-margin-top: 105px; }
 .hero { padding-top: 120px; padding-bottom: 66px; min-height: calc(100svh - 90px); }
 .animated-name { font-family: var(--font-name),sans-serif; font-weight: 600; font-size: clamp(65px,6.25vw,96px); line-height: .98; letter-spacing: -.025em; margin-left: -4px; width: fit-content; perspective: 800px; }
 .name-word { display: block; white-space: nowrap; }
-.name-letter { display: inline-block; position: relative; animation-duration: 950ms; animation-delay: var(--letter-delay); animation-timing-function: cubic-bezier(.16,1,.3,1); animation-fill-mode: backwards; transform-origin: 50% 80%; }
-.entrance-0 { animation-name: print-up; }
-.entrance-1 { animation-name: typed; animation-timing-function: steps(1,end); }
-.entrance-2,.entrance-9 { animation-name: none; }
-.entrance-3 { animation-name: extrude; }
-.entrance-4 { animation-name: fold-in; }
-.entrance-5 { animation-name: stencil; }
-.entrance-6 { animation-name: assemble; }
-.entrance-7 { animation-name: print-down; }
-.entrance-8 { animation-name: decoded; }
-.entrance-10 { animation-name: depth-in; }
-.entrance-11 { animation-name: hinge; }
-.entrance-12 { animation-name: scan-across; }
-.entrance-13 { animation-name: converge; }
-@keyframes print-up { from { clip-path:inset(100% 0 0); text-shadow:0 5px var(--accent),0 10px #c7737055; } to {clip-path:inset(0);text-shadow:0 0 transparent;} }
-@keyframes typed { 0%,28% {opacity:.05;} 29%,100% {opacity:1;} }
-@keyframes fizzle { 0% {opacity:.1;filter:blur(5px);transform:translateX(-4px);} 35% {opacity:.6;filter:blur(1px);transform:translateX(3px);} 50% {opacity:.25;} 100% {opacity:1;filter:none;transform:none;} }
-@keyframes extrude { from {opacity:.1;transform:translateZ(-180px) rotateY(-35deg);text-shadow:4px 4px #c77370,8px 8px #c7737033;} to {opacity:1;transform:none;text-shadow:0 0 transparent;} }
-@keyframes fold-in { from {opacity:.1;transform:rotateX(85deg);} to {opacity:1;transform:none;} }
-@keyframes stencil { from {clip-path:inset(0 0 100%);transform:translateY(-8px);} to {clip-path:inset(0);transform:none;} }
-@keyframes assemble { from {opacity:.1;clip-path:polygon(50% 0,50% 0,50% 100%,50% 100%);transform:rotate(-12deg);} to {opacity:1;clip-path:polygon(0 0,100% 0,100% 100%,0 100%);transform:none;} }
-@keyframes print-down { from {clip-path:inset(0 0 100%);text-shadow:0 -5px var(--accent);} to {clip-path:inset(0);text-shadow:0 0 transparent;} }
-@keyframes decoded { 0% {opacity:.1;transform:skewX(15deg);} 30% {opacity:.45;transform:skewX(-8deg);} 65% {opacity:.8;transform:skewX(3deg);} 100% {opacity:1;transform:none;} }
-@keyframes ignite { from {opacity:.1;filter:blur(7px);text-shadow:-3px 0 var(--accent);} to {opacity:1;filter:none;text-shadow:0 0 transparent;} }
-@keyframes depth-in { from {opacity:.1;transform:translateZ(160px) rotateY(30deg);} to {opacity:1;transform:none;} }
-@keyframes hinge { from {opacity:.1;transform:rotateY(-90deg);} to {opacity:1;transform:none;} }
-@keyframes scan-across { from {clip-path:inset(0 100% 0 0);} to {clip-path:inset(0);} }
-@keyframes converge { from {opacity:.1;transform:translateX(14px) scaleX(.4);} to {opacity:1;transform:none;} }
-.letter-fragment { position:absolute; inset:0; pointer-events:none; opacity:0; animation:fragment-arrive 950ms var(--letter-delay) cubic-bezier(.16,1,.3,1) backwards; }
-.entrance-2 .name-glyph,.entrance-9 .name-glyph { animation:glyph-solid 950ms var(--letter-delay) ease-out backwards; }
-@keyframes fragment-arrive { 0% {opacity:0;transform:translate(var(--piece-x),var(--piece-y)) rotate(var(--piece-turn)) scale(.45);} 30% {opacity:1;} 75% {opacity:1;transform:none;} 100% {opacity:0;transform:none;} }
-@keyframes glyph-solid { 0%,55% {opacity:.08;} 100% {opacity:1;} }
-@media (prefers-reduced-motion:reduce) { .letter-fragment {display:none;} }
-.name-letter::after { content: ""; position: absolute; height: 1px; background: var(--accent); left: 0; right: 0; bottom: 10%; transform: scaleX(0); animation: letter-scan 900ms var(--letter-delay) ease-out backwards; }
-.entrance-1::after { height: 65%; width: 2px; left: auto; right: -3px; bottom: 18%; animation-name: type-cursor; }
-@keyframes type-cursor { 0%,65% {transform:scaleX(1);opacity:.8;} 100% {transform:scaleX(0);opacity:0;} }
-@keyframes letter-slide { from { opacity: .05; transform: translateY(28px) rotate(-8deg); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
-@keyframes letter-turn { from { opacity: .05; transform: rotateX(75deg) translateY(-16px); } to { opacity: 1; transform: none; } }
-@keyframes letter-resolve { 0% { opacity: .05; clip-path: inset(0 0 100%); transform: translateX(9px); } 45% { opacity: .55; clip-path: inset(0 0 35%); } 100% { opacity: 1; clip-path: inset(0); transform: none; } }
-@keyframes letter-scan { 0% { transform: scaleX(0); opacity: 0; } 30% { transform: scaleX(1); opacity: .7; } 100% { transform: scaleX(0); opacity: 0; } }
+.name-letter { display:inline-block; position:relative; transform-origin:50% 80%; }
 .hero-description { font-size: clamp(19px,1.7vw,25px); color: var(--muted); margin-top: 18px; }
 .text-link { display: inline-flex; align-items: center; gap: 18px; color: var(--accent-light); font-size: 16px; transition: color .2s; }
 .text-link svg { transition: transform .2s; flex-shrink: 0; }

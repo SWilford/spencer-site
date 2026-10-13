@@ -1,8 +1,16 @@
 export type Point = { x: number; y: number; z: number };
 export type ScreenPoint = Point & { scale: number; visible: boolean };
 export const count = 12;
-export const shapeNames = ["icosahedron", "cuboctahedron", "hexagonal-antiprism", "decagonal-bipyramid", "hexagonal-prism"];
+export const shapeNames = ["icosahedron", "cuboctahedron", "hexagonal-antiprism", "decagonal-bipyramid", "hexagonal-prism", "trapezoidal-prism", "cube", "triangular-prism", "regular-octahedron", "tetrahedron"];
+export const shapeVertexCounts=[12,12,12,12,12,8,8,6,6,4];
 export function target(i: number, shape: number): Point {
+  if(shape===5 || shape===6) {
+    const x=i%2 ? 1 : -1,y=Math.floor(i/2)%2 ? 1 : -1,z=i<4 ? -1 : 1;
+    return {x:x*(shape===5 && y<0 ? .55 : 1),y,z};
+  }
+  if(shape===7) {const cross=[[-1,-1],[1,-1],[-1,1]][i%3];return {x:cross[0],y:cross[1],z:i<3 ? -1 : 1};}
+  if(shape===8) return [{x:1.5,y:0,z:0},{x:-1.5,y:0,z:0},{x:0,y:1.5,z:0},{x:0,y:-1.5,z:0},{x:0,y:0,z:1.5},{x:0,y:0,z:-1.5}][i];
+  if(shape===9) return [{x:1,y:1,z:1},{x:-1,y:-1,z:1},{x:-1,y:1,z:-1},{x:1,y:-1,z:-1}][i];
   const phi = (1 + Math.sqrt(5)) / 2;
   if (shape === 0) {
     const a = i % 2 ? 1 : -1, b = Math.floor(i / 2) % 2 ? phi : -phi;
@@ -20,6 +28,7 @@ export function target(i: number, shape: number): Point {
 }
 // Supporting planes supply actual closed polygon faces, computed once per target.
 export function hull(shape: number): number[][] {
+  const count=shapeVertexCounts[shape];
   const vertices = Array.from({length:count},(_,i)=>target(i,shape));
   const faces = new Map<string,number[]>();
   for(let a=0;a<count;a++) for(let b=a+1;b<count;b++) for(let c=b+1;c<count;c++) {
