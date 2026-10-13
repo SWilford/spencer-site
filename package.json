@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
+    "test:scene": "node --experimental-strip-types --test tests/scene.test.mjs",
     "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {

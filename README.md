@@ -15,12 +15,17 @@ Open http://localhost:3000. Press Ctrl+C to stop. The interactive draft has a se
 
 ```powershell
 npm.cmd run lint
+npm.cmd run test:scene
 npm.cmd run typecheck
 npm.cmd run build
 npm.cmd run start -- --hostname 127.0.0.1
 ```
 
 npm.cmd run check runs lint, types, and production build. Use npm.cmd if PowerShell blocks npm.ps1. Commit package-lock.json and use npm ci on other computers.
+
+For reviewing page-switch speed, use the built local preview (`npm.cmd run build`, then `npm.cmd run start`) so route compilation does not delay navigation. Stop any development server on port 3000 first. Development output uses `.next-local`; production checks use `.next`, keeping the running development preview isolated from builds.
+
+The approved moving-grid milestone is preserved as Git tag `checkpoint-node-grid-v1`. Current letter effects are listed in `docs/name-animation-map.md` for the next animation design pass.
 
 ## Project map
 

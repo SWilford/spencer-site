@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-13T01:34:01.171930+00:00",
+  "generatedAt": "2026-10-13T01:52:19.288704+00:00",
   "title": "Design System: Spencer Wilford",
   "extensions": {
     "colorMeta": {
@@ -156,12 +156,12 @@
       {
         "name": "shape-phase",
         "value": "14s; randomized initial phase and shape order per body",
-        "purpose": "Snapped lattice-rest, assembly, rotation, growth, five-target morphing, splitting, and dissolution with anchor tethers. Crypto randomness also varies initial travel, lane, and spin; root-layout mounting preserves motion across client page changes."
+        "purpose": "Stable lifecycle lattice anchors, assembly, rotation, growth, long complete-form holds, brief five-solid morphing, and dissolution with tethers. Closed hull faces and cached true face edges define the forms. Scene persists in root layout across client page changes."
       },
       {
         "name": "pointer-smoothing",
         "value": "1 - exp(-dt * 5)",
-        "purpose": "Smoothly blend pointer position and influence, including decay. Forms alone deform and receive cursor-velocity impulses, spin, strain, damped flight, and approximate spherical collision impulses while assembled; affected faces fade. Grid projection stays pointer-independent."
+        "purpose": "Smooth pointer presence; cursor velocity supplies rigid body impulses and spin with damped flight. Cursor does not deform vertices or add stress. Approximate spherical body collisions and wall bounces alone accumulate breakup stress. Grid projection remains pointer-independent."
       },
       {
         "name": "motion-accessibility",
@@ -170,8 +170,8 @@
       },
       {
         "name": "volume-travel",
-        "value": "42s; staggered randomized initial travel",
-        "purpose": "Shared world-space projection carries bodies back left to front right, nearer the camera, with faded recycling. New laps reset flight offset, velocity, and strain, and randomize the lane, lifecycle phase, and shape order. The five-plane lattice advances without pointer deformation."
+        "value": "42s flow-rate scale; event-driven replacement",
+        "purpose": "Bodies flow back left to front right without a timed lifetime reset. Full right exit or collision stress reaching 1.4 immediately spawns a left replacement. Left/top/bottom projected bounds bounce; right remains open. Stress breakup emits 12 bounded fragments fading over 5s. Continuous grid identities and stable lifecycle anchors avoid wrap jumps; grid edges fade at recycling."
       }
     ],
     "breakpoints": [
@@ -240,7 +240,7 @@
   ],
   "narrative": {
     "northStar": "Open content over a tactical graph",
-    "overview": "The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site\u2019s identity.\n\nMovement belongs to the spatial field and the name\u2019s first entrance. A shared world-space projection carries a five-plane lattice and three angular clusters from back left toward front right, advancing rightward and nearer the camera. Shape nodes begin at snapped lattice intersections, assemble into rotating forms, grow, morph, split, and dissolve back into the lattice with anchor tethers. Bright beacons pulse at intersections. The lattice projection stays independent of the pointer. Forms alone deform and receive cursor-velocity impulses, rotation, strain, and damped flight; disrupted faces fade while readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.",
+    "overview": "The approved open-layout-v6 direction places clear, warm typography over a quiet technical background. Foreground content is unboxed, left aligned, and spacious. Soft charcoal and dusty red temper the angular geometry; the professional portfolio leads the site\u2019s identity.\n\nMovement belongs to the spatial field and the name\u2019s first entrance. A shared world-space projection carries a five-plane lattice and three angular clusters from back left toward front right, advancing rightward and nearer the camera. Shape nodes begin at snapped lattice intersections, assemble into rotating forms, grow, hold, morph, and dissolve back into the lattice with anchor tethers. Bright beacons pulse at intersections. The lattice projection stays independent of the pointer. Forms receive rigid cursor impulses and spin, followed by damped flight. Only body and wall collisions accumulate stress; readable foreground content stays stable. Decorative content icons are excluded, while functional header controls and GitHub, LinkedIn, and email icons remain.",
     "keyCharacteristics": [
       "Open typography and asymmetric whitespace.",
       "Soft charcoal, dusty red, and warm gray.",

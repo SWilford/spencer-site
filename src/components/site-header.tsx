@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CaretDown, EnvelopeSimple, GithubLogo, LinkedinLogo, List, X } from "@phosphor-icons/react";
+import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
+import { EnvelopeSimple } from "@phosphor-icons/react/dist/csr/EnvelopeSimple";
+import { GithubLogo } from "@phosphor-icons/react/dist/csr/GithubLogo";
+import { LinkedinLogo } from "@phosphor-icons/react/dist/csr/LinkedinLogo";
+import { List } from "@phosphor-icons/react/dist/csr/List";
+import { X } from "@phosphor-icons/react/dist/csr/X";
 import { profile } from "@/content/profile";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -38,7 +43,7 @@ export function SiteHeader() {
         {mobileOpen ? <X size={23} /> : <List size={23} />}
       </button>
       <nav id="main-navigation" aria-label="Main navigation" className={mobileOpen ? "main-nav is-open" : "main-nav"}>
-        {mainLinks.map(([label, href]) => <Link key={label} href={href} aria-current={pathname === href ? "page" : undefined} onClick={close}>{label}</Link>)}
+        {mainLinks.map(([label, href]) => <Link prefetch={true} key={label} href={href} aria-current={pathname === href ? "page" : undefined} onClick={close}>{label}</Link>)}
         <div className="fun-disclosure" ref={funRef}>
           <button ref={funButton} className="fun-trigger" aria-expanded={funOpen} aria-controls="fun-links"
             onClick={() => setFunOpen(!funOpen)}>For fun <CaretDown size={13} className={funOpen ? "turned" : ""} /></button>
