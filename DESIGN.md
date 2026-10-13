@@ -86,7 +86,7 @@ components:
     padding: "10px 18px"
     size: "14px"
   hero-button:
-    backgroundColor: "linear-gradient(135deg,rgba(237,232,232,.08),rgba(48,48,51,.10) 55%,rgba(199,115,112,.045)),rgba(36,36,38,.22)"
+    backgroundColor: "linear-gradient(135deg,rgba(237,232,232,.035),transparent 45%,rgba(199,115,112,.045)),rgba(36,36,38,.055)"
     textColor: "{colors.foreground}"
     rounded: "{rounded.route-face}"
     padding: "15px 24px"
@@ -160,7 +160,7 @@ At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At
 
 Foreground content is flat. Depth comes from the fixed canvas beneath semantic content: one shared perspective projection for grid and forms, a five-plane advancing lattice, one-time angular body formation, faint filled faces, square nodes, and bright intersection beacons. The canvas is noninteractive in the document hit-test layer and hidden from assistive technology; a subtle reading scrim sits above it.
 
-The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. The current glass trial uses a translucent route face with blur (16px) with saturation (1.1), a faint neutral border, top reflection gradient, and inset upper rim. Route faces use `0 7px 16px rgba(13,13,15,.26),0 2px 0 rgba(17,17,20,.5),inset 0 1px 0 rgba(237,232,232,.16)`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
+The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. The current glass trial uses a translucent route face with blur (4px) with saturation (1.08), a muted red border, top reflection gradient, and inset upper rim. Route faces use `0 5px 12px rgba(13,13,15,.16),0 2px 0 rgba(17,17,20,.22),inset 0 1px 0 rgba(237,232,232,.20)`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
 
 **The Background Geometry Rule.** Keep tactical lines and grids behind the content. Foreground sections remain open and unboxed.
 
@@ -180,7 +180,7 @@ Actions are unboxed text in Light Dusty Red. The base link size is (16px), while
 
 ### Home route buttons
 
-Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `rgba(36,36,38,.22)`, blur (16px) with saturation (1.1), a `rgba(237,232,232,.16)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(48,48,51,.92)`. The outer link has minimum height (64px) and perspective (650px).
+Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `rgba(36,36,38,.055)`, blur (4px) with saturation (1.08), a `rgba(221,139,135,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(48,48,51,.24)`. The outer link has minimum height (64px) and perspective (650px).
 
 On hover, keyboard focus, or press, thirty accent blocks in ten columns and three rows scale in from the left; each column adds (24ms) and each row adds (16ms), reaching a maximum stagger (248ms). The readable label stays unchanged, shifting to dark text over the red fill. Pressing moves the face down (4px), back (-10px), and scales it to (.975) with a flatter shadow and (70ms) response. Pointer/touch and Enter press states reset on release, cancel, pointer leave, or blur. Reduced-motion removes face transforms and the global rule makes fill transitions instant. No portrait is currently included. The footer checks the active pathname and returns no footer on Home, avoiding the repeated name and Contact action; interior pages retain it. Button text disables selection during interaction.
 
@@ -216,7 +216,9 @@ Completed animations remain settled across cached-page visibility changes. Typed
 
 ### Page transitions
 
-A stable React ViewTransition wraps only page children, with the `page-content` name, door update/enter/exit class, and default none; header and canvas remain outside. The wrapper has no pathname key and uses update="door", preserving Next’s cached client-page state instead of remounting children. The document root opts out of snapshots. Outgoing content rotates (-52deg) and translates (16vw) right over (280ms), with opacity (1) initially, (.1) at (40%), and (0) by (60%). Incoming content starts at (48deg)/(-10vw), arrives over (400ms) after (150ms), for a total (550ms), and resolves to its normal position. Both pivot at left (45%) with perspective (160vw). Reduced-motion disables transition animations; unsupported browsers navigate normally. No automatic idle text animation is implemented.
+A stable React ViewTransition wraps only page children, with the `page-content` name, door update/enter/exit class, and default none; header and canvas remain outside. The wrapper has no pathname key and uses update="door", preserving Next’s cached client-page state instead of remounting children. The document root opts out of snapshots. Outgoing content rotates (-58deg) and translates (20vw) right and (6vw) nearer over (440ms), with opacity (1) initially, (.55) at (65%), and (0) at the end. Incoming content starts immediately at opacity (.35), rotation (58deg), and translation (-4vw, 0, -50vw); opacity reaches (.7) at (45%) and (1) at its normal position after (600ms). The old snapshot uses z-index (2) above the new snapshot at (1), revealing the next page early in depth during the concurrent transition. Both pivot at left (45%) with perspective (160vw). Reduced-motion disables transition animations; unsupported browsers navigate normally. No automatic idle text animation is implemented.
+
+The 600ms door arrival uses cubic-bezier(.4,0,.3,1) for a slower initial depth approach. During the transition, snapshots ignore pointer events and the moving page-stage is inert; the header remains outside and clickable. Browser inspection at 160ms confirmed incoming depth near -574px behind outgoing opacity .73, with distinct transform matrices. Full checks and production build passed. Cursor treatments remain proposals.
 
 ### Keyboard focus
 
