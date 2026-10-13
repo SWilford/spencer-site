@@ -196,7 +196,7 @@ export function WireframeBackground() {
           z:anchor.z-center.z+(formed.z*growth-(anchor.z-center.z))*assembly,
         };
         const screen = worldProject({x:center.x+p.x,y:center.y+p.y,z:center.z+p.z});
-        line(worldProject(anchor),screen,.12*assembly*(1-assembly)*fade);
+        if(assembly<1) line(worldProject(anchor),screen,.24*fade);
         screens.push(screen);
       }
       const bounds={left:Math.min(...screens.map(p=>p.x)),right:Math.max(...screens.map(p=>p.x)),top:Math.min(...screens.map(p=>p.y)),bottom:Math.max(...screens.map(p=>p.y))};

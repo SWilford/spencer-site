@@ -160,7 +160,7 @@
       {
         "name": "shape-phase",
         "value": ".55s source activation + 2.52s one-time smoothstep formation",
-        "purpose": "Five-body cap and existing stagger unchanged. Each spawn selects shuffled order[0], forms once, and retains its solid until fracture or exit. Anchors are nearest unused actual visible gridNodes members (fade>.35, projected at least12px inside viewport), stored by idX/idZ/plane and reconstructed by gridNodePosition. No synthetic candidate grid. True edges draw as staggered partial segments; tethers fade at completion."
+        "purpose": "Five-body cap and existing stagger unchanged. Each spawn selects shuffled order[0], forms once, and retains its solid until fracture or exit. Anchors are nearest unused actual visible gridNodes members (fade>.35, projected at least12px inside viewport), stored by idX/idZ/plane and reconstructed by gridNodePosition. No synthetic candidate grid. True edges draw as staggered partial segments; tethers remain visible throughout construction at alpha .24 \u00d7 birth fade and are removed only at complete assembly."
       },
       {
         "name": "pointer-smoothing",
