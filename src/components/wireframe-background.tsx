@@ -58,7 +58,18 @@ export function WireframeBackground() {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let width = 0, height = 0, elapsed = 0, frame = 0, last = 0;
     let reduced = motionQuery.matches;
-    const pointer = { x: .5, y: .5, strength: 0 };
+    const random = () => crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
+    const bodies = Array.from({length:3},(_,layer)=>({
+      travel:layer/3+random()*.12, phase:random()*5, lane:layer*1.8+(random()-.5)*.65,
+      order:shapeNames.map((_,i)=>i), offset:{x:0,y:0,z:0}, velocity:{x:0,y:0,z:0},
+      spin:random()*Math.PI*2, strain:0, cooldown:0, lap:0,
+    }));
+    for(const body of bodies) for(let i=body.order.length-1;i>0;i--) {
+      const j=Math.floor(random()*(i+1)); [body.order[i],body.order[j]]=[body.order[j],body.order[i]];
+    }
+    let kicks=0, collisions=0;
+    const pointer = { x: .5, y: .5, strength: 0, vx:0, vy:0, time:0, serial:0 };
+    let handledPointer=0;
     const smooth = { x: .5, y: .5, strength: 0 };
     const resize = () => {
       width = window.innerWidth;
@@ -70,6 +81,10 @@ export function WireframeBackground() {
     };
     const move = (event: PointerEvent) => {
       if (event.pointerType === "touch" || reduced) return;
+      const seconds=Math.max(.016,(event.timeStamp-pointer.time)/1000);
+      pointer.vx=pointer.time ? Math.max(-1800,Math.min(1800,(event.clientX-pointer.x*width)/seconds)) : 0;
+      pointer.vy=pointer.time ? Math.max(-1800,Math.min(1800,(event.clientY-pointer.y*height)/seconds)) : 0;
+      pointer.time=event.timeStamp; pointer.serial++;
       pointer.x = event.clientX / width;
       pointer.y = event.clientY / height;
       pointer.strength = 1;
@@ -83,7 +98,7 @@ export function WireframeBackground() {
     function draw(timestamp: number) {
       if (!context || !canvas) return;
       if (document.hidden) { last = 0; return; }
-      if (last && timestamp - last < 1000 / 30 && !reduced) {
+      if (last && timestamp - last < 1000 / (elapsed<2 ? 20 : 30) && !reduced) {
         frame = requestAnimationFrame(draw);
         return;
       }
@@ -97,14 +112,8 @@ export function WireframeBackground() {
       context.clearRect(0, 0, width, height);
       const px = smooth.x * width, py = smooth.y * height;
       const worldSize = Math.min(width * .16, height * .21);
-      const worldProject = (p: Point) => {
-        const screen = project(p, width * .30, height * .28, worldSize);
-        const dx = screen.x-px, dy = screen.y-py;
-        const influence = Math.max(0,1-Math.hypot(dx,dy)/210)*smooth.strength;
-        screen.x += dx*influence*.30;
-        screen.y += dy*influence*.30;
-        return screen;
-      };
+      // Grid projection is deliberately independent of the pointer.
+      const worldProject = (p: Point) => project(p,width*.30,height*.28,worldSize);
       const line = (a: ScreenPoint, b: ScreenPoint, alpha: number) => {
         if (!a.visible || !b.visible) return;
         context.beginPath();
@@ -132,10 +141,66 @@ export function WireframeBackground() {
         }
       }
       const smoothstep = (v:number) => {const t=Math.max(0,Math.min(1,v));return t*t*(3-2*t);};
+      const centers = bodies.map(body=>{
+        const lap=Math.floor(elapsed/42+body.travel);
+        if(lap!==body.lap) {
+          body.lap=lap; body.offset={x:0,y:0,z:0}; body.velocity={x:0,y:0,z:0};
+          body.strain=0; body.lane=(bodies.indexOf(body)*1.8)+(random()-.5)*.65;
+          body.phase=random()*5;
+          for(let i=body.order.length-1;i>0;i--) {
+            const j=Math.floor(random()*(i+1)); [body.order[i],body.order[j]]=[body.order[j],body.order[i]];
+          }
+        }
+        const travel=(elapsed/42+body.travel)%1;
+        const center={x:-2.8+travel*8+body.offset.x,y:.6+travel*1.3+body.lane+body.offset.y,z:8-travel*10+body.offset.z};
+        const screen=worldProject(center);
+        const phase=(elapsed/14+body.phase)%1;
+        const formed=smoothstep(phase/.18)*(1-smoothstep((phase-.76)/.18));
+        const dx=screen.x-pointer.x*width,dy=screen.y-pointer.y*height;
+        if(!reduced && pointer.serial!==handledPointer && elapsed>body.cooldown && formed>.45 && screen.visible && Math.hypot(dx,dy)<worldSize*screen.scale*1.15+20) {
+          const speed=Math.hypot(pointer.vx,pointer.vy);
+          const force=.65+Math.min(2.8,speed/600);
+          const distance=Math.hypot(dx,dy)||1;
+          body.velocity.x+=(pointer.vx/900+dx/distance*.8)*force;
+          body.velocity.y+=(pointer.vy/900+dy/distance*.8)*force;
+          body.velocity.z+=(random()-.5)*force*2;
+          body.spin+=(random()-.5)*force; body.strain=Math.min(1,body.strain+.65);
+          body.cooldown=elapsed+.3; kicks++;
+        }
+        for(const axis of ['x','y','z'] as const) {
+          body.offset[axis]+=body.velocity[axis]*dt;
+          body.velocity[axis]*=Math.exp(-dt*.22);
+          center[axis]+=body.velocity[axis]*dt;
+        }
+        body.strain*=Math.exp(-dt*2.6);
+        return {center,formed,travel};
+      });
+      handledPointer=pointer.serial;
+      // Broad-phase spheres exchange impulses only while forms are assembled.
+      for(let a=0;a<bodies.length;a++) for(let b=a+1;b<bodies.length;b++) {
+        const first=centers[a],second=centers[b];
+        if(reduced || dt===0 || first.formed<.45 || second.formed<.45) continue;
+        const delta={x:second.center.x-first.center.x,y:second.center.y-first.center.y,z:second.center.z-first.center.z};
+        const distance=Math.hypot(delta.x,delta.y,delta.z);
+        if(distance>=2.1 || distance<.001) continue;
+        const normal={x:delta.x/distance,y:delta.y/distance,z:delta.z/distance};
+        const relative=(bodies[b].velocity.x-bodies[a].velocity.x)*normal.x+(bodies[b].velocity.y-bodies[a].velocity.y)*normal.y+(bodies[b].velocity.z-bodies[a].velocity.z)*normal.z;
+        const impulse=Math.max(0,-relative)*.85;
+        for(const axis of ['x','y','z'] as const) {
+          const correction=normal[axis]*(2.1-distance)*.5;
+          bodies[a].offset[axis]-=correction; bodies[b].offset[axis]+=correction;
+          first.center[axis]-=correction; second.center[axis]+=correction;
+          bodies[a].velocity[axis]-=normal[axis]*impulse;
+          bodies[b].velocity[axis]+=normal[axis]*impulse;
+        }
+        if(impulse>.15) {collisions++;bodies[a].strain=.6;bodies[b].strain=.6;}
+      }
       for (let layer = 0; layer < 3; layer++) {
-      const travel = (elapsed / 42 + layer / 3) % 1;
-      const phase = elapsed / 14 + layer * 1.7;
-      const shape = Math.floor(phase) % shapeNames.length;
+      const body=bodies[layer];
+      const travel = centers[layer].travel;
+      const phase = elapsed / 14 + body.phase;
+      const shape = body.order[Math.floor(phase)%shapeNames.length];
+      const nextShape = body.order[(Math.floor(phase)+1)%shapeNames.length];
       const stage = phase%1;
       const assembly = smoothstep(stage/.18)*(1-smoothstep((stage-.76)/.18));
       const split = smoothstep((stage-.53)/.18)*(1-smoothstep((stage-.85)/.15));
@@ -144,11 +209,11 @@ export function WireframeBackground() {
       const points: Point[] = [];
       const screens: ScreenPoint[] = [];
       // All nodes and forms use the same projection and back-left → front-right flow.
-      const center = {x:-2.8+travel*8,y:.6+travel*1.3+layer*1.8,z:8-travel*10};
+      const center = centers[layer].center;
       let disruption = 0;
       for (let i = 0; i < count; i++) {
-        const a = target(i, shape), b = target(i, (shape + 1) % shapeNames.length);
-        const formed = rotate({ x:a.x+(b.x-a.x)*blend,y:a.y+(b.y-a.y)*blend,z:a.z+(b.z-a.z)*blend },elapsed*.16+layer,-.25+elapsed*.055);
+        const a = target(i, shape), b = target(i, nextShape);
+        const formed = rotate({ x:a.x+(b.x-a.x)*blend,y:a.y+(b.y-a.y)*blend,z:a.z+(b.z-a.z)*blend },elapsed*.16+body.spin,-.25+elapsed*.055+body.strain*.3);
         const rest = {x:(i%3-1)*1.25,y:Math.floor(i/3)%2 ? 1.2 : -1.2,z:Math.floor(i/6)*1.6-.8};
         const anchor = {
           x:(Math.round((center.x+rest.x)/1.25-driftX)+driftX)*1.25,
@@ -165,15 +230,15 @@ export function WireframeBackground() {
         const screen = worldProject({x:center.x+p.x,y:center.y+p.y,z:center.z+p.z});
         const dx = screen.x - px, dy = screen.y - py;
         const distance = Math.hypot(dx, dy);
-        const influence = Math.max(0, 1 - distance / 230) * smooth.strength;
+        const influence = Math.max(0, 1 - distance / 150) * smooth.strength*assembly;
         disruption = Math.max(disruption,influence);
-        screen.x += (dx * .38 + Math.sin(i*2.7+elapsed)*30) * influence;
-        screen.y += (dy * .38 + Math.cos(i*1.8+elapsed)*30) * influence;
+        screen.x += (dx * .22 + Math.sin(i*2.7+elapsed)*body.strain*35) * influence;
+        screen.y += (dy * .22 + Math.cos(i*1.8+elapsed)*body.strain*35) * influence;
         line(worldProject(anchor),screen,.12*assembly*fade);
         screens.push(screen);
       }
       const completion = assembly*assembly*(1-split)*(1-Math.sin(blend*Math.PI)*.7);
-      for (const indices of shapeFaces[blend < .5 ? shape : (shape+1)%shapeNames.length]) {
+      for (const indices of shapeFaces[blend < .5 ? shape : nextShape]) {
         const face = indices.map(i => screens[i]);
         if (face.every(p => p.visible)) {
           context.beginPath(); context.moveTo(face[0].x,face[0].y);
@@ -203,11 +268,14 @@ export function WireframeBackground() {
         }
       }
       }
-      canvas.dataset.shape = shapeNames[Math.floor(elapsed/14)%shapeNames.length];
+      canvas.dataset.shape = shapeNames[bodies[0].order[Math.floor(elapsed/14+bodies[0].phase)%shapeNames.length]];
       canvas.dataset.travel = ((elapsed/42)%1).toFixed(3);
       canvas.dataset.flow = "back-left-to-front-right";
       canvas.dataset.gridPhase = driftX.toFixed(3);
       canvas.dataset.pointer = smooth.strength.toFixed(2);
+      canvas.dataset.kicks=String(kicks); canvas.dataset.collisions=String(collisions);
+      canvas.dataset.sequence=bodies.map(b=>b.order.join('')).join('-');
+      canvas.dataset.centers=JSON.stringify(centers.map(({center})=>center));
       canvas.dataset.motion = reduced ? "reduced" : "running";
       if (!reduced) frame = requestAnimationFrame(draw);
     }
