@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, formationProgress, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
-import { collide, confine, gridCell, constructionAnchors } from "@/lib/scene-physics";
+import { collide, confine, gridNodes, gridNodePosition, constructionAnchors, type GridNode } from "@/lib/scene-physics";
 
 export function WireframeBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,7 +23,7 @@ export function WireframeBackground() {
       small,size,mass:size**3,period,lane:[.6,3.2,1.2,2.4,3.8][index]+(random()-.5)*.5,
       order:Array.from({length:5},(_,i)=>small ? i+5 : i), offset:{x:0,y:0,z:0},velocity:{x:0,y:0,z:0},
       spin:random()*Math.PI*2, strain:0, cooldown:0,birth,
-      anchors:[] as Point[],
+      anchors:[] as GridNode[],
     };});
     for(const body of bodies) for(let i=body.order.length-1;i>0;i--) {
       const j=Math.floor(random()*(i+1)); [body.order[i],body.order[j]]=[body.order[j],body.order[i]];
@@ -92,17 +92,17 @@ export function WireframeBackground() {
         context.lineWidth = 1; context.stroke();
       };
       // The entire lattice advances rightward and toward the camera in world space.
-      const flowX=elapsed*.14,flowZ=elapsed*.11;
-      const driftX=flowX%1,driftZ=flowZ%1;
-      for(let plane=0;plane<5;plane++) for(let x=-6;x<=6;x++) for(let z=-1;z<=7;z++) {
-        const cell=gridCell(x,z,elapsed);
-        const point = {x:cell.x,y:plane*1.8-1.2,z:cell.z};
+      const driftX=(elapsed*.14)%1;
+      const lattice=gridNodes(elapsed);
+      const visibleNodes=lattice.filter(node=>{const p=worldProject(node.position);return node.fade>.35 && p.visible && p.x>12 && p.x<width-12 && p.y>12 && p.y<height-12;});
+      for(const node of lattice) {
+        const {plane,idX,idZ}=node;
+        const point = node.position;
         const p = worldProject(point);
-        const edgeFade=Math.max(0,Math.min(1,6-Math.abs(x+driftX),(z-driftZ+1),(7-z+driftZ)));
+        const edgeFade=node.fade;
         const depthFade = Math.max(.15,Math.min(1,p.scale))*edgeFade;
         line(p,worldProject({...point,x:point.x+1.25}),.18*depthFade);
         line(p,worldProject({...point,z:point.z+1.6}),.18*depthFade);
-        const {idX,idZ}=cell;
         if(plane===0 && idX%3===0 && idZ%3===0) line(p,worldProject({...point,y:6}),.13*depthFade);
         if(!p.visible) continue;
         const light = Math.pow(.5+.5*Math.sin(idX*7.13+idZ*4.7+plane+elapsed*.8),12);
@@ -130,7 +130,7 @@ export function WireframeBackground() {
         }
         const center={x:base.x+body.offset.x,y:base.y+body.offset.y,z:base.z+body.offset.z};
         const screen=worldProject(center);
-        const formed=formationProgress(reduced ? 2.52 : elapsed-body.birth);
+        const formed=formationProgress(reduced ? 2.52 : elapsed-body.birth-.55);
         const dx=screen.x-pointer.x*width,dy=screen.y-pointer.y*height;
         if(!reduced && pointer.strength>0 && elapsed>body.cooldown && formed>.45 && screen.visible && Math.hypot(dx,dy)<worldSize*screen.scale*1.15*body.size+12) {
           const speed=Math.hypot(pointer.vx,pointer.vy);
@@ -178,14 +178,17 @@ export function WireframeBackground() {
       // All nodes and forms use the same projection and back-left → front-right flow.
       const center = centers[layer].center;
       if(body.anchors.length===0) {
-        body.anchors=constructionAnchors(center,Array.from({length:count},(_,i)=>target(i,shape)),elapsed);
+        if(visibleNodes.length<count) continue;
+        body.anchors=constructionAnchors(center,Array.from({length:count},(_,i)=>target(i,shape)),visibleNodes);
       }
       for (let i = 0; i < count; i++) {
         const formed = rotate(target(i,shape),elapsed*.16+body.spin,-.25+elapsed*.055);
-        const rest = body.anchors[i];
-        const anchor = {
-          x:(rest.x+flowX)*1.25,y:rest.y,z:(rest.z-flowZ)*1.6,
-        };
+        const anchor = gridNodePosition(body.anchors[i],elapsed);
+        if(assembly<1) {
+          const source=worldProject(anchor);
+          context.fillStyle=`rgba(239,174,165,${.85*(1-assembly)})`;
+          context.fillRect(source.x-2,source.y-2,4,4);
+        }
         const growth = .9*body.size;
         const p = {
           x:anchor.x-center.x+(formed.x*growth-(anchor.x-center.x))*assembly,
@@ -272,6 +275,7 @@ export function WireframeBackground() {
       }
       canvas.dataset.shape = shapeNames[bodies[0].order[0]];
       canvas.dataset.shapes=bodies.map(body=>shapeNames[body.order[0]]).join(',');
+      canvas.dataset.seeds=JSON.stringify(bodies.map(body=>body.anchors.map(node=>({idX:node.idX,idZ:node.idZ,plane:node.plane}))));
       canvas.dataset.births=bodies.map(body=>body.birth.toFixed(2)).join(',');
       canvas.dataset.population=String(bodies.length);
       canvas.dataset.active=String(bodies.filter(body=>elapsed>=body.birth).length);

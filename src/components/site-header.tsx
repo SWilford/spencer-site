@@ -12,7 +12,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const mainLinks = [["Home", "/"], ["Experience", "/experience"], ["Projects", "/projects"], ["Résumé", "/resume"], ["Contact", "/contact"]];
-const funLinks = [["Music & guitar", "/music"], ["Photos", "/photos"], ["Journal", "/journal"]];
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -48,7 +47,7 @@ export function SiteHeader() {
           <button ref={funButton} className="fun-trigger" aria-expanded={funOpen} aria-controls="fun-links"
             onClick={() => setFunOpen(!funOpen)}>For fun <CaretDown size={13} className={funOpen ? "turned" : ""} /></button>
           {funOpen && <ul id="fun-links" className="fun-links">
-            {funLinks.map(([label, href]) => <li key={href}><Link href={href} onClick={close}>{label}</Link></li>)}
+            <li className="fun-empty">More to come.</li>
           </ul>}
         </div>
       </nav>

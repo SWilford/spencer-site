@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces, formationProgress } from '../src/lib/scene-geometry.ts';
-import { collide, confine, gridCell, constructionAnchors } from '../src/lib/scene-physics.ts';
+import { collide, confine, gridCell, gridNodes, gridNodePosition, constructionAnchors } from '../src/lib/scene-physics.ts';
 test('grid recycling preserves node identities and continuous world positions',()=>{
   const epsilon=.00001;
   const before=gridCell(0,0,1/.14-epsilon),after=gridCell(1,0,1/.14+epsilon);
@@ -52,16 +52,20 @@ test('formation completes once and never restarts or dissolves during travel',()
   for(const age of [2.52,7,14,28,56,120]) assert.equal(formationProgress(age),1);
 });
 
-test('every construction vertex starts at a distinct moving lattice intersection',()=>{
+test('construction seeds are distinct members of the rendered finite grid, including after recycling',()=>{
   for(const time of [0,9.5,123.4]) for(let shape=0;shape<shapeNames.length;shape++) {
-    const center={x:-2.7,y:2.15,z:7.8};
-    const anchors=constructionAnchors(center,Array.from({length:shapeVertexCounts[shape]},(_,i)=>target(i,shape)),time);
-    assert.equal(new Set(anchors.map(a=>JSON.stringify(a))).size,shapeVertexCounts[shape]);
-    for(const a of anchors) {
-      assert.equal(a.x,Math.round(a.x));assert.equal(a.z,Math.round(a.z));
-      assert.ok(Math.abs((a.y+1.2)/1.8-Math.round((a.y+1.2)/1.8))<1e-10);
+    const nodes=gridNodes(time).filter(node=>node.fade>.35);
+    const anchors=constructionAnchors({x:-2.7,y:2.15,z:7.8},Array.from({length:shapeVertexCounts[shape]},(_,i)=>target(i,shape)),nodes);
+    const identity=node=>`${node.idX}:${node.idZ}:${node.plane}`;
+    assert.equal(new Set(anchors.map(identity)).size,shapeVertexCounts[shape]);
+    for(const anchor of anchors) {
+      assert.ok(nodes.includes(anchor));
+      assert.ok(anchor.plane>=0 && anchor.plane<5);
+      const projected=gridNodePosition(anchor,time);
+      for(const axis of ['x','y','z']) assert.ok(Math.abs(projected[axis]-anchor.position[axis])<1e-10);
+      const later=gridNodes(time+.1).find(node=>identity(node)===identity(anchor));
+      assert.ok(later);
+      for(const axis of ['x','y','z']) assert.ok(Math.abs(gridNodePosition(anchor,time+.1)[axis]-later.position[axis])<1e-10);
     }
-    assert.ok(new Set(anchors.map(a=>a.x)).size>1);
-    assert.ok(new Set(anchors.map(a=>a.z)).size>1);
   }
 });

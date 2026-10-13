@@ -3,7 +3,8 @@ export const profile = {
   email: "sawilford2006@gmail.com",
   github: "https://github.com/SWilford",
   linkedin: "https://www.linkedin.com/in/spencerwilford",
-  introduction: "Experience, projects, and the things I make.",
+  credentials: "CS @ JMU | Prev. SWE at NSWCDD, NGA",
+  introduction: "I've worked in software engineering at NSWCDD and NGA, and helped build a hackathon-winning project at HooHacks 2026. At JMU, I’m a CS ambassador and play men’s rugby. I’m also an Eagle Scout. I’m interested in full-stack development, national security and defense, systems engineering, software architecture, and applying AI and machine learning to practical problems.",
 };
 export const projects = [
   {

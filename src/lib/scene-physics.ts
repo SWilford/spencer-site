@@ -20,19 +20,26 @@ export function confine(bounds:{left:number;right:number;top:number;bottom:numbe
   };
 }
 
-// Pick distinct lattice intersections, independent of the solid's small final size.
-export function constructionAnchors(center:Vector, vertices:Vector[], time:number):Vector[] {
-  const flowX=time*.14,flowZ=time*.11;
-  const origin={x:Math.round(center.x/1.25-flowX),y:Math.round((center.y+1.2)/1.8),z:Math.round(center.z/1.6+flowZ)};
-  const available:Vector[]=[];
-  for(let x=-1;x<=1;x++) for(let y=-1;y<=1;y++) for(let z=-1;z<=1;z++) {
-    available.push({x:origin.x+x,y:(origin.y+y)*1.8-1.2,z:origin.z+z});
+// One finite lattice supplies both rendering and construction; no synthetic seed nodes.
+export type GridNode={idX:number;idZ:number;plane:number;position:Vector;fade:number};
+export function gridNodePosition(node:Pick<GridNode,'idX'|'idZ'|'plane'>,time:number):Vector {
+  return {x:(node.idX+time*.14)*1.25,y:node.plane*1.8-1.2,z:(node.idZ-time*.11)*1.6};
+}
+export function gridNodes(time:number):GridNode[] {
+  const nodes:GridNode[]=[],driftX=(time*.14)%1,driftZ=(time*.11)%1;
+  for(let plane=0;plane<5;plane++) for(let x=-6;x<=6;x++) for(let z=-1;z<=7;z++) {
+    const cell=gridCell(x,z,time);
+    nodes.push({idX:cell.idX,idZ:cell.idZ,plane,position:{x:cell.x,y:plane*1.8-1.2,z:cell.z},fade:Math.max(0,Math.min(1,6-Math.abs(x+driftX),z-driftZ+1,7-z+driftZ))});
   }
+  return nodes;
+}
+export function constructionAnchors(center:Vector,vertices:Vector[],nodes:GridNode[]):GridNode[] {
+  const available=[...nodes];
   return vertices.map(vertex=>{
     const desired={x:center.x+vertex.x,y:center.y+vertex.y,z:center.z+vertex.z};
     let best=0,distance=Infinity;
-    available.forEach((anchor,index)=>{
-      const next=Math.hypot((anchor.x+flowX)*1.25-desired.x,anchor.y-desired.y,(anchor.z-flowZ)*1.6-desired.z);
+    available.forEach((node,index)=>{
+      const p=node.position,next=Math.hypot(p.x-desired.x,p.y-desired.y,p.z-desired.z);
       if(next<distance) {best=index;distance=next;}
     });
     return available.splice(best,1)[0];

@@ -34,7 +34,12 @@ typography:
     lineHeight: 1.6
   introduction:
     fontFamily: "Manrope, sans-serif"
-    fontSize: "clamp(19px,1.7vw,25px)"
+    fontSize: "clamp(17px,1.3vw,19px)"
+    fontWeight: 400
+    lineHeight: 1.85
+  credentials:
+    fontFamily: "Manrope, sans-serif"
+    fontSize: "clamp(16px,1.3vw,20px)"
     fontWeight: 400
     lineHeight: 1.6
   navigation:
@@ -79,6 +84,12 @@ components:
     rounded: "{rounded.print-button}"
     padding: "10px 18px"
     size: "14px"
+  hero-button:
+    backgroundColor: "rgba(36,36,38,.72)"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.print-button}"
+    padding: "9px 20px"
+    size: "15px"
   photo-placeholder:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.muted}"
@@ -130,7 +141,7 @@ Chakra Petch supplies the homepage name at weight (600), with tracking (-.025em)
 - **Introduction:** homepage copy, distinct from ordinary body copy.
 - **Navigation and labels:** compact regular text without uppercase decoration.
 
-At widths up to (850px), the name uses `clamp(61px,11vw,86px)`. At widths up to (580px), it uses `clamp(57px,15.5vw,82px)` with line height (1.03). The small-mobile introduction is (19px), line height (1.5), and maximum width (270px).
+At widths up to (850px), the name uses `clamp(61px,11vw,86px)`. At widths up to (580px), it uses `clamp(57px,15.5vw,82px)` with line height (1.03). Small-mobile credentials are (15px), and the summary is (16px) with line height (1.8).
 
 **The Readable Finish Rule.** Entrance animation must resolve to stable, unobscured text; the full name remains available to assistive technology throughout.
 
@@ -138,11 +149,11 @@ At widths up to (850px), the name uses `clamp(61px,11vw,86px)`. At widths up to 
 
 The content and footer share a maximum width (1324px) and a fluid width of `calc(100% - 12vw)`. The header has its own wider limit (1480px), horizontal padding (5vw), and minimum height (78px). It is transparent and positioned at the page top, rather than sticky.
 
-Desktop Home is a single introduction viewport. Its hero starts at (112px), uses a minimum height of `calc(100svh - 90px)`, and leaves (66px) below. The name’s desktop line height is (0.90); introduction and action margins are (10px) and (15px). Home is separate from the experience, projects, résumé, contact, and creative routes.
+Desktop Home is a single introduction viewport. Its hero starts at (112px), uses a minimum height of `calc(100svh - 90px)`, and leaves (66px) below. The name’s desktop line height is (0.90). Credentials sit (22px) beneath it, the four-sentence summary follows after (36px) with a maximum width (690px), and four static route buttons follow after (30px). Home is separate from the experience, projects, résumé, contact, and creative routes.
 
 Interior pages begin at (150px), with (80px) bottom padding and heading groups capped at (800px). Experience uses two open columns; projects use unequal columns, staggered vertical placement, and a wider final entry. Photo placeholders use unequal columns and a vertical offset. These are content arrangements, not bordered cards.
 
-At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At (850px), the mobile navigation becomes an expandable vertical list, header height becomes (68px), content returns to a (6vw) gutter, and Home starts at (130px). At (580px), content columns stack, interior top padding becomes (135px), and the hero’s introduction/action spacing becomes (20px)/(22px). Responsive values override the desktop token roles rather than replacing the visual identity.
+At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At (850px), the mobile navigation becomes an expandable vertical list, header height becomes (68px), content returns to a (6vw) gutter, and Home starts at (130px). At (580px), content columns stack, interior top padding becomes (135px), and credentials and summary margins become (18px)/(28px), and route buttons form two flexible columns. Responsive values override the desktop token roles rather than replacing the visual identity.
 
 ## Elevation & Depth
 
@@ -160,11 +171,15 @@ Background geometry is angular: large icosahedron, cuboctahedron, hexagonal anti
 
 ### Navigation
 
-The wordmark and compact text links sit in one horizontal desktop header. Current page links use Light Dusty Red; link hover uses the same color. The “For fun” disclosure toggles music, photos, and journal links, closes on outside pointer activity or Escape, and returns focus to its trigger when Escape dismisses it. Mobile navigation has an explicit labeled toggle and expansion state. The three social icons are Phosphor components with accessible labels; icon buttons shift upward (2px) on hover.
+The wordmark and compact text links sit in one horizontal desktop header. Current page links use Light Dusty Red; link hover uses the same color. The “For fun” disclosure shows only “More to come.”, with future creative destinations unsettled; it closes on outside pointer activity or Escape, and returns focus to its trigger when Escape dismisses it. Mobile navigation has an explicit labeled toggle and expansion state. The three social icons are Phosphor components with accessible labels; icon buttons shift upward (2px) on hover.
 
 ### Text links
 
-Actions are unboxed text in Light Dusty Red. The base link size is (16px), while the Home action is (19px), becoming (17px) on small mobile. Current rendered content links are text-only; unused arrow styling in the stylesheet does not imply decorative arrows should be added.
+Actions are unboxed text in Light Dusty Red. The base link size is (16px), while Home uses four static route buttons instead of a text action. Current rendered content links are text-only; unused arrow styling in the stylesheet does not imply decorative arrows should be added.
+
+### Home route buttons
+
+Four small outlined links lead to Experience, Projects, Résumé, and Contact. They have minimum height (46px), padding (9px 20px), radius (4px), a low-opacity accent border, and a translucent background. Hover shifts to the surface fill and Light Dusty Red text/border. They remain static while surrounding copy types. No portrait is currently included.
 
 ### Print button
 
@@ -182,13 +197,13 @@ SVG outlines and contour segments come from the actual Chakra Petch glyph data i
 
 ### Typed supporting text
 
-Only the Home introduction and “View experience” link reveal at (34ms) per character, starting at (850ms) and (1600ms). Text is already laid out before reveal, keeping its width stable. A separate screen-reader string preserves the complete accessible text while visual characters are hidden from assistive technology. Header, navigation, and footer text remain static on every route. Reduced-motion shows all characters immediately.
+Only Home credentials and the four-sentence summary type beneath the approved name. Credentials read “CS @ JMU | Prev. SWE at NSWCDD, NGA” and reveal at (34ms) per character after (850ms); the summary reveals at (12ms) per character after (2300ms). It covers the supplied internships and HooHacks project, JMU CS ambassadorship and rugby, Eagle Scout, and interests in full-stack development, national security and defense, systems engineering, software architecture, and practical AI/ML. Experience, Projects, Résumé, and Contact buttons stay static. Text is already laid out before reveal, keeping its width stable. A separate screen-reader string preserves the complete accessible text while visual characters are hidden from assistive technology. Header, navigation, and footer text remain static on every route. Reduced-motion shows all characters immediately.
 
 ### Spatial background
 
-The scene is capped at (5) bodies: two large and three small. Their initial births occur at (0s), (9s), (3.5s), (7s), and (12s) by body index, keeping entries staggered. The two larger bodies use medium size (.62); small sizes vary from (.18) to (.26), with mass proportional to size cubed. Each vertex starts at a distinct lattice intersection: construction selects the nearest unused anchor from a (3 × 3 × 3) candidate neighborhood, independently of final body size. Formation uses fixed geometry scale (.9 × body size); collision stress does not deform vertices. Shared perspective places all bodies within the same five-plane advancing lattice. Grid projection remains pointer-independent; cells keep continuous identities and fade near recycling edges. Each body stores these anchors once per spawn; respawn clears them. During the (2.52s) assembly, true face edges draw progressively as staggered partial segments. Anchor tethers fade to zero at completion.
+The scene is capped at (5) bodies: two large and three small. Their initial births occur at (0s), (9s), (3.5s), (7s), and (12s) by body index, keeping entries staggered. The two larger bodies use medium size (.62); small sizes vary from (.18) to (.26), with mass proportional to size cubed. Each vertex starts at a distinct actual visible member of the same finite lattice used for drawing. Construction selects nearest unused nodes with fade above (.35), visible projection, and positions more than (12px) inside viewport edges. Stored identities contain `idX`, `idZ`, and `plane`; their positions reconstruct continuous grid movement, including recycling, independently of final size. Formation uses fixed geometry scale (.9 × body size); collision stress does not deform vertices. Shared perspective places all bodies within the same five-plane advancing lattice. Grid projection remains pointer-independent; cells keep continuous identities and fade near recycling edges. Each body stores these anchors once per spawn; respawn clears them. After (.55s) of source-node activation, the (2.52s) assembly draws true face edges progressively as staggered partial segments. Anchor tethers fade to zero at completion.
 
-Bodies flow from back left to front right with randomized rate scales: (42–56s) for large forms and (22–32s) for small ones. These scales do not define lifetimes. Each body assembles once over (2.52s), using smoothstep formation that then remains complete. A shuffled shape order selects its first entry for the whole spawn: larger bodies select from five complex solids and smaller bodies from five simple solids. The selected solid rotates and travels without periodic morphing or dissolution; only fracture or exit respawn selects again. Closed hull faces and cached true face edges define each shape. Shape order, lane variation, spin, and flow rates use crypto randomness; formation age starts with each scheduled birth. Root-layout mounting preserves the scene across client-side page changes.
+Bodies flow from back left to front right with randomized rate scales: (42–56s) for large forms and (22–32s) for small ones. These scales do not define lifetimes. Each body activates its source nodes for (.55s), then assembles once over (2.52s), using smoothstep formation that then remains complete. A shuffled shape order selects its first entry for the whole spawn: larger bodies select from five complex solids and smaller bodies from five simple solids. The selected solid rotates and travels without periodic morphing or dissolution; only fracture or exit respawn selects again. Closed hull faces and cached true face edges define each shape. Shape order, lane variation, spin, and flow rates use crypto randomness; formation age starts with each scheduled birth. Root-layout mounting preserves the scene across client-side page changes.
 
 Cursor movement gives assembled bodies rigid impulses and spin, followed by damped flight; it does not add collision stress or directly deform vertices. Approximate spherical collisions use each body’s radius and mass for impulses and separation. Body and wall collisions accumulate stress; reaching (1.4) releases one fragment per current vertex and schedules that body’s replacement at the left after (1.5–4s). Projected bounds bounce against left, top, and bottom while the right remains open. Full right exit schedules the same independent delayed replacement. Each body replaces independently, without companion waves. Replacement refreshes flow rate, shape order, lane, and spin.
 
