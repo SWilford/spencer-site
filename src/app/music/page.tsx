@@ -1,2 +1,7 @@
-export const metadata = { title: "Music & guitar · Spencer Wilford" };
-export default function MusicPage() { return <main id="main" className="page-content interior-page"><div className="page-heading"><h1>Music &amp; guitar</h1><p>Guitar recordings, music, and listening statistics.</p></div><div className="quiet-placeholder"><h2>More to come.</h2><p>Guitar recordings, favorite discoveries, and eventually my personal listening dashboard.</p><p className="content-note">This is a first layout draft. No listening data is connected yet.</p></div></main>; }
+import { MusicDashboard } from "@/components/music-dashboard";
+import "./music-stats.css";
+
+export const metadata = { title: "Music Stats · Spencer Wilford", robots: { index: false, follow: false } };
+export default function MusicPage() {
+  return <main id="main" className="page-content interior-page music-page"><MusicDashboard /></main>;
+}

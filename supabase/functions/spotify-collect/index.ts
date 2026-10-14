@@ -58,6 +58,14 @@ Deno.serve(async (request: Request) => {
     body = text ? JSON.parse(text) : {};
   } catch { return reply({ error: "invalid_request" }, 400); }
   if (body.action === "status") return reply(context);
+  if (body.action === "dashboard") {
+    const response = await fetch(`${projectUrl}/rest/v1/rpc/music_dashboard_snapshot`, {
+      method: "POST", signal: AbortSignal.timeout(15_000),
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ collector_key: key }),
+    });
+    return response.ok ? reply(await response.json()) : reply({ error: "dashboard_unavailable" }, 503);
+  }
   if (body.action === "bootstrap") {
     if (context.connected) return reply({ error: "already_connected" }, 409);
     try { return reply(await control("bootstrap", key, body)); }

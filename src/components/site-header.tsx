@@ -47,7 +47,7 @@ export function SiteHeader() {
           <button ref={funButton} className="fun-trigger" aria-expanded={funOpen} aria-controls="fun-links"
             onClick={() => setFunOpen(!funOpen)}>For fun <CaretDown size={13} className={funOpen ? "turned" : ""} /></button>
           {funOpen && <ul id="fun-links" className="fun-links">
-            <li className="fun-empty">More to come.</li>
+            <li><Link href="/music" prefetch={true} aria-current={pathname === "/music" ? "page" : undefined} onClick={close}>Music Stats</Link></li>
           </ul>}
         </div>
       </nav>
