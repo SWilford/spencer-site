@@ -209,7 +209,7 @@ html { view-transition-name:none; }
 ::view-transition-old(.decode) { z-index:1; animation:decode-depart 160ms ease-out both; }
 ::view-transition-new(.decode) { z-index:2; animation:decode-settle 620ms linear both; }
 @keyframes decode-depart { to { opacity:0; } }
-@keyframes decode-settle { 0% { opacity:.55; filter:blur(.6px); } 30% { opacity:.88; } 85%,100% { opacity:1; filter:none; } }
+@keyframes decode-settle { 0% { opacity:1; filter:blur(.4px); } 85%,100% { opacity:1; filter:none; } }
 @media(prefers-reduced-motion:reduce) { .hero-summary .typed-word:hover { transform:none; } ::view-transition-old(.decode),::view-transition-new(.decode) { animation:none; } }
 
 ::view-transition { pointer-events:none; }

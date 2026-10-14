@@ -43,8 +43,7 @@ function polygonPath(points: Point[]): string {
 }
 
 /** Only tessellate the visible part of a long page; offscreen content stays intact. */
-export function createDecodeKeyframes(width: number, height: number, visibleTop: number, visibleHeight: number, random = Math.random) {
-  const sectors = createDecodeSectors(width, visibleHeight, random);
+export function createDecodeKeyframes(width: number, height: number, visibleTop: number, visibleHeight: number, random = Math.random, sectors = createDecodeSectors(width, visibleHeight, random)) {
   const offscreen: string[] = [];
   if (visibleTop > 0) offscreen.push(polygonPath([{ x: 0, y: 0 }, { x: width, y: 0 }, { x: width, y: visibleTop }, { x: 0, y: visibleTop }]));
   const bottom = visibleTop + visibleHeight;
