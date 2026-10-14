@@ -34,7 +34,7 @@ Development and testing happen locally before publishing. GitHub repository: htt
 
 ## Evidence on Hand
 
-The user supplied a Word résumé, LinkedIn profile, and public email. Experience, education, and project summaries are based on that résumé. The original Word file, phone number, and clearance detail stay out of the repository. Photos, portraits, guitar recordings, and playback exports have not been supplied; do not invent them.
+The user supplied an updated Word resume dated 8.10.26, LinkedIn profile, and public email. Experience and the resume now use that updated source. The user authorized a public copy without phone/clearance: sanitized DOCX, PDF, and page preview may be committed; the private original, phone number, and clearance details stay out of the repository. Photos, portraits, guitar recordings, and playback exports have not been supplied; do not invent them.
 
 ## Brand Commitments
 

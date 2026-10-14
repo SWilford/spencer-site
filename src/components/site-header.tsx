@@ -11,7 +11,7 @@ import { profile } from "@/content/profile";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const mainLinks = [["Home", "/"], ["Experience", "/experience"], ["Projects", "/projects"], ["Résumé", "/resume"], ["Contact", "/contact"]];
+const mainLinks = [["Home", "/"], ["Experience", "/experience"], ["Projects", "/projects"], ["Resume", "/resume"], ["Contact", "/contact"]];
 
 export function SiteHeader() {
   const pathname = usePathname();

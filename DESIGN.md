@@ -137,7 +137,7 @@ Chakra Petch supplies the homepage name at weight (600), with tracking (-.025em)
 
 - **Display:** the two-line name, using the frontmatter display role on desktop. The letters are real text with one accessible full-name label.
 - **Headline:** interior page headings, with a short muted introduction beneath.
-- **Title:** general section headings; project headings use a fixed (30px), experience headings (27px), and résumé headings their local scale.
+- **Title:** general section headings; project headings use a fixed (30px), experience headings (27px), and resume headings their local scale.
 - **Body:** regular text; experience descriptions use a slightly looser line height (1.7). Small mobile body text becomes (16px).
 - **Introduction:** homepage copy, distinct from ordinary body copy.
 - **Navigation and labels:** compact regular text without uppercase decoration.
@@ -150,9 +150,9 @@ At widths up to (850px), the name uses `clamp(61px,11vw,86px)`. At widths up to 
 
 The content and footer share a maximum width (1324px) and a fluid width of `calc(100% - 12vw)`. The header has its own wider limit (1480px), horizontal padding (5vw), and minimum height (78px). It is transparent and positioned at the page top, rather than sticky.
 
-Desktop Home is a single introduction viewport. Its hero starts at (112px), uses a minimum height of `calc(100svh - 90px)`, and leaves (66px) below. The name’s desktop line height is (0.90). Credentials sit (22px) beneath it, the four-sentence summary follows after (36px) with a maximum width (690px), and four static route buttons follow after (30px). Home is separate from the experience, projects, résumé, contact, and creative routes.
+Desktop Home is a single introduction viewport. Its hero starts at (112px), uses a minimum height of `calc(100svh - 90px)`, and leaves (66px) below. The name’s desktop line height is (0.90). Credentials sit (22px) beneath it, the four-sentence summary follows after (36px) with a maximum width (690px), and four static route buttons follow after (30px). Home is separate from the experience, projects, resume, contact, and creative routes.
 
-Interior pages begin at (150px), with (80px) bottom padding and heading groups capped at (800px). Experience uses two open columns; projects use unequal columns, staggered vertical placement, and a wider final entry. Photo placeholders use unequal columns and a vertical offset. These are content arrangements, not bordered cards.
+Interior pages begin at (150px), with (80px) bottom padding and heading groups capped at (800px). Experience uses open stacked sections with dates aligned to the right on desktop; projects use unequal columns, staggered vertical placement, and a wider final entry. Photo placeholders use unequal columns and a vertical offset. These are content arrangements, not bordered cards.
 
 At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At (850px), the mobile navigation becomes an expandable vertical list, header height becomes (68px), content returns to a (6vw) gutter, and Home starts at (130px). At (580px), content columns stack, interior top padding becomes (135px), and credentials and summary margins become (18px)/(28px), and route buttons form two flexible columns. Responsive values override the desktop token roles rather than replacing the visual identity.
 
@@ -180,13 +180,13 @@ Actions are unboxed text in Light Dusty Red. The base link size is (16px), while
 
 ### Home route buttons
 
-Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `transparent`, blur (2.5px) with saturation (1.12), a `rgba(223,138,133,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(202,115,112,.025)`. The outer link has minimum height (64px) and perspective (650px).
+Four magnetic links lead to Experience, Projects, Resume, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `transparent`, blur (2.5px) with saturation (1.12), a `rgba(223,138,133,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(202,115,112,.025)`. The outer link has minimum height (64px) and perspective (650px).
 
 On hover, keyboard focus, or press, thirty accent blocks in ten columns and three rows scale in from the left; each column adds (24ms) and each row adds (16ms), reaching a maximum stagger (248ms). The readable label stays unchanged, shifting to dark text over the red fill. Pressing moves the face down (4px), back (-10px), and scales it to (.975) with a flatter shadow and (70ms) response. Pointer/touch and Enter press states reset on release, cancel, pointer leave, or blur. Reduced-motion removes face transforms and the global rule makes fill transitions instant. No portrait is currently included. The footer checks the active pathname and returns no footer on Home, avoiding the repeated name and Contact action; interior pages retain it. Button text disables selection during interaction.
 
-### Print button
+### Resume downloads
 
-The résumé has a small Raised Charcoal button labeled “Print / save PDF.” It calls the browser print flow and disappears in print output. It uses the shared keyboard focus treatment; no distinct filled primary-action system is implemented.
+The Resume page presents a source-faithful document preview with PDF and Word downloads, plus an Open PDF link for selectable text. Downloads use the sanitized public copy, not the private original.
 
 ### Media placeholders
 
@@ -200,7 +200,7 @@ SVG outlines and contour segments come from the actual Chakra Petch glyph data i
 
 ### Typed supporting text
 
-Only Home credentials and the four-sentence summary type beneath the approved name. Credentials read “CS @ JMU | Prev. SWE at NSWCDD, NGA” and reveal at (34ms) per character after (850ms); the summary reveals at (12ms) per character after (2300ms). It covers the supplied internships and HooHacks project, JMU CS ambassadorship and rugby, Eagle Scout, and interests in full-stack development, national security and defense, systems engineering, software architecture, and practical AI/ML. Experience, Projects, Résumé, and Contact buttons stay static. Text is already laid out before reveal, keeping its width stable. A separate screen-reader string preserves the complete accessible text while visual characters are hidden from assistive technology. Header, navigation, and footer text remain static on every route. Summary-word hover brightens to foreground and lifts (1px) over (180ms). Reduced-motion removes the lift and shows all characters immediately.
+Only Home credentials and the four-sentence summary type beneath the approved name. Credentials read “CS @ JMU | Prev. SWE at NSWCDD, NGA” and reveal at (34ms) per character after (850ms); the summary reveals at (12ms) per character after (2300ms). It covers the supplied internships and HooHacks project, JMU CS ambassadorship and rugby, Eagle Scout, and interests in full-stack development, national security and defense, systems engineering, software architecture, and practical AI/ML. Experience, Projects, Resume, and Contact buttons stay static. Text is already laid out before reveal, keeping its width stable. A separate screen-reader string preserves the complete accessible text while visual characters are hidden from assistive technology. Header, navigation, and footer text remain static on every route. Summary-word hover brightens to foreground and lifts (1px) over (180ms). Reduced-motion removes the lift and shows all characters immediately.
 
 ### Spatial background
 
@@ -246,3 +246,13 @@ Spencer selected 1 + 7 with a little 5; the initial depth echo was removed. Sens
 Only fine hover mouse pointers with no reduced-motion preference receive the cursor. Text and editable content retain the native browser cursor; the custom I-beam was removed. Special cursor contexts, keyboard use, scroll, blur, pointer exit and hidden tabs restore the native cursor. Touch and reduced-motion retain native behavior. Glass faces have no charcoal base, a 2.5% reflection with 3.5–5.5% red tint, 2.5px frosted blur, saturation 1.12 and the existing red outline; the block fill and magnetic/press behavior stay intact.
 
 Palette exploration: slightly deeper charcoal (#202022), raised charcoal (#2b2b2e), muted dark red (#ca7370), and readable lighter red (#df8a85). Previous palette remains available in commit bba4407. Geometry, motion, glass alpha and blur are unchanged.
+
+## Verified experience and public resume
+
+The source of truth is the user-supplied Spencer Wilford Resume - 8.10.26.docx, replacing the earlier desktop resume. Experience sections follow: Professional Experience (NSWCDD May–August 2026, then NGA June–August 2023), Education (JMU, GPA 3.48, latest coursework), Leadership (Eagle Scout and rugby), Awards & Hackathons (Thaw / HooHacks 2026), Teaching & Mentorship (CS Ambassador Fall 2025, supplied directly in the request). Clearance content is excluded. The older minor and Byte-Builder are not carried into the latest resume.
+
+The user selected a public copy without phone/clearance. Only this sanitized DOCX, its Word-exported PDF, and a WebP preview are public under /resume/. The private original remains outside Git. Phone and both clearance paragraphs are removed from the OOXML before PDF generation. The resume is a single page retaining the source formatting; the site preview links to the selectable PDF. Resume labels use plain ASCII spelling.
+
+Contact follows the supplied screenshot's structure with three real contact channels and quick links to Projects, Experience, Resume and GitHub, plus an email action. No location, certification, or citizenship facts are borrowed from the reference. The materials use the established charcoal/red palette, transparent surfaces, and existing functional icon family. At 850px the two columns stack.
+
+Introductions are direct descriptions across the existing pages. Projects' existing content/layout is retained for a later dedicated design pass. Transition alternatives are documented in docs/page-transition-directions.md; the existing door animation is unchanged until selection.

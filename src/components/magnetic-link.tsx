@@ -63,6 +63,6 @@ export function MagneticActions() {
     return ()=>{window.removeEventListener("pointermove",move);window.removeEventListener("blur",reset);document.documentElement.removeEventListener("pointerleave",reset);motion.removeEventListener("change",reset);};
   },[]);
   return <nav ref={navRef} className="hero-actions" aria-label="Explore my portfolio">
-    {[["Experience","/experience"],["Projects","/projects"],["Résumé","/resume"],["Contact","/contact"]].map(([label,href])=><MagneticLink key={href} href={href}>{label}</MagneticLink>)}
+    {[["Experience","/experience"],["Projects","/projects"],["Resume","/resume"],["Contact","/contact"]].map(([label,href])=><MagneticLink key={href} href={href}>{label}</MagneticLink>)}
   </nav>;
 }
