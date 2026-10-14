@@ -216,10 +216,9 @@ Completed animations remain settled across cached-page visibility changes. Typed
 
 ### Page transitions
 
-A stable React ViewTransition wraps only page children, with the `page-content` name, door update/enter/exit class, and default none; header and canvas remain outside. The wrapper has no pathname key and uses update="door", preserving Next’s cached client-page state instead of remounting children. The document root opts out of snapshots. Outgoing content rotates (-58deg) and translates (20vw) right and (6vw) nearer over (440ms), with opacity (1) initially, (.55) at (65%), and (0) at the end. Incoming content starts immediately at opacity (.35), rotation (58deg), and translation (-4vw, 0, -50vw); opacity reaches (.7) at (45%) and (1) at its normal position after (600ms). The old snapshot uses z-index (2) above the new snapshot at (1), revealing the next page early in depth during the concurrent transition. Both pivot at left (45%) with perspective (160vw). Reduced-motion disables transition animations; unsupported browsers navigate normally. No automatic idle text animation is implemented.
+A stable React ViewTransition wraps page children with the page-content name and decode class, preserving cached state. Each navigation tessellates the visible incoming content into fresh irregular Voronoi cells: 28 desktop, 18 mobile. A shuffled per-sector acquisition order reveals clipped patches through short partial stages, then settles completely over 620ms. The old page fades in 160ms. The incoming snapshot begins at opacity .55 with .6px blur and resolves to crisp foreground. There is no rotation, depth translation, uniform block grid, text scrambling, or simulated loading.
 
-The 600ms door arrival uses cubic-bezier(.4,0,.3,1) for a slower initial depth approach. During the transition, snapshots ignore pointer events and the moving page-stage is inert; the header remains outside and clickable. Browser inspection at 160ms confirmed incoming depth near -574px behind outgoing opacity .73, with distinct transform matrices. Full checks and production build passed. The selected cursor combines sensor brackets, lock/click feedback, and a short vector trail, with no depth echo.
-
+Only the incoming snapshot receives a compound-path mask through the Web Animations API, using 25 compatible path keyframes. Offscreen parts of long pages remain intact. Geometry and keyframes are generated once per navigation; no React animation loop, DOM duplication, route interception, or navigation delay is added. Transition cleanup cancels the mask on completion/interruption. Reduced motion bypasses the mask and CSS motion; unsupported pseudo animation falls back to the CSS crossfade. Header, cursor and the persistent canvas remain outside the snapshot. Moving page content and snapshots ignore pointer events during the short transition while the header stays usable.
 ### Keyboard focus
 
 Links and buttons share a Light Dusty Red outline (2px) with offset (6px). The skip link becomes visible on focus. Preserve these states whenever extending navigation or adding actions.
@@ -255,7 +254,7 @@ The user selected a public copy without phone/clearance. Only this sanitized DOC
 
 Contact follows the supplied screenshot's structure with three real contact channels and quick links to Projects, Experience and Resume, plus an email action. No location, certification, or citizenship facts are borrowed from the reference. The materials use the established charcoal/red palette, transparent surfaces, and existing functional icon family. At 850px the two columns stack.
 
-Introductions are direct descriptions across the existing pages. Projects' existing content/layout is retained for a later dedicated design pass. Transition alternatives are documented in docs/page-transition-directions.md; the existing door animation is unchanged until selection.
+Introductions are direct descriptions across the existing pages. Projects' existing content/layout is retained for a later dedicated design pass. Transition alternatives are documented in docs/page-transition-directions.md; randomized irregular sector decoding is now selected and implemented.
 
 ## Consistent action controls
 

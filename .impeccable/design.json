@@ -203,9 +203,7 @@
         "purpose": "Summary words brighten to foreground; reduced motion omits the transform."
       },
       {
-        "name": "page-door",
-        "value": "Concurrent exit440ms / enter600ms cubic-bezier(.4,0,.3,1); no delay",
-        "purpose": "Stable page-content ViewTransition update/enter/exit door preserves cached children. Left45% pivot,160vw perspective. Old snapshot z2 rotates-58deg/translate3d20vw,0,6vw,opacity1\u2192.55 at65%\u21920. New snapshot z1 starts opacity.35/rotate58deg/translate3d-4vw,0,-50vw,opacity.7 at45%,thenlandsopacity1. Header/canvas remain outside; root snapshot disabled; reduced motion disables animations and unsupported browsers navigate normally. Snapshots ignore pointer events; active-transition page-stage is inert while the persistent header remains clickable. Browser inspection confirmed distinct depths during navigation; full checks and build passed."
+        "name": "page-sector-decode", "value": "620ms irregular acquisition / 160ms departure", "purpose": "Stable page-content ViewTransition uses decode update/enter/exit classes with a randomized Voronoi compound-path mask: 28 desktop and 18 mobile sectors, 25 compatible keyframes, offscreen preservation on long pages. Incoming opacity .55 with .6px blur resolves crisply. Old page fades, no rotation/depth. Root header/cursor/grid remain live. Native navigation and cached state are preserved; reduced motion bypasses the mask and unsupported pseudo animation retains a CSS crossfade."
       }
     ],
     "breakpoints": [

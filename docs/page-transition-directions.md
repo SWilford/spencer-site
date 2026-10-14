@@ -1,6 +1,6 @@
 # Page-transition directions
 
-Current behavior is still the existing concurrent 3D door: 58-degree opposing rotations, a large incoming depth offset, 440ms departure and 600ms arrival. No replacement selected in this pass.
+Selected and implemented: irregular sector decoding. Incoming content is revealed through randomized polygon patches, rather than a uniform block fill. Earlier proposals below remain alternatives.
 
 The current treatment can make long text look skewed and create competing text layers during overlap. The next pass should keep the background and navigation continuous, use one short handoff, and honor reduced motion and interrupted navigation.
 
@@ -29,3 +29,5 @@ These are visual concepts, not implementations. Keep the spatial field live, the
 10. Contour scan: heading strokes appear as thin red contours then settle into solid type; body content appears together below. Avoid replaying the full name entrance.
 
 Best fit: Target acquisition plus a restrained Depth-plane transfer. Alternative with more tactical character: Radar sweep plus Sector assembly. Select one central motif rather than stacking all of these.
+
+Verified implementation: three geometry/keyframe tests pass across desktop, mobile and ultrawide sizes; lint, type checking and production build pass. A native browser capture confirms fragmented incoming content during the handoff and a fully settled page afterward. Long-page mobile navigation completes without overflow, and repeated header navigation reaches the intended destination. Previous door code has been removed.
