@@ -18,6 +18,7 @@ import { CaretLeft } from "@phosphor-icons/react/dist/csr/CaretLeft";
 
 import { CaretRight } from "@phosphor-icons/react/dist/csr/CaretRight";
 
+import { SpotifyLogo } from "@phosphor-icons/react/dist/csr/SpotifyLogo";
 import { Funnel } from "@phosphor-icons/react/dist/csr/Funnel";
 
 import { StatsMenu } from "./music-controls";
@@ -342,7 +343,7 @@ export function MusicDashboard() {
 
       <div className="stats-kind-tabs" aria-label="Ranking type">{(["tracks", "artists", "albums"] as const).map(value => <button key={value} aria-pressed={kind === value} onClick={() => { setKind(value); setLimit(30); }}>{value[0].toUpperCase() + value.slice(1)}</button>)}</div>
 
-      <div className="stats-top-options"><StatsMenu label="Filter" icon={<Funnel size={21} />}><p>Sort by</p><button aria-pressed={sort === "time"} onClick={() => setSort("time")}>Listening time</button><button aria-pressed={sort === "streams"} onClick={() => setSort("streams")}>Streams</button></StatsMenu>
+      <div className="stats-top-options"><a className="stats-spotify-credit" href="https://open.spotify.com" target="_blank" rel="noreferrer" aria-label="Music metadata from Spotify"><SpotifyLogo size={20} /></a><StatsMenu label="Filter" icon={<Funnel size={21} />}><p>Sort by</p><button aria-pressed={sort === "time"} onClick={() => setSort("time")}>Listening time</button><button aria-pressed={sort === "streams"} onClick={() => setSort("streams")}>Streams</button></StatsMenu>
 
         <button className="stats-control stats-layout-control" aria-label={`Change layout: ${density ?? "responsive"} ${layout}. Cycle 3, 4, 5 columns and list.`} onClick={cycleLayout}>{layout === "list" ? <List size={21} /> : <SquaresFour size={21} />}<span className="stats-control-label">{layout === "list" ? "List" : "Grid"}</span>{layout === "grid" && <small>{density ?? <><i className="grid-default-wide">5</i><i className="grid-default-normal">4</i><i className="grid-default-small">3</i></>}</small>}</button>
 
@@ -354,7 +355,7 @@ export function MusicDashboard() {
 
         {layout === "list" && <span className="stats-list-position">#{index + 1}</span>}
 
-        <div className="stats-rank-surface"><div className="stats-rank-art">{row.artwork && <Image src={row.artwork} unoptimized alt={kind === "artists" ? `Album artwork associated with ${row.name}` : ""} width={400} height={400} loading="lazy" />}</div>
+        <div className="stats-rank-surface"><div className="stats-rank-art">{row.artwork && <Image className={kind === "artists" ? "stats-artist-image" : undefined} src={row.artwork} unoptimized alt={kind === "artists" ? `${row.name} artist profile` : ""} width={400} height={400} loading="lazy" />}{!row.artwork && <span className="stats-art-placeholder" aria-label={kind === "artists" ? `No artist profile image available for ${row.name}` : "Artwork unavailable"}>{row.name.slice(0, 1)}</span>}</div>
 
           <div className="stats-rank-text"><h2>{row.url ? <a href={row.url} target="_blank" rel="noreferrer" title={row.name}>{layout === "grid" ? `${index + 1}. ` : ""}{row.name}</a> : <span title={row.name}>{layout === "grid" ? `${index + 1}. ` : ""}{row.name}</span>}</h2>
 

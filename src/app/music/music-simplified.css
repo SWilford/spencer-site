@@ -165,3 +165,9 @@
  .clock-tooltip { left:50% !important; }
 }
 @media (prefers-reduced-motion:reduce) { .stats-tooltip { animation:none; } }
+
+.stats-art-placeholder { display:grid; place-items:center; width:100%; height:100%; color:var(--muted); font-size:clamp(24px,4vw,42px); font-weight:400; }
+
+.stats-rank-art img.stats-artist-image { object-fit:contain; }
+.stats-spotify-credit { display:flex; align-items:center; color:var(--muted); }
+.stats-spotify-credit:hover { color:var(--foreground); }

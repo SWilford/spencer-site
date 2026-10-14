@@ -33,3 +33,17 @@ test("unmatched source-event hashes are not used as public ranking IDs", () => {
   const result = publicMusicStats(snapshot, { start: "2026-10-14", end: "2026-10-14" });
   assert.equal(JSON.stringify(result).includes("a".repeat(64)), false);
 });
+
+
+test("artists use catalog profile images and never substitute a track album cover", () => {
+  const albumArtwork = "https://i.scdn.co/image/album";
+  const profile = "https://i.scdn.co/image/artist";
+  const snapshot = { ...fixture, artistProfiles: { artist: { image: profile, url: "https://open.spotify.com/artist/artist" } }, plays: [{ ...fixture.plays[0], artwork: albumArtwork }] };
+  const result = publicMusicStats(snapshot, { start: "2026-10-14", end: "2026-10-14" });
+  assert.equal(result.rankings.artists[0].artwork, profile);
+  assert.equal(result.rankings.artists[0].url, snapshot.artistProfiles.artist.url);
+  assert.equal(result.rankings.tracks[0].artwork, albumArtwork);
+  assert.equal(result.rankings.albums[0].artwork, albumArtwork);
+  const missing = publicMusicStats({ ...snapshot, artistProfiles: {} }, result.range);
+  assert.equal(missing.rankings.artists[0].artwork, null);
+});

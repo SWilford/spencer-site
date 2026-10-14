@@ -4,7 +4,7 @@ export type MusicPlay = {
   artists: { id: string; name: string }[]; albumId: string | null; album: string | null; artwork: string | null;
 };
 export type MusicSnapshot = { generatedAt: string; lastCollection: string | null; collectionError: string | null;
-  collectionStartedAt: string | null; truncated: boolean; plays: MusicPlay[] };
+  collectionStartedAt: string | null; truncated: boolean; artistProfiles?: Record<string, { image: string | null; url: string | null }>; plays: MusicPlay[] };
 export type DateRange = { start: string; end: string };
 export type RangePreset = "day" | "week" | "month" | "year" | "past-year" | "ytd" | "lifetime" | "custom";
 export type DurationMode = "estimated" | "measured";
@@ -71,11 +71,11 @@ export function dailySeries(plays: MusicPlay[], range: DateRange, mode: Duration
 export function rank(plays: MusicPlay[], range: DateRange, mode: DurationMode, kind: RankingKind, sort: "plays" | "time") {
   const map = new Map<string, { id: string; name: string; detail: string; count: number; milliseconds: number; artwork: string | null; url: string | null }>();
   for (const p of plays.filter(p => inRange(p, range))) {
-    const identities = kind === "artists" ? p.artists.map(a => ({ id: a.id, name: a.name, detail: "Album artwork" }))
+    const identities = kind === "artists" ? p.artists.map(a => ({ id: a.id, name: a.name, detail: "Artist profile" }))
       : kind === "albums" ? [{ id: p.albumId ?? `unknown:${p.trackId}`, name: p.album ?? "Unknown album", detail: p.artists.map(a => a.name).join(", ") }]
       : [{ id: p.trackId, name: p.name, detail: p.artists.map(a => a.name).join(", ") || "Unknown artist" }];
     for (const item of identities) {
-      const row = map.get(item.id) ?? { ...item, count: 0, milliseconds: 0, artwork: p.artwork, url: kind === "tracks" ? p.url : null };
+      const row = map.get(item.id) ?? { ...item, count: 0, milliseconds: 0, artwork: kind === "artists" ? null : p.artwork, url: kind === "tracks" ? p.url : null };
       row.count++; row.milliseconds += durationMs(p, mode); map.set(item.id, row);
     }
   }

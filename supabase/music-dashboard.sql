@@ -1,4 +1,4 @@
-create function public.music_dashboard_snapshot(collector_key text)
+create or replace function public.music_dashboard_snapshot(collector_key text)
 returns jsonb language plpgsql security definer set search_path=pg_catalog
 as $$
 begin
@@ -11,6 +11,7 @@ begin
    'collectionError',(select last_error from music_private.collector),
    'collectionStartedAt',(select min(started_at) from music_private.runs),
    'truncated',(select count(*)>25000 from music_private.spotify_plays),
+   'artistProfiles',coalesce((select jsonb_object_agg(artist_id,jsonb_build_object('image',image_url,'url',spotify_url)) from music_private.artist_profiles),'{}'::jsonb),
    'plays',coalesce((select jsonb_agg(jsonb_build_object(
      'id',p.source_key,'at',p.played_at,'provider','spotify',
      'songLengthMs',p.song_length_ms,'actualMs',p.actual_listened_ms,

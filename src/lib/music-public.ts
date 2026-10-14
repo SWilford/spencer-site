@@ -25,6 +25,7 @@ export function publicMusicStats(snapshot: MusicSnapshot, range: DateRange) {
     const rows = new Map([...rank(snapshot.plays, range, "estimated", kind, "time").slice(0, 200),
       ...rank(snapshot.plays, range, "estimated", kind, "plays").slice(0, 200)].map(row => [row.id, row]));
     return [...rows.values()].map((row, index) => ({ ...row,
+      ...(kind === "artists" ? { artwork: snapshot.artistProfiles?.[row.id]?.image ?? null, url: snapshot.artistProfiles?.[row.id]?.url ?? (/^[A-Za-z0-9]{22}$/.test(row.id) ? `https://open.spotify.com/artist/${row.id}` : null) } : {}),
       id: /^[a-f0-9]{64}$/.test(row.id) || row.id.startsWith("unknown:") ? `unmatched-${index}` : row.id }));
   };
   return {
