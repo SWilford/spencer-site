@@ -1,29 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type AnchorHTMLAttributes, type CSSProperties, type ReactNode } from "react";
 
-export function MagneticLink({href,children}:{href:string;children:string}) {
+export function MagneticLink({href,children,download}:{href:string;children:string;download?:string}) {
   const reset=(element:HTMLAnchorElement)=>{
     for(const property of ["--mag-x","--mag-y"]) element.style.setProperty(property,"0px");
     for(const property of ["--tilt-x","--tilt-y"]) element.style.setProperty(property,"0deg");
     delete element.dataset.pressed;
   };
-  return <Link href={href} prefetch={true} className="hero-button"
-    onPointerLeave={event=>reset(event.currentTarget)}
-    onPointerDown={event=>{event.currentTarget.dataset.pressed="true";}}
-    onPointerUp={event=>{delete event.currentTarget.dataset.pressed;}}
-    onPointerCancel={event=>reset(event.currentTarget)} onBlur={event=>reset(event.currentTarget)}
-    onKeyDown={event=>{if(event.key==="Enter" && !event.repeat) event.currentTarget.dataset.pressed="true";}}
-    onKeyUp={event=>{if(event.key==="Enter") delete event.currentTarget.dataset.pressed;}}>
-    <span className="magnetic-face">
+  const interaction:AnchorHTMLAttributes<HTMLAnchorElement> = {
+    className:"hero-button",
+    onPointerLeave:event=>reset(event.currentTarget),
+    onPointerDown:event=>{event.currentTarget.dataset.pressed="true";},
+    onPointerUp:event=>{delete event.currentTarget.dataset.pressed;},
+    onPointerCancel:event=>reset(event.currentTarget), onBlur:event=>reset(event.currentTarget),
+    onKeyDown:event=>{if(event.key==="Enter" && !event.repeat) event.currentTarget.dataset.pressed="true";},
+    onKeyUp:event=>{if(event.key==="Enter") delete event.currentTarget.dataset.pressed;},
+  };
+  const face = <span className="magnetic-face">
       <span className="button-blocks" aria-hidden="true">{Array.from({length:30},(_,index)=><span key={index} className="button-block" style={{"--block-delay":`${index%10*24+Math.floor(index/10)*16}ms`} as CSSProperties}/>)}</span>
       <span className="button-label">{children}</span>
-    </span>
-  </Link>;
+    </span>;
+  return download ? <a {...interaction} href={href} download={download}>{face}</a> : <Link {...interaction} href={href} prefetch={true}>{face}</Link>;
 }
 
-export function MagneticActions() {
+export function MagneticActions({children,label="Explore my portfolio",className=""}:{children?:ReactNode;label?:string;className?:string}) {
   const navRef=useRef<HTMLElement>(null);
   useEffect(()=>{
     const links=Array.from(navRef.current?.querySelectorAll<HTMLAnchorElement>(".hero-button") ?? []);
@@ -62,7 +64,7 @@ export function MagneticActions() {
     motion.addEventListener("change",reset);
     return ()=>{window.removeEventListener("pointermove",move);window.removeEventListener("blur",reset);document.documentElement.removeEventListener("pointerleave",reset);motion.removeEventListener("change",reset);};
   },[]);
-  return <nav ref={navRef} className="hero-actions" aria-label="Explore my portfolio">
-    {[["Experience","/experience"],["Projects","/projects"],["Resume","/resume"],["Contact","/contact"]].map(([label,href])=><MagneticLink key={href} href={href}>{label}</MagneticLink>)}
+  return <nav ref={navRef} className={`hero-actions ${className}`} aria-label={label}>
+    {children ?? [["Experience","/experience"],["Projects","/projects"],["Resume","/resume"],["Contact","/contact"]].map(([label,href])=><MagneticLink key={href} href={href}>{label}</MagneticLink>)}
   </nav>;
 }

@@ -12,3 +12,20 @@ The current treatment can make long text look skewed and create competing text l
 6. Shared heading handoff: move emphasis from the selected navigation label to the incoming page title, then resolve the body with a short fade. Most editorial option, least spatial movement.
 
 Keep transitions on page content only. The header, cursor, and grid must remain persistent. Do not replay the homepage name or typed summary after completed entrances. Reduced motion uses immediate navigation or a brief opacity-only change. No long timers or router interception.
+
+## Tactical and futuristic transition brainstorm
+
+These are visual concepts, not implementations. Keep the spatial field live, the header usable, and text readable; avoid fake loading, flashing, random glitch spam, or tactical labels added to ordinary content. Each transition should complete in roughly 300–500ms, with reduced-motion fallback.
+
+1. Target acquisition: a corner bracket briefly contracts around the selected nav item, then opens into the incoming content boundary as the old content fades. Links the reticle identity to navigation.
+2. Depth-plane transfer: the old content peels toward front-right while the next page advances from a shallow back-left plane, aligned with grid flow. Retains the original spatial idea with less text distortion.
+3. Radar sweep: one thin red scanning line crosses the content and resolves the next page behind it. A faint short-lived sweep edge, no fullscreen overlay.
+4. Sector assembly: the next page resolves in a few broad staggered rectangular regions, echoing the existing three-row block-fill language. Text remains on a stable final baseline.
+5. Wireframe-to-content: a sparse geometric outline sketches the incoming content plane, then becomes real type while the outline disappears. Echoes shapes assembling from nodes.
+6. Aperture shutters: two angular masks separate to expose the new page, with a brief mechanical acceleration/deceleration. No heavy panel chrome on the actual page.
+7. Coordinate snap: incoming content makes a short diagonal approach and lands with a precise bracket confirmation, no bounce. Crisp HUD-like navigation.
+8. Signal resolve: a single short scan displacement passes through departing content, then the incoming page resolves cleanly. No repeated glitching or unreadable randomized text.
+9. Vector handoff: a short route-aligned red vector travels from the selected navigation item toward the new heading; body content follows with a short opacity reveal.
+10. Contour scan: heading strokes appear as thin red contours then settle into solid type; body content appears together below. Avoid replaying the full name entrance.
+
+Best fit: Target acquisition plus a restrained Depth-plane transfer. Alternative with more tactical character: Radar sweep plus Sector assembly. Select one central motif rather than stacking all of these.

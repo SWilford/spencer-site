@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { MagneticActions, MagneticLink } from "@/components/magnetic-link";
 export const metadata = { title: "Experience · Spencer Wilford" };
 const jobs = [
   { organization: "Naval Surface Warfare Center Dahlgren Division", location: "Dahlgren, VA", dates: "May 2026 – August 2026", bullets: [
@@ -33,5 +33,5 @@ export default function ExperiencePage() { return <main id="main" className="pag
   </section>
   <section id="awards" className="career-section"><h2>Awards &amp; Hackathons</h2><article className="career-entry"><div className="career-entry-heading"><div><h3>Best First Time Hack</h3><p className="career-organization">Thaw · HooHacks 2026</p></div><p className="career-date">2026</p></div><p className="career-detail">Built an AI-powered platform matching startups with investors and partners in a 3-person team. Led backend development with Supabase and implemented Gemini-powered matching, structured responses, and agentic workflows under hackathon time constraints.</p></article></section>
   <section id="mentorship" className="career-section"><h2>Teaching &amp; Mentorship</h2><article className="career-entry"><div className="career-entry-heading"><div><h3>CS Ambassador</h3><p className="career-organization">JMU Computer Science Department</p></div><p className="career-date">Fall 2025</p></div><p className="career-detail">Selected to represent the Computer Science department at university events, open houses, and prospective student visits.</p><ul className="career-bullets"><li>Mentored incoming CS majors on course selection and career paths.</li><li>Organized and led departmental events and campus tours.</li><li>Served as liaison between students and faculty.</li></ul></article></section>
-  <Link className="text-link page-followup" href="/resume">View my resume</Link>
+  <MagneticActions label="Experience actions" className="page-followup"><MagneticLink href="/resume">View Resume</MagneticLink></MagneticActions>
 </main>; }

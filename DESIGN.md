@@ -186,7 +186,7 @@ On hover, keyboard focus, or press, thirty accent blocks in ten columns and thre
 
 ### Resume downloads
 
-The Resume page presents a source-faithful document preview with PDF and Word downloads, plus an Open PDF link for selectable text. Downloads use the sanitized public copy, not the private original.
+The Resume page presents a source-faithful document preview with one Download Resume action for the PDF; clicking the preview opens selectable text. Downloads use the sanitized public copy, not the private original.
 
 ### Media placeholders
 
@@ -253,6 +253,10 @@ The source of truth is the user-supplied Spencer Wilford Resume - 8.10.26.docx, 
 
 The user selected a public copy without phone/clearance. Only this sanitized DOCX, its Word-exported PDF, and a WebP preview are public under /resume/. The private original remains outside Git. Phone and both clearance paragraphs are removed from the OOXML before PDF generation. The resume is a single page retaining the source formatting; the site preview links to the selectable PDF. Resume labels use plain ASCII spelling.
 
-Contact follows the supplied screenshot's structure with three real contact channels and quick links to Projects, Experience, Resume and GitHub, plus an email action. No location, certification, or citizenship facts are borrowed from the reference. The materials use the established charcoal/red palette, transparent surfaces, and existing functional icon family. At 850px the two columns stack.
+Contact follows the supplied screenshot's structure with three real contact channels and quick links to Projects, Experience and Resume, plus an email action. No location, certification, or citizenship facts are borrowed from the reference. The materials use the established charcoal/red palette, transparent surfaces, and existing functional icon family. At 850px the two columns stack.
 
 Introductions are direct descriptions across the existing pages. Projects' existing content/layout is retained for a later dedicated design pass. Transition alternatives are documented in docs/page-transition-directions.md; the existing door animation is unchanged until selection.
+
+## Consistent action controls
+
+Resume has one visible download action, Download Resume (PDF). The document preview still opens the selectable PDF. Word remains a public artifact but is no longer a competing page action. Experience uses View Resume, and Contact uses Get in Touch. These actions reuse MagneticLink/MagneticActions from Home, including the three-row red block fill, nearest local magnet, weighted press and keyboard/reduced-motion behavior. Download links use native anchors with the download attribute, without route prefetch. Contact keeps one body GitHub contact card; Quick Links contains only the three local routes. The persistent header social link remains global navigation.

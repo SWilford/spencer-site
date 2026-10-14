@@ -266,17 +266,13 @@ html:active-view-transition .page-stage { pointer-events:none; }
 .contact-quick-links svg { color:var(--accent-light); }
 .contact-opportunities { padding:2px 28px 0; }
 .contact-opportunities p { color:var(--muted); line-height:1.8; margin:16px 0 22px; }
-.contact-cta { display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; padding:13px 18px; border:1px solid rgba(223,138,133,.45); border-radius:8px; color:var(--foreground); background:rgba(202,115,112,.10); transition:background 180ms; }
-.contact-cta:hover { background:rgba(202,115,112,.2); }
 @media(max-width:850px) { .contact-layout { grid-template-columns:1fr; gap:32px; } .career-entry-heading { flex-direction:column; gap:10px; } .experience-index { margin-bottom:45px; } }
 @media(max-width:580px) { .contact-channel { min-height:113px; padding:23px 19px; gap:15px; } .contact-quick-links { padding:24px; } .contact-opportunities { padding:0 4px; } .career-bullets { font-size:16px; } }
 @media(prefers-reduced-motion:reduce) { .contact-channel:hover,.contact-channel:hover .channel-arrow { transform:none; } }
 .resume-document-page { max-width:1120px; }
 .resume-document-page .page-heading { margin-bottom:32px; }
 .resume-document-actions { display:flex; align-items:center; flex-wrap:wrap; gap:18px 28px; margin-bottom:36px; }
-.resume-download { display:inline-flex; align-items:center; gap:24px; padding:14px 21px; border:1px solid rgba(223,138,133,.45); border-radius:8px; background:rgba(202,115,112,.10); font-size:16px; transition:background 180ms; }
-.resume-download span { font-size:12px; color:var(--accent-light); }
-.resume-download:hover { background:rgba(202,115,112,.20); color:var(--foreground); }
 .resume-document-preview { display:block; max-width:1000px; background:#fff; border-radius:2px; overflow:hidden; box-shadow:0 12px 40px rgba(8,8,10,.25); }
 .resume-document-preview img { display:block; width:100%; height:auto; }
-@media(max-width:580px) { .resume-document-actions { gap:18px; align-items:flex-start; } .resume-document-actions .text-link { font-size:14px; } }
+.contact-action { margin-top:22px; }
+.contact-action .hero-button,.contact-action .magnetic-face { width:100%; }
