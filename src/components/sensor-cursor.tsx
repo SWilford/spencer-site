@@ -54,10 +54,8 @@ export function SensorCursor() {
       const control = target.closest("a,button,[role='button'],summary");
       root.dataset.locked = String(!!control && !control.matches(":disabled,[aria-disabled='true']"));
       const nativeCursor = getComputedStyle(target).cursor;
-      const text = !control && !!target.closest("p,h1,h2,h3,h4,h5,h6,input:not([type]),input[type='text'],input[type='email'],input[type='search'],input[type='password'],input[type='url'],input[type='tel'],textarea,[contenteditable='true'],pre,code");
-      root.dataset.mode = text ? "text" : "pointer";
-      // The custom I-beam is decorative; browser selection and editing stay native.
-      return !control && (!!target.closest("select") || /resize|grab|wait|progress|not-allowed/.test(nativeCursor));
+      // Restore the browser cursor over text and editing surfaces.
+      return !control && (!!target.closest("p,h1,h2,h3,h4,h5,h6,input,textarea,select,[contenteditable='true'],pre,code") || /text|resize|grab|wait|progress|not-allowed/.test(nativeCursor));
     };
     const move = (event: PointerEvent) => {
       if (!eligible.matches || event.pointerType !== "mouse" || document.hidden || classify(event.target)) { hide(); return; }
@@ -75,7 +73,7 @@ export function SensorCursor() {
     };
     const click = (event: PointerEvent) => {
       move(event);
-      if (!visible || root.dataset.mode === "text" || event.pointerType !== "mouse" || event.button !== 0) return;
+      if (!visible || event.pointerType !== "mouse" || event.button !== 0) return;
       pulse.style.left = `${event.clientX}px`;
       pulse.style.top = `${event.clientY}px`;
       pulseAnimation?.cancel();
