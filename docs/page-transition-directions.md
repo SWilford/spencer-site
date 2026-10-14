@@ -31,3 +31,6 @@ These are visual concepts, not implementations. Keep the spatial field live, the
 Best fit: Target acquisition plus a restrained Depth-plane transfer. Alternative with more tactical character: Radar sweep plus Sector assembly. Select one central motif rather than stacking all of these.
 
 Verified implementation: three geometry/keyframe tests pass across desktop, mobile and ultrawide sizes; lint, type checking and production build pass. A native browser capture confirms fragmented incoming content during the handoff and a fully settled page afterward. Long-page mobile navigation completes without overflow, and repeated header navigation reaches the intended destination. Previous door code has been removed.
+
+Homepage lettering and typed copy pause for the lifetime of an active view transition, then resume with their existing stagger. The decode mask itself continues normally. This gates pending entrances against actual transition state rather than assuming a 620ms timer.
+Browser verification: on a fresh Contact-to-Home navigation, active transition=true with 0 completed letters and both letter/typing animation-play-state=paused; after completion, active=false and both states=running. Full lint, type checking and build passed.

@@ -47,3 +47,6 @@
 .type-complete .typed-character { animation:none; opacity:1; }
 .letter-complete :is(.glyph-solid,.letter-piece,.glyph-outline,.growing-edges,.growing-edges path,.growing-edges circle,.binary-rain>span,.radar-sweep,.print-head) { animation:none; }
 .letter-complete .glyph-solid { opacity:1; clip-path:none; transform:none; }
+
+/* Keep entrance timelines at their starting frames until page decoding completes. */
+html:active-view-transition .home-page :is(.animated-name,.typed-text) * { animation-play-state:paused !important; }
