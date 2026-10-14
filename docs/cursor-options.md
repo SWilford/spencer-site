@@ -1,6 +1,6 @@
-# Cursor concepts - brainstorm only
+# Cursor concepts and selected implementation
 
-No custom cursor has been implemented. These are visual directions for Spencer to select.
+Implemented selection: 1 + 7, with a short 5 trail and a restrained 10 depth echo. The remaining concepts below are alternatives.
 
 1. Sensor reticle: a precise center dot with four small corner brackets that trail slightly and catch up.
 2. Acquisition brackets: brackets contract and align around a hovered interactive element.
@@ -14,3 +14,9 @@ No custom cursor has been implemented. These are visual directions for Spencer t
 10. Layered depth: center point tracks exactly, while an offset frame moves with restrained parallax.
 
 Preferred combination: 1 with the hover/click behavior of 7, optionally a short 5 trail. Keep the actual pointer location precise while only the outer decoration lags. Avoid a large full-screen crosshair. Preserve native text-selection and resize cursors; use desktop fine-pointer behavior and a reduced-motion version. Keep existing magnetic button behavior consistent with any hover acquisition.
+
+## Approved cursor implementation
+
+Spencer selected 1 + 7 with a little 5 and 10. SensorCursor mounts once in the root layout outside page transitions. The exact 3px center tracks immediately; a 25px corner frame follows with a 45ms exponential catch-up and contracts over links/buttons. Three short red vector segments cap at 14px each and disappear at rest. A faint .22-opacity echo sits 2–5px behind the main frame. Primary clicks emit a 300ms ring pulse. Pointer positions never trigger React renders; animation frames stop once settled. The overlay is decorative and cannot intercept input.
+
+Only fine hover mouse pointers with no reduced-motion preference receive the cursor. Text, editing, special cursor contexts, keyboard use, scroll, blur, pointer exit and hidden tabs restore the native cursor. Touch and reduced-motion retain native behavior. Glass faces now have no charcoal base, only a 1.2–2.5% reflection/red tint, 1.5px blur and the existing red outline; the block fill and magnetic/press behavior stay intact.

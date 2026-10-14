@@ -86,7 +86,7 @@ components:
     padding: "10px 18px"
     size: "14px"
   hero-button:
-    backgroundColor: "linear-gradient(135deg,rgba(237,232,232,.035),transparent 45%,rgba(199,115,112,.045)),rgba(36,36,38,.055)"
+    backgroundColor: "linear-gradient(135deg,rgba(237,232,232,.012),transparent 45%,rgba(199,115,112,.025)),transparent"
     textColor: "{colors.foreground}"
     rounded: "{rounded.route-face}"
     padding: "15px 24px"
@@ -160,7 +160,7 @@ At (1050px), header spacing tightens and content briefly uses a (5vw) gutter. At
 
 Foreground content is flat. Depth comes from the fixed canvas beneath semantic content: one shared perspective projection for grid and forms, a five-plane advancing lattice, one-time angular body formation, faint filled faces, square nodes, and bright intersection beacons. The canvas is noninteractive in the document hit-test layer and hidden from assistive technology; a subtle reading scrim sits above it.
 
-The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. The current glass trial uses a translucent route face with blur (4px) with saturation (1.08), a muted red border, top reflection gradient, and inset upper rim. Route faces use `0 5px 12px rgba(13,13,15,.16),0 2px 0 rgba(17,17,20,.22),inset 0 1px 0 rgba(237,232,232,.20)`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
+The desktop “For fun” disclosure and Home’s magnetic route-button faces are the raised UI surfaces. Its shadow is `0 16px 32px rgba(16,17,19,.3)`; on mobile its background becomes transparent and its shadow is removed. The current glass trial uses a translucent route face with blur (1.5px) with saturation (1.04), a muted red border, top reflection gradient, and inset upper rim. Route faces use `0 3px 9px rgba(13,13,15,.09),inset 0 1px 0 rgba(237,232,232,.10)`, flattening to `0 1px 3px rgba(13,13,15,.3),0 1px 0 #161619` while pressed. There are no card shadows.
 
 **The Background Geometry Rule.** Keep tactical lines and grids behind the content. Foreground sections remain open and unboxed.
 
@@ -180,7 +180,7 @@ Actions are unboxed text in Light Dusty Red. The base link size is (16px), while
 
 ### Home route buttons
 
-Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `rgba(36,36,38,.055)`, blur (4px) with saturation (1.08), a `rgba(221,139,135,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(48,48,51,.24)`. The outer link has minimum height (64px) and perspective (650px).
+Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `transparent`, blur (1.5px) with saturation (1.04), a `rgba(221,139,135,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(199,115,112,.025)`. The outer link has minimum height (64px) and perspective (650px).
 
 On hover, keyboard focus, or press, thirty accent blocks in ten columns and three rows scale in from the left; each column adds (24ms) and each row adds (16ms), reaching a maximum stagger (248ms). The readable label stays unchanged, shifting to dark text over the red fill. Pressing moves the face down (4px), back (-10px), and scales it to (.975) with a flatter shadow and (70ms) response. Pointer/touch and Enter press states reset on release, cancel, pointer leave, or blur. Reduced-motion removes face transforms and the global rule makes fill transitions instant. No portrait is currently included. The footer checks the active pathname and returns no footer on Home, avoiding the repeated name and Contact action; interior pages retain it. Button text disables selection during interaction.
 
@@ -218,7 +218,7 @@ Completed animations remain settled across cached-page visibility changes. Typed
 
 A stable React ViewTransition wraps only page children, with the `page-content` name, door update/enter/exit class, and default none; header and canvas remain outside. The wrapper has no pathname key and uses update="door", preserving Next’s cached client-page state instead of remounting children. The document root opts out of snapshots. Outgoing content rotates (-58deg) and translates (20vw) right and (6vw) nearer over (440ms), with opacity (1) initially, (.55) at (65%), and (0) at the end. Incoming content starts immediately at opacity (.35), rotation (58deg), and translation (-4vw, 0, -50vw); opacity reaches (.7) at (45%) and (1) at its normal position after (600ms). The old snapshot uses z-index (2) above the new snapshot at (1), revealing the next page early in depth during the concurrent transition. Both pivot at left (45%) with perspective (160vw). Reduced-motion disables transition animations; unsupported browsers navigate normally. No automatic idle text animation is implemented.
 
-The 600ms door arrival uses cubic-bezier(.4,0,.3,1) for a slower initial depth approach. During the transition, snapshots ignore pointer events and the moving page-stage is inert; the header remains outside and clickable. Browser inspection at 160ms confirmed incoming depth near -574px behind outgoing opacity .73, with distinct transform matrices. Full checks and production build passed. Cursor treatments remain proposals.
+The 600ms door arrival uses cubic-bezier(.4,0,.3,1) for a slower initial depth approach. During the transition, snapshots ignore pointer events and the moving page-stage is inert; the header remains outside and clickable. Browser inspection at 160ms confirmed incoming depth near -574px behind outgoing opacity .73, with distinct transform matrices. Full checks and production build passed. The selected cursor combines sensor brackets, lock/click feedback, a short vector trail, and a faint depth echo.
 
 ### Keyboard focus
 
@@ -238,3 +238,9 @@ Links and buttons share a Light Dusty Red outline (2px) with offset (6px). The s
 - **Don't** turn open foreground content into tactical panels, tables, or bordered cards.
 - **Don't** substitute stark black/crimson contrast or flowing ribbon geometry for the chosen direction.
 - **Don't** invent photographs, project screenshots, forms, or component variants absent from the implementation.
+
+## Approved cursor implementation
+
+Spencer selected 1 + 7 with a little 5 and 10. SensorCursor mounts once in the root layout outside page transitions. The exact 3px center tracks immediately; a 25px corner frame follows with a 45ms exponential catch-up and contracts over links/buttons. Three short red vector segments cap at 14px each and disappear at rest. A faint .22-opacity echo sits 2–5px behind the main frame. Primary clicks emit a 300ms ring pulse. Pointer positions never trigger React renders; animation frames stop once settled. The overlay is decorative and cannot intercept input.
+
+Only fine hover mouse pointers with no reduced-motion preference receive the cursor. Text, editing, special cursor contexts, keyboard use, scroll, blur, pointer exit and hidden tabs restore the native cursor. Touch and reduced-motion retain native behavior. Glass faces now have no charcoal base, only a 1.2–2.5% reflection/red tint, 1.5px blur and the existing red outline; the block fill and magnetic/press behavior stay intact.
