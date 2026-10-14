@@ -5,7 +5,7 @@ Visitor mode: Experience. Professional portfolio first; experience and resume be
 ## Direction contract
 
 THESIS: Open professional content lives over an autonomous tactical graph. Only the background is griddy.
-OWN-WORLD: Sampled charcoal #202022, warm red #bd6866/#d17d79, warm gray #ede8e8; Manrope content and Chakra Petch name, unframed text and asymmetric space. Angular lines and nodes belong to a separate canvas.
+OWN-WORLD: Sampled charcoal #202022, warm red #ca7370/#df8a85, warm gray #ede8e8; Manrope content and Chakra Petch name, unframed text and asymmetric space. Angular lines and nodes belong to a separate canvas.
 STORY: Home introduces Spencer alone. Experience, projects, resume, and contact remain separate routes; none are stacked on Home. Creative destinations are unsettled: For fun currently shows only “More to come.” Existing creative pages remain untouched pending the user’s direction. Decorative content icons are excluded.
 FIRST VIEWPORT: Full-width spatial graph behind a left-aligned animated name, credentials “CS @ JMU | Prev. SWE at NSWCDD, NGA”, a four-sentence summary, and four static links: Experience, Projects, Résumé, Contact. No portrait is added without an asset. A compact text-only header carries Home, Experience, Projects, Resume, Contact, For fun, and right-aligned social icons. The approved fourteen name effects remain unchanged, then settle to readable letters.
 FORM: Approved open-layout-v6 comp, evolved from seed 6c71a9ea. The user approved this look and requested a first code draft to evaluate feel, explicitly changing the name and header. This session builds a flexible interactive translation for review; the image remains the visual reference and source of layout/material discipline.

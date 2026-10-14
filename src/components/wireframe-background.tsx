@@ -88,7 +88,7 @@ export function WireframeBackground() {
         if (!a.visible || !b.visible || (a.x<0 && b.x<0) || (a.x>width && b.x>width) || (a.y<0 && b.y<0) || (a.y>height && b.y>height)) return;
         context.beginPath();
         context.moveTo(a.x, a.y); context.lineTo(b.x, b.y);
-        context.strokeStyle = `rgba(189,104,102,${alpha})`;
+        context.strokeStyle = `rgba(202,115,112,${alpha})`;
         context.lineWidth = 1; context.stroke();
       };
       // The entire lattice advances rightward and toward the camera in world space.
@@ -106,11 +106,11 @@ export function WireframeBackground() {
         if(plane<4 && idX%3===0 && idZ%2===0) line(p,worldProject({...point,y:point.y+1.8}),.16*depthFade);
         if(!p.visible) continue;
         const light = Math.pow(.5+.5*Math.sin(idX*7.13+idZ*4.7+plane+elapsed*.8),12);
-        context.fillStyle = `rgba(230,158,151,${(.12+light*.8)*depthFade})`;
+        context.fillStyle = `rgba(239,170,161,${(.12+light*.8)*depthFade})`;
         const radius = (1+light)*Math.min(1.5,p.scale);
         context.fillRect(p.x-radius,p.y-radius,radius*2,radius*2);
         if(light>.75) {
-          context.strokeStyle=`rgba(209,125,121,${light*.6*depthFade})`;
+          context.strokeStyle=`rgba(223,138,133,${light*.6*depthFade})`;
           context.strokeRect(p.x-4,p.y-4,8,8);
         }
       }
@@ -186,7 +186,7 @@ export function WireframeBackground() {
         const anchor = gridNodePosition(body.anchors[i],elapsed);
         if(assembly<1) {
           const source=worldProject(anchor);
-          context.fillStyle=`rgba(230,158,151,${.85*(1-assembly)})`;
+          context.fillStyle=`rgba(239,170,161,${.85*(1-assembly)})`;
           context.fillRect(source.x-2,source.y-2,4,4);
         }
         const growth = .9*body.size;
@@ -216,7 +216,7 @@ export function WireframeBackground() {
         if (face.every(p => p.visible)) {
           context.beginPath(); context.moveTo(face[0].x,face[0].y);
           face.slice(1).forEach(p => context.lineTo(p.x,p.y));
-          context.closePath(); context.fillStyle = `rgba(189,104,102,${completion*.055*fade})`; context.fill();
+          context.closePath(); context.fillStyle = `rgba(202,115,112,${completion*.055*fade})`; context.fill();
         }
       }
       for(const [index,[a,b]] of shapeEdges[shape].entries()) {
@@ -227,10 +227,10 @@ export function WireframeBackground() {
       for (let i = 0; i < count; i++) {
         const p = screens[i];
         const half = 1.8;
-        context.strokeStyle = `rgba(209,125,121,${.75*fade})`;
+        context.strokeStyle = `rgba(223,138,133,${.75*fade})`;
         context.strokeRect(p.x-half, p.y-half, half*2, half*2);
         const beacon = .5 + .5*Math.sin(elapsed*.7+i*2+layer);
-        if(beacon>.7) {context.fillStyle=`rgba(230,158,151,${beacon*fade})`;context.fillRect(p.x-1,p.y-1,2,2);}
+        if(beacon>.7) {context.fillStyle=`rgba(239,170,161,${beacon*fade})`;context.fillRect(p.x-1,p.y-1,2,2);}
         if (i % 9 === 0) {
           line({ ...p, x:p.x-7 }, { ...p, x:p.x+7 }, .32);
           line({ ...p, y:p.y-7 }, { ...p, y:p.y+7 }, .32);
