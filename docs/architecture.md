@@ -43,6 +43,14 @@ Static/server-rendered content comes first. Load a 3D module separately; preserv
 
 Targets to validate after implementation: LCP <2.5 s, INP <200 ms, CLS <0.1 at the 75th percentile. These are goals, not claimed measurements. Start with representative mobile hardware/network testing; confirm real-user performance after launch.
 
+## Global survey scrollbar
+
+`src/components/survey-scrollbar.tsx` progressively enhances native page scrolling on fine-pointer, hover-capable desktops. The viewport-fitted ruler has 61 ticks, a longer mark every five intervals, and a muted-red thumb proportional to the visible page (minimum 44px). It fades after 1,100ms of idle time, reappears on edge hover, and remains visible during focus or captured pointer dragging. Track clicks reposition the thumb; Arrow keys move 48px, Page keys move 85% of the viewport, and Home/End reach the boundaries. The scrollbar exposes its position through ARIA without adding visible percentages or HUD labels.
+
+Passive scroll events schedule measurements through requestAnimationFrame; ResizeObserver tracks body and rail size changes. Native scrollbars remain available on coarse pointers, in forced colors, and without JavaScript. Reduced motion removes the rail's transitions and translation. This extends the existing visual world with current color tokens; DESIGN.md and `.impeccable/design.json` remain authoritative and unchanged. It changes no page content, music data access, or hosting configuration.
+
+Review passed with no blocking findings (`detector: []`). Browser checks recorded PageDown at scrollY 850 / ARIA 60, End at 100, Home at 0, a track click at 50, idle opacity 0, and no narrow-screen horizontal overflow. Captures are in `.impeccable/review/scrollbar-desktop.png`, `scrollbar-idle.png`, and `scrollbar-mobile.png`. Physical dragging, coarse-pointer behavior, and forced-colors fallback were reviewed in source only. `npm run check` completed successfully, including lint, type checking, and the production build.
+
 ## Module boundaries
 
 Keep website content, music ingestion, music analytics, and provider adapters separate. A provider adapter returns source records with provenance, never precomputed public UI state. Analytics read our normalized catalog/history, not live provider APIs. The public UI reads saved, allowlisted aggregate output. Imports and collection never run as a side effect of a public page load.

@@ -274,3 +274,20 @@ html:active-view-transition .page-stage { pointer-events:none; }
 .resume-document-preview img { display:block; width:100%; height:auto; }
 .contact-action { margin-top:22px; }
 .contact-action .hero-button,.contact-action .magnetic-face { width:100%; }
+/* Survey scale: progressive enhancement of the page's native scrolling. */
+html.survey-scroll-enabled { scrollbar-width:none; }
+html.survey-scroll-enabled::-webkit-scrollbar { display:none; }
+.survey-scrollbar { --survey-thumb:44px; --survey-offset:0px; position:fixed; z-index:80; top:96px; bottom:28px; right:0; width:28px; display:none; touch-action:none; user-select:none; opacity:0; transform:translateX(5px); transition:opacity 280ms ease-out,transform 360ms cubic-bezier(.16,1,.3,1); }
+.survey-scrollbar[data-enabled="true"][data-scrollable="true"] { display:block; }
+.survey-scrollbar[data-active="true"],.survey-scrollbar:focus-visible { opacity:1; transform:none; }
+.survey-ticks { display:block; width:100%; height:100%; pointer-events:none; }
+.survey-ticks line { stroke:var(--muted); stroke-opacity:.22; stroke-width:.8; vector-effect:non-scaling-stroke; }
+.survey-ticks line.major { stroke-opacity:.48; }
+.survey-thumb { position:absolute; top:0; right:6px; width:12px; height:var(--survey-thumb); transform:translateY(var(--survey-offset)); pointer-events:none; }
+.survey-thumb::before { content:""; position:absolute; top:0; bottom:0; right:0; width:3px; background:var(--accent); border-radius:2px; transition:background 160ms; }
+.survey-thumb i,.survey-thumb b { position:absolute; right:0; width:10px; height:1px; background:var(--accent-light); }
+.survey-thumb i { top:0; } .survey-thumb b { bottom:0; }
+.survey-scrollbar:hover .survey-thumb::before,.survey-scrollbar[data-dragging="true"] .survey-thumb::before { background:var(--accent-light); }
+.survey-scrollbar:focus-visible { outline:1px solid var(--accent-light); outline-offset:-2px; border-radius:2px; }
+@media (prefers-reduced-motion:reduce) { .survey-scrollbar { transition:none; transform:none; } }
+@media (forced-colors:active) { html.survey-scroll-enabled { scrollbar-width:auto; } html.survey-scroll-enabled::-webkit-scrollbar { display:initial; } .survey-scrollbar { display:none !important; } }
