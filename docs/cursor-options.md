@@ -1,6 +1,6 @@
 # Cursor concepts and selected implementation
 
-Implemented selection: 1 + 7, with a short 5 trail and a restrained 10 depth echo. The remaining concepts below are alternatives.
+Implemented selection: 1 + 7, with a short 5 trail and no 10 depth echo (removed by request). The remaining concepts below are alternatives.
 
 1. Sensor reticle: a precise center dot with four small corner brackets that trail slightly and catch up.
 2. Acquisition brackets: brackets contract and align around a hovered interactive element.
@@ -17,6 +17,6 @@ Preferred combination: 1 with the hover/click behavior of 7, optionally a short 
 
 ## Approved cursor implementation
 
-Spencer selected 1 + 7 with a little 5 and 10. SensorCursor mounts once in the root layout outside page transitions. The exact 3px center tracks immediately; a 25px corner frame follows with a 45ms exponential catch-up and contracts over links/buttons. Three short red vector segments cap at 14px each and disappear at rest. A faint .22-opacity echo sits 2–5px behind the main frame. Primary clicks emit a 300ms ring pulse. Pointer positions never trigger React renders; animation frames stop once settled. The overlay is decorative and cannot intercept input.
+Spencer selected 1 + 7 with a little 5; the initial depth echo was removed. SensorCursor mounts once in the root layout outside page transitions. The exact 3px center tracks immediately; a 25px corner frame follows with a 45ms exponential catch-up and contracts over links/buttons. Three short red vector segments cap at 14px each and disappear at rest. There is no offset depth frame. Primary clicks emit a 300ms expanding corner-bracket pulse. Pointer positions never trigger React renders; animation frames stop once settled. The overlay is decorative and cannot intercept input.
 
-Only fine hover mouse pointers with no reduced-motion preference receive the cursor. Text, editing, special cursor contexts, keyboard use, scroll, blur, pointer exit and hidden tabs restore the native cursor. Touch and reduced-motion retain native behavior. Glass faces now have no charcoal base, only a 1.2–2.5% reflection/red tint, 1.5px blur and the existing red outline; the block fill and magnetic/press behavior stay intact.
+Only fine hover mouse pointers with no reduced-motion preference receive the cursor. Text and editable content use an exact custom 19px I-beam with muted red end caps. Special cursor contexts, keyboard use, scroll, blur, pointer exit and hidden tabs restore the native cursor. Touch and reduced-motion retain native behavior. Glass faces have no charcoal base, a 4.5% reflection with 7–12% red tint, 12px frosted blur, saturation 1.25 and the existing red outline; the block fill and magnetic/press behavior stay intact.

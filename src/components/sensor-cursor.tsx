@@ -10,7 +10,6 @@ export function SensorCursor() {
     if (!root) return;
     const dot = root.querySelector<HTMLElement>(".cursor-core")!;
     const frame = root.querySelector<HTMLElement>(".cursor-frame")!;
-    const echo = root.querySelector<HTMLElement>(".cursor-depth")!;
     const pulse = root.querySelector<HTMLElement>(".cursor-pulse")!;
     const tail = Array.from(root.querySelectorAll<HTMLElement>(".cursor-vector"));
     const eligible = matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
@@ -35,9 +34,6 @@ export function SensorCursor() {
       followX += (x - followX) * ease;
       followY += (y - followY) * ease;
       frame.style.transform = `translate3d(${followX}px,${followY}px,0)`;
-      const dx = Math.max(-3, Math.min(3, (x - followX) * .12));
-      const dy = Math.max(-3, Math.min(3, (y - followY) * .12));
-      echo.style.transform = `translate3d(${followX + 2 + dx}px,${followY + 2 + dy}px,0)`;
       let distance = Math.hypot(x - followX, y - followY);
       points[0] = { x, y };
       for (let i = 1; i < points.length; i++) {
@@ -57,8 +53,11 @@ export function SensorCursor() {
       if (!(target instanceof Element)) return false;
       const control = target.closest("a,button,[role='button'],summary");
       root.dataset.locked = String(!!control && !control.matches(":disabled,[aria-disabled='true']"));
-      // Keep browser selection/editing and special grab/resize cursors intact.
-      return !control && (!!target.closest("p,h1,h2,h3,h4,h5,h6,input,textarea,select,[contenteditable='true'],pre,code") || /text|resize|grab|wait|progress|not-allowed/.test(getComputedStyle(target).cursor));
+      const nativeCursor = getComputedStyle(target).cursor;
+      const text = !control && !!target.closest("p,h1,h2,h3,h4,h5,h6,input:not([type]),input[type='text'],input[type='email'],input[type='search'],input[type='password'],input[type='url'],input[type='tel'],textarea,[contenteditable='true'],pre,code");
+      root.dataset.mode = text ? "text" : "pointer";
+      // The custom I-beam is decorative; browser selection and editing stay native.
+      return !control && (!!target.closest("select") || /resize|grab|wait|progress|not-allowed/.test(nativeCursor));
     };
     const move = (event: PointerEvent) => {
       if (!eligible.matches || event.pointerType !== "mouse" || document.hidden || classify(event.target)) { hide(); return; }
@@ -75,7 +74,8 @@ export function SensorCursor() {
       if (!request) request = requestAnimationFrame(render);
     };
     const click = (event: PointerEvent) => {
-      if (!visible || event.pointerType !== "mouse" || event.button !== 0) return;
+      move(event);
+      if (!visible || root.dataset.mode === "text" || event.pointerType !== "mouse" || event.button !== 0) return;
       pulse.style.left = `${event.clientX}px`;
       pulse.style.top = `${event.clientY}px`;
       pulseAnimation?.cancel();
@@ -86,6 +86,7 @@ export function SensorCursor() {
     };
     const refresh = () => hide();
     window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerover", move, { passive: true });
     window.addEventListener("pointerdown", click, { passive: true });
     window.addEventListener("blur", hide);
     window.addEventListener("scroll", hide, { passive: true });
@@ -96,6 +97,7 @@ export function SensorCursor() {
     return () => {
       hide();
       window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerover", move);
       window.removeEventListener("pointerdown", click);
       window.removeEventListener("blur", hide);
       window.removeEventListener("scroll", hide);
@@ -107,9 +109,8 @@ export function SensorCursor() {
   }, []);
   return <div ref={rootRef} className="sensor-cursor" aria-hidden="true" data-visible="false">
     {[0, 1, 2].map(index => <span className="cursor-vector" key={index} />)}
-    <span className="cursor-depth"><span /></span>
     <span className="cursor-frame"><span /></span>
     <span className="cursor-core"><span /></span>
-    <span className="cursor-pulse" />
+    <span className="cursor-pulse"><span /></span>
   </div>;
 }
