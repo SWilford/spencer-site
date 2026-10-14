@@ -51,3 +51,22 @@ test("duplicate fragments and invalid duration inputs fail instead of doubling t
   assert.throws(() => includeAppleImport(snapshot, { ...input, plays: [apple, apple] }, true));
   assert.throws(() => includeAppleImport(snapshot, { ...input, plays: [{ ...apple, actualMs: -1 }] }, true));
 });
+
+test("saved Spotify enrichment supplies Apple-only photos and covers without changing counts or time", () => {
+  const artistId = "s".repeat(22), image = "https://i.scdn.co/image/abc123";
+  const enrichment = { schemaVersion: 1, runKey: input.runKey,
+    artists: { "apple:artist:1": { status: "matched", id: artistId, image } },
+    albums: { "apple:album:1": { status: "matched", id: "b".repeat(22), image } } };
+  const emptySpotify = { ...snapshot, plays: [] };
+  const included = includeAppleImport(emptySpotify, input, true, enrichment);
+  const result = publicMusicStats(included, { start: "2026-07-31", end: "2026-08-01" });
+  assert.equal(result.rankings.artists[0].artwork, image);
+  assert.equal(result.rankings.tracks[0].artwork, image);
+  assert.equal(result.rankings.albums[0].artwork, image);
+  assert.equal(result.summary.streams, 1);
+  assert.equal(result.summary.milliseconds, 90000);
+  assert.equal(input.plays[0].artwork, null);
+  const alternateCover = { ...enrichment, albums: { "apple:album:1": { ...enrichment.albums["apple:album:1"], artworkOnly: true } } };
+  assert.equal(includeAppleImport(emptySpotify, input, true, alternateCover).plays[0].albumId, apple.albumId);
+  assert.throws(() => includeAppleImport(emptySpotify, input, true, { ...enrichment, runKey: "bad" }));
+});

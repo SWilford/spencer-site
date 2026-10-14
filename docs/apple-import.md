@@ -14,6 +14,8 @@ Unique matching title/album/artist/duration metadata reuses observed Spotify tra
 
 Verification: nineteen JavaScript music tests and eight Python import tests passed, along with lint, type checking and production build. The actual local endpoint for February 5–September 19 returns exactly 6,924 streams and 1,296,848,377 ms; daily and hourly duration sums reconcile. Browser verification confirmed combined Lifetime stats and artist rankings. Artwork is reused only from matching cached Spotify metadata; missing artwork remains a placeholder and never triggers Apple API access. The local server was restarted with the flag enabled; no cloud resource or deployment changed.
 
+Subsequent metadata enrichment now searches Spotify for Apple-only artists/albums/tracks from an owner-operated script and saves matches for page reads. See [Spotify catalog enrichment](spotify-catalog-enrichment.md), including the current Spotify cooldown and pending work. Apple remains a one-time file import, with no Apple API planned or used.
+
 ## Run on Windows
 
 ```powershell

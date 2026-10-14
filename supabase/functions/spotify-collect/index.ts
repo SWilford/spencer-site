@@ -112,6 +112,10 @@ Deno.serve(async (request: Request) => {
     try { return reply(await control("bootstrap", key, body)); }
     catch { return reply({ error: "bootstrap_failed" }, 400); }
   }
+  const catalogOnly = body.action === "catalog";
+  const queries = body.queries as { type: string; q: string; offset?: number }[];
+  if (catalogOnly && (!Array.isArray(queries) || queries.length < 1 || queries.length > 20 || queries.some(q => !q || !["artist", "album", "track"].includes(q.type) || typeof q.q !== "string" || q.q.length < 1 || q.q.length > 250 || (q.offset !== undefined && (!Number.isInteger(q.offset) || q.offset < 0 || q.offset > 1000))))) return reply({ error: "invalid_catalog_queries" }, 400);
+  if (catalogOnly && context.last_success && Date.now() - Date.parse(context.last_success) > 8 * 60_000) return reply({ state: "collection_due" });
   try { context = await control("acquire", key); }
   catch { return reply({ error: "acquire_failed" }, 503); }
   if (context.state !== "acquired") return reply({ state: context.state });
@@ -128,6 +132,23 @@ Deno.serve(async (request: Request) => {
     const token = await refresh.json();
     if (!token.access_token || token.token_type?.toLowerCase() !== "bearer") throw new Error("invalid_token");
     if (token.refresh_token) await control("save_token", key, { run_id, refresh_token: token.refresh_token });
+    if (catalogOnly) {
+      const results = [];
+      for (const query of queries) {
+        const search = new URL("https://api.spotify.com/v1/search");
+        search.search = new URLSearchParams({ q: query.q, type: query.type, limit: "10", market: "US", offset: String(query.offset ?? 0) }).toString();
+        const found = await fetch(search, { redirect: "error", signal: AbortSignal.timeout(10000), headers: { Authorization: `Bearer ${token.access_token}` } });
+        if (!found.ok) {
+          code = `catalog_http_${found.status}`;
+          retrySeconds = found.status === 429 ? Math.max(60, Number(found.headers.get("retry-after")) || 600) : 0;
+          await control("catalog_finish", key, { run_id, code, retry_seconds: retrySeconds });
+          return reply({ results, error: code, retry_seconds: retrySeconds }, found.status === 429 ? 429 : 502);
+        }
+        results.push(await found.json());
+      }
+      await control("catalog_finish", key, { run_id });
+      return reply({ results });
+    }
     let next: URL | null = new URL("https://api.spotify.com/v1/me/player/recently-played?limit=50");
     if (context.after !== null) next.searchParams.set("after", String(context.after));
     const pages = [];
@@ -154,7 +175,7 @@ Deno.serve(async (request: Request) => {
     try { artistProfilesUpdated = await syncArtistProfiles(key, token.access_token); } catch { /* Next scheduled collection retries metadata. */ }
     return reply({ ...result, artist_profiles_updated: artistProfilesUpdated });
   } catch {
-    try { await control("fail", key, { run_id, code, retry_seconds: Math.max(60, Math.min(86400, retrySeconds)) }); } catch { /* Lease expires if the database is unreachable. */ }
+    try { await control(catalogOnly ? "catalog_finish" : "fail", key, { run_id, code, retry_seconds: catalogOnly ? 0 : Math.max(60, Math.min(86400, retrySeconds)) }); } catch { /* Lease expires if the database is unreachable. */ }
     return reply({ error: code }, 502);
   }
 });

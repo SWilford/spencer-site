@@ -35,7 +35,7 @@ revoke all on all tables in schema music_private from public, anon, authenticate
 
 -- Only the hosted function's service role can call this API. Raw/token tables
 -- stay in an unexposed schema; the additional random key protects the function.
-create function public.music_collector_control(action text, collector_key text, payload jsonb default '{}')
+create or replace function public.music_collector_control(action text, collector_key text, payload jsonb default '{}')
 returns jsonb language plpgsql security definer set search_path = pg_catalog
 as $$
 declare
@@ -87,6 +87,15 @@ begin
    if length(coalesce(payload->>'refresh_token','')) < 10 then raise exception 'Invalid token'; end if;
    perform vault.update_secret(c.refresh_secret,payload->>'refresh_token');
    return jsonb_build_object('saved',true);
+ elsif action = 'catalog_finish' then
+   -- Catalog-only work shares refresh-token fencing, but never claims a history sync.
+   update music_private.runs set status=case when payload->>'code' is null then 'catalog_success' else 'catalog_failed' end,
+     finished_at=now(),error_code=left(payload->>'code',80) where id=run;
+   update music_private.collector set lease_id=null,lease_until=null,
+     retry_at=case when coalesce((payload->>'retry_seconds')::integer,0)>0
+       then now()+make_interval(secs=>least(86400,greatest(60,(payload->>'retry_seconds')::integer))) else retry_at end
+     where singleton;
+   return jsonb_build_object('released',true);
  elsif action = 'finish' then
    if jsonb_array_length(payload->'pages') > 10 then raise exception 'Too many pages'; end if;
    latest := c.cursor_ms;
