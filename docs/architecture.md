@@ -35,7 +35,7 @@ The user requested separate tab pages and permits filler for the visual draft. C
 4. **Music imports and private data.** Inspect real Spotify and Apple files; inventory schemas, timestamps, duration units, identifiers, and missing fields. Implement immutable private upload storage, import audit reports, versioned parsers, and reprocessing. Authenticate owner, enforce limits, and validate accuracy using export fixtures.
 5. **Listening dashboard.** Implement metrics and charts over normalized data. Independent summary/top-list date ranges; data quality labels, coverage, freshness, manual catalog corrections, and public allowlist. Verify calculations against known fixtures.
 6. **Spotify collection.** Confirm current developer-access rules and actual credentials/scopes. Start recent-history ingestion with an external scheduler, database lock/lease, persisted cursor and overlap window, idempotent writes, refresh-token handling, rate-limit backoff, and failure visibility. Reconcile with later extended-history imports.
-7. **Advanced tracking and migration.** Investigate playback observations and Apple automation separately. Frequent observation is approximate. Inspect the other project's runtime, persistence, auth, domains, and deployment requirements before choosing migration strategy.
+7. **Advanced tracking and migration.** Investigate Spotify playback observations separately; frequent observation is approximate. Apple is exclusively a one-time supplied-file import, with no API, auth or automation planned. Inspect the other project's runtime, persistence, auth, domains, and deployment requirements before choosing migration strategy.
 
 ## Performance and interaction budget
 

@@ -2,6 +2,8 @@ export type MusicPlay = {
   id: string; at: string; provider: "spotify" | "apple"; songLengthMs: number | null;
   actualMs: number | null; trackId: string; name: string; url: string | null;
   artists: { id: string; name: string }[]; albumId: string | null; album: string | null; artwork: string | null;
+  // Imported hourly fragments carry one stream only at the qualified attempt's start.
+  streamCount?: number;
 };
 export type MusicSnapshot = { generatedAt: string; lastCollection: string | null; collectionError: string | null;
   collectionStartedAt: string | null; truncated: boolean; artistProfiles?: Record<string, { image: string | null; url: string | null }>; plays: MusicPlay[] };
@@ -48,9 +50,10 @@ export function inRange(play: MusicPlay, range: DateRange) {
 export function durationMs(play: MusicPlay, mode: DurationMode) {
   return mode === "measured" ? play.actualMs ?? 0 : play.actualMs ?? play.songLengthMs ?? 0;
 }
+export function playbackCount(play: MusicPlay) { return play.streamCount ?? 1; }
 export function summarize(plays: MusicPlay[], range: DateRange, mode: DurationMode) {
   const selected = plays.filter(p => inRange(p, range));
-  return { selected, count: selected.length, milliseconds: selected.reduce((total, p) => total + durationMs(p, mode), 0),
+  return { selected, count: selected.reduce((total, p) => total + playbackCount(p), 0), milliseconds: selected.reduce((total, p) => total + durationMs(p, mode), 0),
     tracks: new Set(selected.map(p => p.trackId)).size,
     artists: new Set(selected.flatMap(p => p.artists.map(a => a.id))).size,
     albums: new Set(selected.map(p => p.albumId).filter(Boolean)).size,
@@ -62,7 +65,7 @@ export function dailySeries(plays: MusicPlay[], range: DateRange, mode: Duration
   const totals = new Map<string, { count: number; milliseconds: number }>();
   for (const p of plays.filter(p => inRange(p, range))) {
     const key = dayKey(p.at), value = totals.get(key) ?? { count: 0, milliseconds: 0 };
-    value.count++; value.milliseconds += durationMs(p, mode); totals.set(key, value);
+    value.count += playbackCount(p); value.milliseconds += durationMs(p, mode); totals.set(key, value);
   }
   const days = rangeDays(range);
   if (days < 1 || days > 36525) return [];
@@ -76,7 +79,7 @@ export function rank(plays: MusicPlay[], range: DateRange, mode: DurationMode, k
       : [{ id: p.trackId, name: p.name, detail: p.artists.map(a => a.name).join(", ") || "Unknown artist" }];
     for (const item of identities) {
       const row = map.get(item.id) ?? { ...item, count: 0, milliseconds: 0, artwork: kind === "artists" ? null : p.artwork, url: kind === "tracks" ? p.url : null };
-      row.count++; row.milliseconds += durationMs(p, mode); map.set(item.id, row);
+      row.count += playbackCount(p); row.milliseconds += durationMs(p, mode); map.set(item.id, row);
     }
   }
   return [...map.values()].sort((a, b) => (sort === "plays" ? b.count - a.count : b.milliseconds - a.milliseconds) || a.name.localeCompare(b.name));

@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts/music'))
 import apple_archive as apple
 import normalize_apple as normal
+import export_apple_dashboard as dashboard
 
 
 def end(event, start, milliseconds, position=0, reason='NATURAL_END_OF_TRACK', title='Example', item='ITUNES_STORE_CONTENT'):
@@ -72,6 +73,12 @@ class AppleNormalizationTests(unittest.TestCase):
             self.assertEqual(audit['catalog_unmatched_segments'],2)
             self.assertEqual(audit['daily_report']['milliseconds'],900000)
             self.assertEqual(audit['excluded_event_types']['LYRIC_DISPLAY'],1)
+            exported=dashboard.export_dashboard(output)
+            self.assertEqual(exported['milliseconds'],410000)
+            self.assertEqual(exported['streams'],3)
+            input_rows=json.loads((output/'apple-dashboard.json').read_text(encoding='utf-8'))['plays']
+            self.assertEqual(sum(p['actualMs'] for p in input_rows if p['streamCount']==0),30000)
+            self.assertEqual(dashboard.export_dashboard(output),exported)
             with closing(sqlite3.connect(output/'apple-normalized.sqlite3')) as db:
                 self.assertEqual(db.execute('select sum(milliseconds) from hourly').fetchone()[0],411500)
                 self.assertEqual(db.execute('select count(*) from hourly where hour=2').fetchone()[0],0)

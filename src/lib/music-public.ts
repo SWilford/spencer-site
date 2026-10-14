@@ -1,4 +1,4 @@
-import { dailySeries, dayKey, durationMs, rank, rangeDays, shiftDay, summarize, type DateRange, type MusicSnapshot } from "./music-stats";
+import { dailySeries, dayKey, durationMs, playbackCount, rank, rangeDays, shiftDay, summarize, type DateRange, type MusicSnapshot } from "./music-stats";
 
 function totals(snapshot: MusicSnapshot, range: DateRange) {
   const s = summarize(snapshot.plays, range, "estimated");
@@ -16,10 +16,11 @@ export function publicMusicStats(snapshot: MusicSnapshot, range: DateRange) {
   const weekdayFormat = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short" });
   for (const p of summary.selected) {
     const date = dayKey(p.at), hour = Number(hourFormat.format(new Date(p.at)));
-    hours[hour].count++; hours[hour].minutes += durationMs(p, "estimated") / 60000;
-    weekdays.find(d => d.label === weekdayFormat.format(new Date(p.at)))!.count++;
-    months[Number(date.slice(5, 7)) - 1].count++;
-    years.set(date.slice(0, 4), (years.get(date.slice(0, 4)) ?? 0) + 1);
+    const count = playbackCount(p);
+    hours[hour].count += count; hours[hour].minutes += durationMs(p, "estimated") / 60000;
+    weekdays.find(d => d.label === weekdayFormat.format(new Date(p.at)))!.count += count;
+    months[Number(date.slice(5, 7)) - 1].count += count;
+    years.set(date.slice(0, 4), (years.get(date.slice(0, 4)) ?? 0) + count);
   }
   const rankings = (kind: "tracks" | "artists" | "albums") => {
     const rows = new Map([...rank(snapshot.plays, range, "estimated", kind, "time").slice(0, 200),

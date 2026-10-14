@@ -73,7 +73,7 @@ The client ID is public. The refresh token is a secret. The helper must be runni
 
 Recent-history timestamps and export timestamps can have different semantics. Spotify documents extended-history timestamps as stream end times; do not match them blindly against API played_at. Inspect source semantics, identifiers, duration, ordering, and plausible intervals, retaining ambiguous matches for review. Keep import records immutable and evidence linked; never add an export duration and a song-length estimate as two listening sessions. Unknown/estimated durations must remain distinguishable from export-reported played milliseconds.
 
-Apple exports now have a local, versioned staging and reconstruction pipeline; see [Apple import processing](apple-import.md). Candidate counts and overlaps remain under review before dashboard integration. It does not require Apple login or Spotify credentials. Automatic Apple collection remains a separate investigation.
+Apple is a one-time supplied-file import only: no Apple API, login or automatic collection is needed or planned. Its local, versioned reconstruction pipeline now feeds Music Stats behind the internal inclusion switch; see [Apple import processing](apple-import.md). Spotify is the sole ongoing collector.
 
 ## Primary references
 

@@ -4,6 +4,7 @@
 - Use GrillMe for material unresolved intent; Taste and Impeccable for design. Keep confirmed choices durable and avoid re-interviewing settled facts.
 - Work locally. Do not deploy, provision services, buy a domain, or change Vercel/Supabase/Cloudflare resources unless the user asks.
 - Never invent professional claims, résumé content, listening data, or Apple export schemas. Mark demonstration content visibly.
+- Apple Music is strictly the supplied one-time historical file import. Never add Apple API/auth/MusicKit/automatic collection. `MUSIC_INCLUDE_APPLE_IMPORT` is the internal server-only inclusion switch, enabled locally for exploration; preserve it and the import provenance. Spotify alone collects ongoing activity.
 - Keep secrets, original music exports, personal history, and private content out of Git. Public and private access paths must be explicit.
 - Isolate motion/3D in client components; preserve keyboard, touch, reduced-motion, and non-WebGL behavior.
 - Run lint, typecheck, and build for foundation changes. Music ingestion needs meaningful fixtures proving duration, deduplication, timezone, and reconciliation behavior.

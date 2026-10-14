@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { publicMusicStats, calendarRange, validMusicDate } from "@/lib/music-public";
 import { dayKey, rangeDays, type MusicSnapshot } from "@/lib/music-stats";
+import { withLocalAppleImport } from "@/lib/music-apple-import";
 
 let cached: { snapshot: MusicSnapshot; expires: number } | undefined;
 
@@ -21,6 +22,7 @@ export async function GET(request: Request) {
       snapshot = await response.json() as MusicSnapshot;
       cached = { snapshot, expires: Date.now() + 60000 };
     }
+    snapshot = await withLocalAppleImport(snapshot);
     const params = new URL(request.url).searchParams;
     const today = dayKey(snapshot.generatedAt);
     const earliest = snapshot.plays.length ? snapshot.plays.map(p => dayKey(p.at)).sort()[0] : today;

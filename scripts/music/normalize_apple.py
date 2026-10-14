@@ -203,7 +203,7 @@ def write_audit(output, audit):
               'All accepted segment milliseconds reconcile exactly with reconstructed sessions and Eastern hourly buckets.', '',
               f"The separate daily report covers {audit['daily_report']['start']} through {audit['daily_report']['end']}; it is not added to detailed-event totals.", '',
               '## Remaining review', '', *[f'- {warning}' for warning in audit['warnings']], '',
-              'This run is local and has not been added to the website or combined with Spotify.', '',
+              'Normalization alone does not enable dashboard inclusion. The server-only MUSIC_INCLUDE_APPLE_IMPORT switch controls the separate dashboard export.', '',
               f"Run: `{audit['run_key']}`", '']
     (output / 'apple-import-report.md').write_text('\n'.join(lines), encoding='utf-8')
 
