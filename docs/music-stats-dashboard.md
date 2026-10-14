@@ -1,62 +1,63 @@
 # Music Stats dashboard
 
-Documentation captured October 14, 2026. This is an ordinary extension of the existing site, governed by `PRODUCT.md`, `DESIGN.md`, and `.impeccable/music-stats-contract.md`. It does not replace the site's visual system. `DESIGN.md` and `.impeccable/design.json` remain unchanged.
+Documentation captured October 14, 2026. This surface extends the existing site under `PRODUCT.md`, `DESIGN.md`, and `.impeccable/music-stats-contract.md`. The established design system and `.impeccable/design.json` remain unchanged.
 
 ## Confirmed scope
 
-The user confirmed **Music Stats**, **America/New_York**, and regular statistical displays now, with fun experiments later. `/music` presents real saved Spotify history in a private local preview. The portfolio remains unpublished. Hosted owner authentication, public statistics selection, and public sharing are future work.
+The user authorized public listening summaries and rankings. `/music` now presents those aggregates from saved Spotify records through `/api/music-stats`; it is no longer a loopback-only private preview. The portfolio remains unpublished. Individual playback history, event timestamps, original imports, exports, credentials, administration, and collector controls remain private. Hosted owner authentication remains future work.
 
-The Apple archive is preserved and staged for reconciliation; its playback segments are not included in dashboard totals. The extended Spotify history export is still pending. “All connected sources” currently contains the available Spotify records only. “Lifetime” means records available to this preview, not the owner's complete lifetime listening history.
+The supplied Apple archive is preserved and staged; its segments are not counted in dashboard totals. Extended Spotify history is pending. Lifetime describes the available saved snapshot, not complete lifetime listening history. Experimental displays remain later work.
 
 ## Implemented surface
 
-- Heading, private-preview status, collection freshness, and a refresh action that rereads saved statistics.
-- Independent summary and top-list ranges: Day, Week, Month, Year, Past year, Year to date, Lifetime, and Custom. Year accepts a selected year; custom dates are inclusive. Week begins Monday; Past year covers 365 calendar dates. Current-period ranges end on the snapshot's Eastern date.
-- An open overview strip for recorded plays, estimated or measured listening, distinct tracks, artists, known albums, and active days. Supporting metrics cover qualified streams, listening duration expressed in days, and daily averages with calendar-day or active-day denominators.
-- Daily or cumulative activity, switchable between recorded plays and listening minutes. Ranges exceeding 370 dates use monthly visual bins while the expandable table retains daily data.
-- A 24-hour listening clock and weekday/month/year patterns using the summary range and Eastern time with daylight saving changes.
-- Tracks, artists, and albums ranked by recorded plays or listening time; ten rows initially, with ten more on demand. Saved album artwork accompanies rows; artist artwork is explicitly an album-art fallback. Available track links open Spotify.
-- Coverage and preceding-period comparison with explicit coverage qualifications, plus loading, error/retry, empty-range, and unavailable-time states.
+The heading is **Music Stats**, with functional Stats and Top Artists view buttons and a **Last collected** timestamp in Eastern time. The simplified surface has no explanatory subtitle, private-preview badge, refresh button, or visible duration-warning panel.
+
+Both views share one sticky timeframe control. Day, Week, Month, Year, and Lifetime are direct choices; More contains Past year, Year to date, and Custom. Previous/next controls navigate day, week, month, and year. Weeks begin Monday, custom endpoints are inclusive, Past year covers 365 calendar dates, and current calendar periods end on the saved snapshot's Eastern date. The API validates dates and limits a requested range to 30 years. Changing the range hides the preceding range's results while the new request is pending or fails.
+
+Stats includes:
+
+- Eight metric tiles: streams, different tracks, minutes, different artists, hours, different albums, days of listening, and active days. Eligible non-Lifetime metrics show change against the preceding period of the same length when prior data supplies a denominator.
+- Two 24-hour listening clocks, for streams and minutes, using America/New_York.
+- Average streams and minutes per calendar day, including dates without saved plays.
+- Daily and Cumulative charts, each showing streams and minutes together. Ranges exceeding 730 dates use monthly chart bins; each chart's expandable Chart data table matches the plotted values. A single-date series has visible points.
+- Streams by weekday, month, and year. A year bar remains visible when the selected data contains only one year; no year section is rendered when there are no year rows.
+
+Top Artists opens artwork-led rankings with Artists selected. Tracks, Artists, and Albums each support listening-time or stream-count sorting, list or grid layouts, and three, four, or five grid columns. Thirty results appear initially; Show more adds thirty. The column selector remains available on small screens. Track links open Spotify where available; artist artwork is associated album artwork rather than an asserted artist portrait. Empty rankings show a timeframe-specific message.
+
+The public ranking projection includes the union of the top 200 entities by time and top 200 by count for each ranking kind. It does not expose an unlimited catalog. Ties use name ordering.
 
 ## Evidence and interpretation
 
-Recorded plays count saved playback entries. They are not verified complete listens. Track identities remain provider identities, so different Spotify versions remain distinct. Collaborations credit each artist; artist totals overlap, while overall listening time counts each entry once. Album counts require known album IDs.
+The UI's **streams** are saved playback entries, not verified complete listens or a duration-qualified stream definition. Track identity follows provider identity, so different versions can remain distinct. Artist collaborations credit each artist; artist totals overlap. Overall listening counts each entry once. Distinct album totals require known album IDs; rankings can retain unknown albums.
 
-The default time view is **Song-length estimates**. Recent Spotify history supplies song duration, not the duration actually listened; skipping and pausing can make those estimates too high. When a measured duration exists, aggregation uses it before falling back to song length in estimated mode. Unknown duration preserves the recorded-play count and contributes no invented time.
+Time aggregation prefers actual duration when available, then falls back to song length; unknown duration contributes no invented time. Recent Spotify records provide song lengths, so minutes, hours, days, and time rankings can overstate listening after skips or pauses. The public payload retains machine-readable `timeBasis`, and time tiles, minute charts/clocks, and ranking values retain title-tooltip provenance. There is no measured-only selector or qualification-threshold control in this surface.
 
-**Measured only** never substitutes song length. No measured Spotify listening duration is currently available, so time and qualified-stream fields show unavailable states. The editable qualification threshold is a local analytical control, not a confirmed universal stream definition. Qualified streams require measured-duration evidence regardless of the selected time view.
+Records belong to their playback timestamp's Eastern date/hour; estimates are not distributed across elapsed clock intervals. Empty dates mean no saved records, not confirmed silence. Period comparisons do not establish equal collection coverage.
 
-Charts assign records to their playback timestamp's Eastern date/hour; they do not distribute an estimated song across elapsed clock intervals. Empty dates indicate no saved records, not confirmed silence. Daily averages use inclusive range dates or days with records, as selected. Period comparison is qualified because collection coverage can differ.
-
-The snapshot is capped at the latest 25,000 saved plays. When truncated, the interface warns that earlier records remain stored and lifetime totals in the preview are partial. Freshness is based on the last successful collection, with delayed collection indicated after 30 minutes. An open visible page rereads the saved snapshot once per minute; collection runs independently every ten minutes.
+The protected snapshot query selects the latest 25,000 saved plays. Its truncation flag becomes the public payload's `partial` flag, without a visible warning panel. Earlier records can remain stored while summaries, Lifetime, earliest date, and rankings describe only the returned snapshot. This cap and pending imports limit completeness.
 
 ## Access and data path
 
-The browser requests `/api/music-stats` with caching disabled. The server requires `MUSIC_LOCAL_PREVIEW=1`, a loopback host, compatible same-origin request headers, and no Vercel hosting marker. Forwarded-header mismatches and non-loopback hops are rejected. The preview server must bind to loopback. These controls support this local preview; hosted private access requires owner authentication first.
+The public route reads a saved snapshot through the protected collector function's dashboard action, then serializes an explicit aggregate allowlist in `src/lib/music-public.ts`. The browser receives summary and previous-period totals, date-level series, hourly/weekday/month/year aggregates, freshness, range metadata, provenance/partial flags, and ranking metadata. It receives no individual plays, private record IDs, per-play timestamps, tokens, or collector controls. Requested range dates and collection freshness are intentionally public metadata.
 
-The server calls the existing protected collector function's dashboard action to read its saved snapshot through a service-role-only database RPC. That action does not fetch listening history from Spotify or trigger collection. Credentials stay server-side; private source files, snapshots, and original imports must stay out of Git and build output. API responses use `Cache-Control: private, no-store`; the route metadata also disables indexing. Indexing metadata is supplementary, not access control.
+`MUSIC_COLLECTOR_KEY` and `MUSIC_SUPABASE_PROJECT_ID` are server-only configuration. For local development the route can fall back to the ignored `private-data/music/collector-bootstrap.json`; do not commit that file or credentials. No public Supabase RPC was introduced. The protected snapshot RPC remains behind the server and collector action.
 
-The scheduled collector remains the independent ingestion path. Operational details and import-reconciliation constraints are documented in `music-collector.md`.
+The server caches the saved snapshot for 60 seconds. Successful aggregate responses use `Cache-Control: public, max-age=30, s-maxage=60`; validation and unavailable responses use `no-store`. A visible open page rerequests saved statistics every 60 seconds. The public route never triggers Spotify collection; scheduled ingestion remains independent. Operational details are in `music-collector.md`.
 
 ## Visual inheritance and responsive behavior
 
-Music Stats inherits Manrope, the charcoal neutrals, and dusty-red accent family from the site. Accent identifies estimates, chart marks, interaction states, and selected controls. Existing page chrome, background geometry, cursor behavior, and transitions remain the site's authority.
+The surface keeps the site's Manrope, warm charcoal, dusty red, page chrome, background field, cursor, and transitions. Numbers, charts, and artwork carry its hierarchy. The user-supplied stats.fm screenshots guide composition and functionality within the existing visual world.
 
-The dashboard adds compact controls, tabular numerals, a wide activity plot, an adjacent listening clock, and artwork-led rankings. Quiet charcoal chart surfaces keep data legible over the persistent background. This density and grouping are local to the statistics surface; they are not a new global card or typography system.
+Local exceptions are intentional: rounded metric tiles, quiet charcoal content grouping, compact controls and type, a sticky range bar, and rounded artwork/list surfaces. These implement the explicit dashboard reference; they do not replace the site's open foreground rule or become global tokens. Metric tiles use four columns at wide widths and two below 1000px. Daily/cumulative and weekday/month chart pairs stack below that breakpoint. Below 680px, the title shrinks, view-button text hides, the range controls wrap, and ranking options occupy a second row. Long bar sets scroll horizontally inside their section.
 
-At the dashboard's narrower breakpoints, metrics reduce from six columns to three and then two; main chart/list columns stack, controls wrap, and the sidebar becomes a single column on small screens. Small-screen inputs have a 44px minimum height, custom date fields stack, and SVG labels increase their internal sizes for readability. Controls have labels, selected segment state uses `aria-pressed`, charts have accessible names, the daily table is expandable, and reduced-motion disables dashboard transitions.
+Controls expose labels and pressed states. Clocks and line charts have accessible names; short line series support focus readouts, and both line charts supply captioned data tables for keyboard and assistive-technology access. Bar labels and values remain text in the document. Custom inputs and selects retain visible focus styling. Reduced-motion disables dashboard transitions. These source features do not by themselves constitute a full accessibility audit.
 
 ## Documentation and review evidence
 
-Checked directly for this document:
+This pass read the contract, product/design authorities and sidecar, `src/app/music/page.tsx`, `src/components/music-stats-view.tsx`, `src/app/music/music-simplified.css`, `src/lib/music-public.ts`, `src/lib/music-stats.ts`, `src/app/api/music-stats/route.ts`, and the protected snapshot query. It did not read private data or secrets, run checks, or repeat browser interaction.
 
-- Product and design authorities: `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`, and `.impeccable/music-stats-contract.md`.
-- Surface implementation: `src/app/music/page.tsx`, `src/components/music-dashboard.tsx`, and `src/app/music/music-stats.css`.
-- Aggregation and access boundaries: `src/lib/music-stats.ts`, `src/lib/music-local-access.ts`, and `src/app/api/music-stats/route.ts`.
-- Existing operational documentation, package scripts, and the invented-fixture cases in `tests/music-stats.test.mjs`.
+The final implementation handoff reports eleven passing music tests and successful post-fix lint, typecheck, and production build. The fresh finish reviewer confirmed that three identified P2 issues are resolved: one-year bars, stale range results, and line-chart data accessibility. This is a fix-scoped verdict, not approval of every surface or a full accessibility audit. The reviewer also confirmed a clean four-column ranking recapture after the earlier capture contained sticky-filter/focused-skip-link artifacts. The handoff reports a successful production HTTP response with the public cache header, all three ranking kinds, and no raw plays or selected records; an invalid-date request returned HTTP 400. The production build was restarted locally for verification; no hosting deployment occurred.
 
-The implementation handoff reports nine passing music tests, successful lint/typecheck/production build, successful separate Deno checking, desktop/mobile captures, and two resolved finish-review corrections. This documentation pass did not rerun those checks or independently repeat the browser review. Review captures are available at `.impeccable/review/desktop.png` and `.impeccable/review/mobile.png`; no private data or secrets were read for this pass.
+Reported browser evidence is saved locally in `.impeccable/review/`: `simple-stats-desktop.png`, `simple-stats-mobile.png`, `simple-top-desktop.png` (four columns), `simple-top-five-desktop.png` (five columns), `simple-top-mobile.png` (three columns), and `simple-list-mobile.png`. This document records the supplied capture inventory without claiming independent visual verification.
 
-Advisory design drift remains visible in the source: the dashboard introduces compact local type sizes and weights outside the root typography roles, 5px control/artwork radii, and 12px chart/error-panel radii. The root design describes open foreground content and narrower rounding roles. These are recorded as surface-level drift for later review, not promoted into normative tokens or repaired here. The documentation leaves `DESIGN.md` and its sidecar intact.
-
-**Documentation verdict:** complete for the implemented local preview, with source-backed behavior and explicit provenance, coverage, access, and review limits. Hosted access, reconciled imports, public sharing, and experimental displays remain pending.
+Documentation covers the current public aggregate surface and its implementation limits. Portfolio publication, owner administration/authentication, reconciled Apple data, extended Spotify imports, and experimental displays remain pending.

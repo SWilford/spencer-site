@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test:scene": "node --experimental-strip-types --test tests/scene.test.mjs",
-    "test:music": "node --experimental-strip-types --test tests/spotify-client.test.mjs tests/music-stats.test.mjs",
+    "test:music": "tsx --test tests/spotify-client.test.mjs tests/music-stats.test.mjs tests/music-public.test.mjs",
     "music:connect": "node scripts/music/connect-spotify.mjs",
     "check": "npm run lint && npm run typecheck && npm run build"
   },
@@ -27,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
+    "tsx": "4.23.15",
     "typescript": "^5"
   }
 }

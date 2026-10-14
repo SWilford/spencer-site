@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { dayKey, presetRange, rangeDays, summarize, rank, dailySeries, breakdown } from "../src/lib/music-stats.ts";
-import { canReadLocalMusic } from "../src/lib/music-local-access.ts";
 
 const play = (id, at, overrides = {}) => ({ id, at, provider: "spotify", songLengthMs: 180000, actualMs: null, trackId: id, name: id, url: null, artists: [{ id: "artist", name: "Artist" }], albumId: "album", album: "Album", artwork: null, ...overrides });
 
@@ -42,15 +41,4 @@ test("calendar presets and inclusive custom-day denominators are explicit", () =
   assert.deepEqual(presetRange("year", "2026-10-14", "2020-01-01", 2025), { start: "2025-01-01", end: "2025-12-31" });
   assert.equal(rangeDays(presetRange("past-year", "2024-02-29", "2020-01-01")), 365);
   assert.deepEqual(presetRange("lifetime", "2026-10-14", "2026-10-13"), { start: "2026-10-13", end: "2026-10-14" });
-});
-
-test("local private data requires explicit opt-in, loopback host, same origin, and no hosted deployment", () => {
-  const local = new Headers({ host: "127.0.0.1:3001", origin: "http://127.0.0.1:3001", "sec-fetch-site": "same-origin", "x-forwarded-host": "127.0.0.1:3001", "x-forwarded-for": "127.0.0.1" });
-  assert.equal(canReadLocalMusic(local, true, false), true);
-  assert.equal(canReadLocalMusic(local, false, false), false);
-  assert.equal(canReadLocalMusic(local, true, true), false);
-  for (const [name, value] of [["host", "example.com"], ["origin", "https://example.com"], ["sec-fetch-site", "cross-site"], ["x-forwarded-host", "example.com"], ["x-forwarded-for", "203.0.113.1"]]) {
-    const changed = new Headers(local); changed.set(name, value);
-    assert.equal(canReadLocalMusic(changed, true, false), false, name);
-  }
 });
