@@ -2,12 +2,12 @@
 name: Spencer Wilford
 description: Open professional content over a responsive angular spatial field.
 colors:
-  background: "#242426"
-  surface: "#303033"
+  background: "#202022"
+  surface: "#2b2b2e"
   foreground: "#ede8e8"
   muted: "#b7b3b3"
-  accent: "#c77370"
-  accent-light: "#dd8b87"
+  accent: "#bd6866"
+  accent-light: "#d17d79"
 typography:
   display:
     fontFamily: "Chakra Petch, sans-serif"
@@ -86,7 +86,7 @@ components:
     padding: "10px 18px"
     size: "14px"
   hero-button:
-    backgroundColor: "linear-gradient(135deg,rgba(237,232,232,.025),rgba(199,115,112,.035) 45%,rgba(199,115,112,.055)),transparent"
+    backgroundColor: "linear-gradient(135deg,rgba(237,232,232,.025),rgba(189,104,102,.035) 45%,rgba(189,104,102,.055)),transparent"
     textColor: "{colors.foreground}"
     rounded: "{rounded.route-face}"
     padding: "15px 24px"
@@ -180,7 +180,7 @@ Actions are unboxed text in Light Dusty Red. The base link size is (16px), while
 
 ### Home route buttons
 
-Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `transparent`, blur (2.5px) with saturation (1.12), a `rgba(221,139,135,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(199,115,112,.025)`. The outer link has minimum height (64px) and perspective (650px).
+Four magnetic links lead to Experience, Projects, Résumé, and Contact. `MagneticActions` owns one passive window pointer-move listener. Only the nearest button within (44px) of its fixed rectangle attracts toward a mouse pointer, with squared distance falloff; other buttons reset. The inner face retains caps of (7px) horizontal/(5px) vertical attraction and (5deg)/(7deg) tilt. This nearby-pointer attraction does not trigger the fill; hover, focus, and press do. The glass trial faces use a reflection gradient over `transparent`, blur (2.5px) with saturation (1.12), a `rgba(209,125,121,.26)` border, radius (8px), minimum height (62px), minimum width (138px), padding (15px 24px), and a soft shadow with inset upper rim. Unsupported backdrop blur falls back to `rgba(189,104,102,.025)`. The outer link has minimum height (64px) and perspective (650px).
 
 On hover, keyboard focus, or press, thirty accent blocks in ten columns and three rows scale in from the left; each column adds (24ms) and each row adds (16ms), reaching a maximum stagger (248ms). The readable label stays unchanged, shifting to dark text over the red fill. Pressing moves the face down (4px), back (-10px), and scales it to (.975) with a flatter shadow and (70ms) response. Pointer/touch and Enter press states reset on release, cancel, pointer leave, or blur. Reduced-motion removes face transforms and the global rule makes fill transitions instant. No portrait is currently included. The footer checks the active pathname and returns no footer on Home, avoiding the repeated name and Contact action; interior pages retain it. Button text disables selection during interaction.
 
@@ -244,3 +244,5 @@ Links and buttons share a Light Dusty Red outline (2px) with offset (6px). The s
 Spencer selected 1 + 7 with a little 5; the initial depth echo was removed. SensorCursor mounts once in the root layout outside page transitions. The exact 3px center tracks immediately; a 25px corner frame follows with a 45ms exponential catch-up and contracts over links/buttons. Three short red vector segments cap at 14px each and disappear at rest. There is no offset depth frame. Primary clicks emit a 300ms expanding corner-bracket pulse. Pointer positions never trigger React renders; animation frames stop once settled. The overlay is decorative and cannot intercept input.
 
 Only fine hover mouse pointers with no reduced-motion preference receive the cursor. Text and editable content retain the native browser cursor; the custom I-beam was removed. Special cursor contexts, keyboard use, scroll, blur, pointer exit and hidden tabs restore the native cursor. Touch and reduced-motion retain native behavior. Glass faces have no charcoal base, a 2.5% reflection with 3.5–5.5% red tint, 2.5px frosted blur, saturation 1.12 and the existing red outline; the block fill and magnetic/press behavior stay intact.
+
+Palette exploration: slightly deeper charcoal (#202022), raised charcoal (#2b2b2e), muted dark red (#bd6866), and readable lighter red (#d17d79). Previous palette remains available in commit bba4407. Geometry, motion, glass alpha and blur are unchanged.
