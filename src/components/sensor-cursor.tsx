@@ -51,7 +51,7 @@ export function SensorCursor() {
     };
     const classify = (target: EventTarget | null) => {
       if (!(target instanceof Element)) return false;
-      const control = target.closest("a,button,[role='button'],summary");
+      const control = target.closest("a,button,[role='button'],[role='scrollbar'],summary");
       root.dataset.locked = String(!!control && !control.matches(":disabled,[aria-disabled='true']"));
       const nativeCursor = getComputedStyle(target).cursor;
       // Restore the browser cursor over text and editing surfaces.
@@ -83,11 +83,17 @@ export function SensorCursor() {
       ], { duration: 300, easing: "cubic-bezier(.16,1,.3,1)" });
     };
     const refresh = () => hide();
+    const scroll = () => {
+      // Captured dragging scrolls on every move; keep the reticle instead of
+      // restoring the system cursor between those scroll and pointer events.
+      if (document.querySelector('.survey-scrollbar[data-dragging="true"],.survey-scrollbar:hover')) return;
+      hide();
+    };
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerover", move, { passive: true });
     window.addEventListener("pointerdown", click, { passive: true });
     window.addEventListener("blur", hide);
-    window.addEventListener("scroll", hide, { passive: true });
+    window.addEventListener("scroll", scroll, { passive: true });
     document.documentElement.addEventListener("pointerleave", hide);
     document.addEventListener("visibilitychange", hide);
     document.addEventListener("keydown", hide);
@@ -98,7 +104,7 @@ export function SensorCursor() {
       window.removeEventListener("pointerover", move);
       window.removeEventListener("pointerdown", click);
       window.removeEventListener("blur", hide);
-      window.removeEventListener("scroll", hide);
+      window.removeEventListener("scroll", scroll);
       document.documentElement.removeEventListener("pointerleave", hide);
       document.removeEventListener("visibilitychange", hide);
       document.removeEventListener("keydown", hide);

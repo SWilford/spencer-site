@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { scrollbarGeometry, scrollbarFraction } from "@/lib/scrollbar-geometry";
 
 const ticks = Array.from({ length: 61 }, (_, index) => <line key={index} x1={index % 5 === 0 ? 5 : 12} x2="21" y1={index * 16 + 10} y2={index * 16 + 10} className={index % 5 === 0 ? "major" : undefined} />);
 
@@ -24,12 +25,9 @@ export function SurveyScrollbar() {
     };
     reveal.current = show;
     const measure = () => {
-      const maximum = Math.max(0, document.documentElement.scrollHeight - innerHeight);
-      const height = element.clientHeight;
-      const thumb = Math.min(height, Math.max(44, height * innerHeight / Math.max(innerHeight, document.documentElement.scrollHeight)));
-      const fraction = maximum ? Math.max(0, Math.min(1, scrollY / maximum)) : 0;
+      const { maximum, thumb, fraction, offset } = scrollbarGeometry(element.clientHeight, innerHeight, document.documentElement.scrollHeight, scrollY);
       element.style.setProperty("--survey-thumb", `${thumb}px`);
-      element.style.setProperty("--survey-offset", `${fraction * (height - thumb)}px`);
+      element.style.setProperty("--survey-offset", `${offset}px`);
       element.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
       element.setAttribute("aria-valuetext", `${Math.round(fraction * 100)}% of page`);
       element.dataset.scrollable = String(maximum > 1);
@@ -73,9 +71,9 @@ export function SurveyScrollbar() {
   const moveTo = (clientY: number, offset: number) => {
     const element = rail.current!;
     const bounds = element.getBoundingClientRect();
-    const thumb = Number.parseFloat(element.style.getPropertyValue("--survey-thumb"));
-    const fraction = Math.max(0, Math.min(1, (clientY - bounds.top - offset) / Math.max(1, bounds.height - thumb)));
-    window.scrollTo({ top: fraction * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" });
+    const geometry = scrollbarGeometry(bounds.height, innerHeight, document.documentElement.scrollHeight, scrollY);
+    const fraction = scrollbarFraction(clientY, bounds.top, offset, geometry);
+    window.scrollTo({ top: fraction * geometry.maximum, behavior: "instant" });
   };
 
   return <div ref={rail} className="survey-scrollbar" role="scrollbar" aria-label="Page scroll position" aria-controls="main" aria-orientation="vertical" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0} tabIndex={-1}

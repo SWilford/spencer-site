@@ -21,6 +21,7 @@ import { CaretRight } from "@phosphor-icons/react/dist/csr/CaretRight";
 import { SpotifyLogo } from "@phosphor-icons/react/dist/csr/SpotifyLogo";
 import { Funnel } from "@phosphor-icons/react/dist/csr/Funnel";
 
+import { musicChartSeries, hourLabel } from "@/lib/music-chart-series";
 import { StatsMenu } from "./music-controls";
 
 import { shiftDay, type RangePreset, type RankingKind } from "@/lib/music-stats";
@@ -85,70 +86,32 @@ function Clock({ hours, minutes }: { hours: PublicMusicStats["hours"]; minutes: 
 
 
 
-function LineChart({ daily, cumulative }: { daily: PublicMusicStats["daily"]; cumulative: boolean }) {
-
+function LineChart({ daily, cumulative, hours }: { daily: PublicMusicStats["daily"]; cumulative: boolean; hours?: PublicMusicStats["hours"] }) {
   const id = useId();
-
   const [hover, setHover] = useState<number | null>(null);
-
-  const rows: { day: string; count: number; minutes: number }[] = [];
-
-  let count = 0, minutes = 0;
-
-  for (const row of daily) {
-
-    count += row.count; minutes += row.milliseconds / 60000;
-
-    const key = daily.length > 730 ? row.day.slice(0, 7) : row.day;
-
-    const last = rows.at(-1);
-
-    if (last?.day === key) { last.count = cumulative ? count : last.count + row.count; last.minutes = cumulative ? minutes : last.minutes + row.milliseconds / 60000; }
-
-    else rows.push({ day: key, count: cumulative ? count : row.count, minutes: cumulative ? minutes : row.milliseconds / 60000 });
-
-  }
-
-  const maximum = Math.max(1, ...rows.flatMap(r => [r.count, r.minutes]));
-
-  const x = (i: number) => 62 + i / Math.max(1, rows.length - 1) * 660;
-
-  const y = (v: number) => 208 - v / maximum * 173;
-
-  const line = (field: "count" | "minutes") => rows.map((r, i) => `${i ? "L" : "M"}${x(i)},${y(r[field])}`).join(" ");
-
+  const hourly = !!hours && daily.length === 1;
+  const rows = musicChartSeries(daily, cumulative, hours);
+  const maximum = Math.max(1, ...rows.flatMap(row => [row.count, row.minutes]));
+  const x = (index: number) => 62 + (rows[index]?.position ?? 0) * 660;
+  const y = (value: number) => 208 - value / maximum * 173;
+  const line = (field: "count" | "minutes") => rows.map((row, index) => `${index ? "L" : "M"}${x(index)},${y(row[field])}`).join(" ");
   const selected = hover === null ? null : rows[hover];
-
+  const heading = cumulative ? "Cumulative" : "Daily";
   return <div className="stats-chart-wrap">
-
-    {selected && <div className="stats-tooltip chart-tooltip" role="tooltip" id={`${id}-value`} style={{ left: `${Math.max(26, Math.min(74, x(hover!) / 760 * 100))}%` }}><b>{selected.day.length === 7 ? selected.day : dateLabel(selected.day)}</b><span>{n.format(selected.count)} streams</span><span>{n.format(selected.minutes)} min · {decimal.format(selected.minutes / 60)} hr</span></div>}
-
-    <svg viewBox="0 0 760 250" className="stats-line-chart" role="group" tabIndex={0} aria-label={`${cumulative ? "Cumulative" : "Daily"} streams and minutes. Use arrow keys to inspect dates.`} aria-describedby={selected ? `${id}-value` : undefined}
-
-      onPointerMove={event => { const bounds = event.currentTarget.getBoundingClientRect(); const px = (event.clientX - bounds.left) / bounds.width * 760; setHover(Math.max(0, Math.min(rows.length - 1, Math.round((px - 62) / 660 * (rows.length - 1))))); }}
-
-      onPointerLeave={() => setHover(null)} onFocus={() => setHover(0)} onBlur={() => setHover(null)} onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home", "End", "Escape"].includes(event.key)) { event.preventDefault(); setHover(event.key === "Escape" ? null : event.key === "Home" ? 0 : event.key === "End" ? rows.length - 1 : Math.max(0, Math.min(rows.length - 1, (hover ?? 0) + (event.key === "ArrowRight" ? 1 : -1)))); } }}><title id={id}>{cumulative ? "Cumulative" : "Daily"} streams and minutes</title>
-
-      {[0, .5, 1].map(v => <g key={v}><line x1="62" x2="722" y1={y(maximum * v)} y2={y(maximum * v)} className="stats-chart-rule" /><text x="48" y={y(maximum * v) + 4} textAnchor="end">{n.format(maximum * v)}</text></g>)}
-
+    {selected && <div className="stats-tooltip chart-tooltip" role="tooltip" id={`${id}-value`} style={{ left: `${Math.max(26, Math.min(74, x(hover!) / 760 * 100))}%` }}><b>{selected.day.length === 7 ? selected.day : dateLabel(selected.day)}</b>{selected.period && <span>{selected.period}</span>}<span>{n.format(selected.count)} streams</span><span>{n.format(selected.minutes)} min · {decimal.format(selected.minutes / 60)} hr</span></div>}
+    <svg viewBox="0 0 760 250" className="stats-line-chart" role="group" tabIndex={0} aria-label={`${heading} streams and minutes${hourly ? " by hour" : ""}. Use arrow keys to inspect ${hourly ? "hours" : "dates"}.`} aria-describedby={selected ? `${id}-value` : undefined}
+      onPointerMove={event => { const bounds = event.currentTarget.getBoundingClientRect(); const position = ((event.clientX - bounds.left) / bounds.width * 760 - 62) / 660; let nearest = 0; for (let index = 1; index < rows.length; index++) if (Math.abs(rows[index].position - position) < Math.abs(rows[nearest].position - position)) nearest = index; setHover(nearest); }}
+      onPointerLeave={() => setHover(null)} onFocus={() => setHover(0)} onBlur={() => setHover(null)} onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home", "End", "Escape"].includes(event.key)) { event.preventDefault(); setHover(event.key === "Escape" ? null : event.key === "Home" ? 0 : event.key === "End" ? rows.length - 1 : Math.max(0, Math.min(rows.length - 1, (hover ?? 0) + (event.key === "ArrowRight" ? 1 : -1)))); } }}><title id={id}>{heading} streams and minutes{hourly ? " by hour" : ""}</title>
+      {[0, .5, 1].map(value => <g key={value}><line x1="62" x2="722" y1={y(maximum * value)} y2={y(maximum * value)} className="stats-chart-rule" /><text x="48" y={y(maximum * value) + 4} textAnchor="end">{n.format(maximum * value)}</text></g>)}
       <path d={line("minutes")} className="stats-line minutes" /><path d={line("count")} className="stats-line streams" />
-
       {rows.length === 1 && <><circle cx={x(0)} cy={y(rows[0].minutes)} r="4" className="stats-dot minutes" /><circle cx={x(0)} cy={y(rows[0].count)} r="4" className="stats-dot streams" /></>}
-
       {selected && <g className="stats-crosshair"><line x1={x(hover!)} x2={x(hover!)} y1="14" y2="208" /><circle cx={x(hover!)} cy={y(selected.count)} r="5" className="stats-dot streams" /><circle cx={x(hover!)} cy={y(selected.minutes)} r="5" className="stats-dot minutes" /></g>}
-
-      {rows.length > 0 && <><text x="62" y="241">{rows[0].day.length === 7 ? rows[0].day : dateLabel(rows[0].day, { month: "short", day: "numeric" })}</text><text x="722" y="241" textAnchor="end">{rows.at(-1)!.day.length === 7 ? rows.at(-1)!.day : dateLabel(rows.at(-1)!.day, { month: "short", day: "numeric" })}</text></>}
-
+      {hourly ? [0, 6, 12, 18, 24].map(hour => <text key={hour} x={62 + hour / 24 * 660} y="241" textAnchor={hour === 0 ? "start" : hour === 24 ? "end" : "middle"}>{hourLabel(hour)}</text>) : rows.length > 0 && <><text x="62" y="241">{rows[0].day.length === 7 ? rows[0].day : dateLabel(rows[0].day, { month: "short", day: "numeric" })}</text><text x="722" y="241" textAnchor="end">{rows.at(-1)!.day.length === 7 ? rows.at(-1)!.day : dateLabel(rows.at(-1)!.day, { month: "short", day: "numeric" })}</text></>}
     </svg>
-
     <div className="stats-chart-legend"><span><i className="streams" />streams</span><span title="Time may use song-length estimates"><i className="minutes" />minutes</span></div>
-
-    <span className="sr-only" aria-live="polite">{selected ? `${selected.day}: ${n.format(selected.count)} streams, ${n.format(selected.minutes)} minutes` : "Use arrow keys, Home, or End to inspect chart values."}</span>
-
+    <span className="sr-only" aria-live="polite">{selected ? `${selected.day} ${selected.period ?? ""}: ${n.format(selected.count)} streams, ${n.format(selected.minutes)} minutes` : `Use arrow keys, Home, or End to inspect chart ${hourly ? "hours" : "dates"}.`}</span>
   </div>;
-
 }
-
 
 
 function Bars({ title, rows }: { title: string; rows: { label: string; count: number }[] }) {
@@ -331,7 +294,7 @@ export function MusicDashboard() {
 
       <section className="stats-section"><h2>Streams and minutes per day</h2><dl className="stats-average-grid"><div className="stats-metric"><dd>{n.format(summary.streams / summary.days)}</dd><dt>average streams per day</dt></div><div className="stats-metric" title={timeTitle}><dd>{n.format(summary.milliseconds / 60000 / summary.days)}</dd><dt>average minutes per day</dt></div></dl></section>
 
-      <div className="stats-chart-grid"><section className="stats-section"><h2>Daily</h2><LineChart daily={data.daily} cumulative={false} /></section><section className="stats-section"><h2>Cumulative</h2><LineChart daily={data.daily} cumulative /></section></div>
+      <div className="stats-chart-grid"><section className="stats-section"><h2>Daily</h2><LineChart daily={data.daily} hours={data.range.start === data.range.end ? data.hours : undefined} cumulative={false} /></section><section className="stats-section"><h2>Cumulative</h2><LineChart daily={data.daily} hours={data.range.start === data.range.end ? data.hours : undefined} cumulative /></section></div>
 
       <div className="stats-breakdown-grid"><Bars title="Streams by day of the week" rows={data.weekdays} /><Bars title="Streams by month" rows={data.months} /></div>
 
