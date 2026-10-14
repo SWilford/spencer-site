@@ -45,6 +45,8 @@ Targets to validate after implementation: LCP <2.5 s, INP <200 ms, CLS <0.1 at t
 
 ## Global survey scrollbar
 
+The ruler is vertically centered in the viewport with equal top and bottom insets of `clamp(28px,6vh,64px)`, independently of the header.
+
 `src/components/survey-scrollbar.tsx` progressively enhances native page scrolling on fine-pointer, hover-capable desktops. The viewport-fitted ruler has 61 ticks, a longer mark every five intervals, and a muted-red thumb proportional to the visible page (minimum 44px). It fades after 1,100ms of idle time, reappears on edge hover, and remains visible during focus or captured pointer dragging. Track clicks reposition the thumb; Arrow keys move 48px, Page keys move 85% of the viewport, and Home/End reach the boundaries. The scrollbar exposes its position through ARIA without adding visible percentages or HUD labels.
 
 Passive scroll events schedule measurements through requestAnimationFrame; ResizeObserver tracks body and rail size changes. Native scrollbars remain available on coarse pointers, in forced colors, and without JavaScript. Reduced motion removes the rail's transitions and translation. This extends the existing visual world with current color tokens; DESIGN.md and `.impeccable/design.json` remain authoritative and unchanged. It changes no page content, music data access, or hosting configuration.
