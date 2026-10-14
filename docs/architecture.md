@@ -1,5 +1,7 @@
 # Architecture and delivery plan
 
+October 14 music update: prospective Spotify collection now precedes the historical dashboard while the extended export is prepared. Use a dedicated free Supabase project in Spencer's personal organization, a private scheduled Edge Function, and initially Supabase Storage if original files fit its limits. R2 remains optional. The portfolio stays unpublished. See [music-collector.md](music-collector.md) for current setup state and live-verification gates.
+
 ## Initial decisions
 
 Start with one Next.js application. React Server Components render content; small client components own interactive navigation and projected 3D canvas motion. TypeScript and native CSS provide the current foundation. Avoid a monorepo and unnecessary infrastructure until the second server-backed project is understood.

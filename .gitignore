@@ -52,3 +52,5 @@ next-env.d.ts
 .impeccable/review/
 .impeccable/build/
 /.eslintcache
+__pycache__/
+*.pyc

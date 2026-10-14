@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-The user requested an initial stack choice and local setup. Initial choice: Next.js App Router, React, TypeScript, Tailwind CSS, npm with a committed lockfile. Hosting is intended for Vercel but no deployment or service provisioning is authorized yet. Database recommendation: Supabase Postgres and owner authentication, added when music data needs persistence. Object-storage recommendation: Cloudflare R2 for large media and private original exports, added later.
+The user requested an initial stack choice and local setup. Initial choice: Next.js App Router, React, TypeScript, Tailwind CSS, npm with a committed lockfile. Portfolio hosting is intended for Vercel but publication is not yet authorized. A dedicated private Supabase Postgres collector and private Supabase Storage are now authorized for music data. Owner dashboard authentication will follow. Cloudflare R2 remains optional for larger exports/media.
 
 ## Users
 
@@ -30,11 +30,11 @@ Development and testing happen locally before publishing. GitHub repository: htt
 - Import Spotify Extended Streaming History JSON and actual Apple Music privacy-export ZIP files. Inspect supplied files before assuming Apple's schema or historical coverage. No Apple login, device, MusicKit, or developer membership is needed for file parsing.
 - Preserve original imports, prevent duplicate records, keep unmatched data, and distinguish exported durations from observed estimates and song-length estimates.
 - Public visitors must never trigger collection. Secrets and private history stay server-side and out of Git.
-- Do not publish, buy domains, provision services, or alter Vercel/Supabase/Cloudflare resources yet.
+- Keep the portfolio unpublished; do not buy domains or alter Vercel/Cloudflare resources without authorization. The dedicated personal Supabase music collector and private storage are now authorized; the unrelated rugby project is outside scope.
 
 ## Evidence on Hand
 
-The user supplied an updated Word resume dated 8.10.26, LinkedIn profile, and public email. Experience and the resume now use that updated source. The user authorized a public copy without phone/clearance: sanitized DOCX, PDF, and page preview may be committed; the private original, phone number, and clearance details stay out of the repository. Photos, portraits, guitar recordings, and playback exports have not been supplied; do not invent them.
+The user supplied an updated Word resume dated 8.10.26, LinkedIn profile, and public email. Experience and the resume now use that updated source. The user authorized a public copy without phone/clearance: sanitized DOCX, PDF, and page preview may be committed; the private original, phone number, and clearance details stay out of the repository. An Apple Media Services export has now been supplied and privately preserved; Spotify extended history is requested but not received. Photos, portraits, and guitar recordings have not been supplied; do not invent them.
 
 ## Brand Commitments
 
@@ -61,5 +61,7 @@ The background is the only gridded/tactical layer. Foreground text layout should
 - Data coverage and precision are visible rather than implied.
 
 ## Open Decisions
+
+Music update (October 14, 2026): Spencer currently listens on Spotify; Apple history covers a break of a couple of months. The extended-history request is submitted. The user created and authorized spencer-music in spencer-personal; the rugby organization/project remains untouched. Private Spotify collection is live every ten minutes in Supabase, with real authorization/refresh, duplicate prevention, and a scheduler-triggered run verified. The supplied Apple ZIP is preserved locally and in private Supabase Storage; its observed history schema is staged locally without equating end segments to streams. R2 is optional. The portfolio stays unpublished. See docs/music-collector.md for setup state and verification gates.
 
 The open-layout-v6 visual concept is approved for a first code draft. Latest user correction: match the reference first, Home is separate from all navigation pages, and remove decorative content icons. Keep the requested GitHub/LinkedIn/email header icons. Content-editing workflow, remaining assets, domain, monthly budget, stream threshold, listening timezone, and public statistics selection remain undecided. Do not treat the operating system's timezone as an approved statistics preference.

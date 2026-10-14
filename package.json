@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test:scene": "node --experimental-strip-types --test tests/scene.test.mjs",
+    "test:music": "node --test tests/spotify-client.test.mjs",
+    "music:connect": "node scripts/music/connect-spotify.mjs",
     "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
