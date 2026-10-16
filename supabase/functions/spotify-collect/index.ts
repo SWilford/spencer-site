@@ -11,47 +11,6 @@ async function control(action: string, key: string, payload: Record<string, unkn
   return await response.json();
 }
 
-async function artistCatalog(action: string, key: string, payload: Record<string, unknown> = {}) {
-  const response = await fetch(`${projectUrl}/rest/v1/rpc/music_artist_catalog`, {
-    method: "POST", signal: AbortSignal.timeout(10000),
-    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ action, collector_key: key, payload }),
-  });
-  if (!response.ok) throw new Error("artist_catalog_failed");
-  return await response.json();
-}
-
-async function syncArtistProfiles(key: string, token: string) {
-  const pending: string[] = await artistCatalog("pending", key);
-  const profiles: { id: string; name: string; image: string | null }[] = [];
-  let stop = false;
-  const queue = pending.filter(id => /^[A-Za-z0-9]{22}$/.test(id));
-  await Promise.all(Array.from({ length: Math.min(3, queue.length) }, async () => {
-    while (queue.length && !stop) {
-      const id = queue.shift()!;
-      try {
-        const response = await fetch(`https://api.spotify.com/v1/artists/${id}`, { redirect:"error", signal:AbortSignal.timeout(5000), headers:{Authorization:`Bearer ${token}`} });
-        if (response.status === 404) { profiles.push({id,name:"Unknown artist",image:null}); continue; }
-        if (!response.ok) {
-          stop = true;
-          const retry = response.headers.get("retry-after");
-          const parsed = retry ? (/^\d+$/.test(retry) ? Number(retry) : Math.ceil((Date.parse(retry)-Date.now())/1000)) : 600;
-          const seconds = Number.isFinite(parsed) ? parsed : 600;
-          await artistCatalog("defer", key, { seconds });
-          break;
-        }
-        const artist = await response.json();
-        if (artist.id !== id || artist.type !== "artist") throw new Error("invalid_artist");
-        const images = Array.isArray(artist.images) ? artist.images : [];
-        const image = images.find((img: { url?: string; width?: number }) => (img.width ?? 0) >= 300) ?? images[0];
-        profiles.push({ id, name: String(artist.name ?? "Unknown artist"), image: typeof image?.url === "string" ? image.url : null });
-      } catch { stop = true; await artistCatalog("defer", key, {seconds:600}); }
-    }
-  }));
-  if (profiles.length) await artistCatalog("save", key, { artists:profiles });
-  return profiles.length;
-}
-
 function reply(body: unknown, status = 200) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 }
@@ -112,10 +71,7 @@ Deno.serve(async (request: Request) => {
     try { return reply(await control("bootstrap", key, body)); }
     catch { return reply({ error: "bootstrap_failed" }, 400); }
   }
-  const catalogOnly = body.action === "catalog";
-  const queries = body.queries as { type: string; q: string; offset?: number }[];
-  if (catalogOnly && (!Array.isArray(queries) || queries.length < 1 || queries.length > 20 || queries.some(q => !q || !["artist", "album", "track"].includes(q.type) || typeof q.q !== "string" || q.q.length < 1 || q.q.length > 250 || (q.offset !== undefined && (!Number.isInteger(q.offset) || q.offset < 0 || q.offset > 1000))))) return reply({ error: "invalid_catalog_queries" }, 400);
-  if (catalogOnly && context.last_success && Date.now() - Date.parse(context.last_success) > 8 * 60_000) return reply({ state: "collection_due" });
+  if (body.action === "catalog") return reply({ error: "catalog_disabled_for_collection_safety" }, 403);
   try { context = await control("acquire", key); }
   catch { return reply({ error: "acquire_failed" }, 503); }
   if (context.state !== "acquired") return reply({ state: context.state });
@@ -132,23 +88,6 @@ Deno.serve(async (request: Request) => {
     const token = await refresh.json();
     if (!token.access_token || token.token_type?.toLowerCase() !== "bearer") throw new Error("invalid_token");
     if (token.refresh_token) await control("save_token", key, { run_id, refresh_token: token.refresh_token });
-    if (catalogOnly) {
-      const results = [];
-      for (const query of queries) {
-        const search = new URL("https://api.spotify.com/v1/search");
-        search.search = new URLSearchParams({ q: query.q, type: query.type, limit: "10", market: "US", offset: String(query.offset ?? 0) }).toString();
-        const found = await fetch(search, { redirect: "error", signal: AbortSignal.timeout(10000), headers: { Authorization: `Bearer ${token.access_token}` } });
-        if (!found.ok) {
-          code = `catalog_http_${found.status}`;
-          retrySeconds = found.status === 429 ? Math.max(60, Number(found.headers.get("retry-after")) || 600) : 0;
-          await control("catalog_finish", key, { run_id, code, retry_seconds: retrySeconds });
-          return reply({ results, error: code, retry_seconds: retrySeconds }, found.status === 429 ? 429 : 502);
-        }
-        results.push(await found.json());
-      }
-      await control("catalog_finish", key, { run_id });
-      return reply({ results });
-    }
     let next: URL | null = new URL("https://api.spotify.com/v1/me/player/recently-played?limit=50");
     if (context.after !== null) next.searchParams.set("after", String(context.after));
     const pages = [];
@@ -170,12 +109,9 @@ Deno.serve(async (request: Request) => {
       next = page.next ? new URL(page.next) : null;
     }
     const result = await control("finish", key, { run_id, pages, truncated: next !== null });
-    // Catalog work cannot turn a durable history collection into a failed run.
-    let artistProfilesUpdated = 0;
-    try { artistProfilesUpdated = await syncArtistProfiles(key, token.access_token); } catch { /* Next scheduled collection retries metadata. */ }
-    return reply({ ...result, artist_profiles_updated: artistProfilesUpdated });
+    return reply({ ...result, artist_profiles_updated: 0 });
   } catch {
-    try { await control(catalogOnly ? "catalog_finish" : "fail", key, { run_id, code, retry_seconds: catalogOnly ? 0 : Math.max(60, Math.min(86400, retrySeconds)) }); } catch { /* Lease expires if the database is unreachable. */ }
+    try { await control("fail", key, { run_id, code, retry_seconds: Math.max(60, Math.min(86400, retrySeconds)) }); } catch { /* Lease expires if the database is unreachable. */ }
     return reply({ error: code }, 502);
   }
 });

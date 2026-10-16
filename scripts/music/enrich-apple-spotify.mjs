@@ -2,6 +2,8 @@ import { readFile, writeFile, rename } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { catalogName, matchArtist, matchAlbum, matchTrack, quoted } from "./spotify-catalog.mjs";
 
+if (!process.argv.includes("--cached-only")) throw new Error("Authenticated catalog lookups are disabled to protect collection. Use cache-music-artwork.mjs for public metadata, or --cached-only here.");
+
 const directory = new URL("../../private-data/music/apple/", import.meta.url);
 const input = JSON.parse(await readFile(new URL("apple-dashboard.json", directory), "utf8"));
 const config = JSON.parse(await readFile(new URL("../collector-bootstrap.json", directory), "utf8"));

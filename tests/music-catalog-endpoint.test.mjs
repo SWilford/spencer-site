@@ -16,26 +16,33 @@ async function mocked(run, rateLimited = false) {
       return Response.json(body.action === "acquire" ? { state: "acquired", run_id: "run", client_id: "client", refresh_token: "private-refresh" } : {});
     }
     if (url === "https://accounts.spotify.com/api/token") return Response.json({ access_token: "private-access", token_type: "Bearer", refresh_token: "rotated-refresh" });
-    assert.equal(url.startsWith("https://api.spotify.com/v1/search?"), true);
-    actions.push({ action: "search" });
-    return rateLimited ? new Response("", { status: 429, headers: { "retry-after": "123" } }) : Response.json({ artists: { items: [] } });
+    assert.equal(url.startsWith("https://api.spotify.com/v1/me/player/recently-played?"), true);
+    actions.push({ action: "history" });
+    return rateLimited ? new Response("", { status: 429, headers: { "retry-after": "123" } }) : Response.json({ items: [], next: null });
   };
   try { await run(actions); } finally { globalThis.fetch = original; }
 }
-test("catalog searches save rotated tokens before lookup and release without advancing listening collection", async () => mocked(async actions => {
+test("catalog searches are disabled before acquiring credentials or calling Spotify", async () => mocked(async actions => {
   const response = await handler(request([{ type: "artist", q: "Sabaton" }]));
-  assert.equal(response.status, 200);
-  assert.deepEqual(actions.map(a => a.action), ["status", "acquire", "save_token", "search", "catalog_finish"]);
+  assert.equal(response.status, 403);
+  assert.deepEqual(actions.map(a => a.action), ["status"]);
   assert.equal(JSON.stringify(await response.json()).includes("private-access"), false);
 }));
-test("catalog rate limits release the lease with shared backoff, without claiming a history failure", async () => mocked(async actions => {
-  const response = await handler(request([{ type: "album", q: "Example" }]));
-  assert.equal(response.status, 429);
-  assert.equal(actions.at(-1).action, "catalog_finish");
+test("collection saves rotation and history without any catalog API calls", async () => mocked(async actions => {
+  const req = request([]);
+  const response = await handler(new Request(req.url, { method: "POST", headers: req.headers, body: '{"action":"collect"}' }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(actions.map(a => a.action), ["status", "acquire", "save_token", "history", "finish"]);
+}));
+test("history rate limits still respect retry-after", async () => mocked(async actions => {
+  const req = request([]);
+  const response = await handler(new Request(req.url, { method: "POST", headers: req.headers, body: '{"action":"collect"}' }));
+  assert.equal(response.status, 502);
+  assert.equal(actions.at(-1).action, "fail");
   assert.equal(actions.at(-1).payload.retry_seconds, 123);
 }, true));
-test("invalid query batches are rejected before acquiring credentials", async () => mocked(async actions => {
+test("old metadata clients cannot bypass the disabled catalog path", async () => mocked(async actions => {
   const response = await handler(request([{ type: "artist", q: "Sabaton", offset: -1 }]));
-  assert.equal(response.status, 400);
+  assert.equal(response.status, 403);
   assert.deepEqual(actions.map(a => a.action), ["status"]);
 }));

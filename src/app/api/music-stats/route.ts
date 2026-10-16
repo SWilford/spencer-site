@@ -3,6 +3,7 @@ import path from "node:path";
 import { publicMusicStats, calendarRange, validMusicDate } from "@/lib/music-public";
 import { dayKey, rangeDays, type MusicSnapshot } from "@/lib/music-stats";
 import { withLocalAppleImport } from "@/lib/music-apple-import";
+import { localMusicHistory } from "@/lib/music-history-store";
 
 let cached: { snapshot: MusicSnapshot; expires: number } | undefined;
 
@@ -23,9 +24,10 @@ export async function GET(request: Request) {
       cached = { snapshot, expires: Date.now() + 60000 };
     }
     snapshot = await withLocalAppleImport(snapshot);
+    const history = await localMusicHistory(snapshot);
     const params = new URL(request.url).searchParams;
     const today = dayKey(snapshot.generatedAt);
-    const earliest = snapshot.plays.length ? snapshot.plays.map(p => dayKey(p.at)).sort()[0] : today;
+    const earliest = history?.earliest ?? (snapshot.plays.length ? snapshot.plays.map(p => dayKey(p.at)).sort()[0] : today);
     const preset = params.get("preset") ?? "month";
     if (!["day", "week", "month", "year", "past-year", "ytd", "lifetime", "custom"].includes(preset)) {
       return Response.json({ error: "Choose a supported timeframe." }, { status: 400, headers: { "Cache-Control": "no-store" } });
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
     if (!validMusicDate(range.start) || !validMusicDate(range.end) || range.start > range.end || range.end > today || rangeDays(range) > 10958) {
       return Response.json({ error: "Choose a valid range of up to 30 years." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
-    return Response.json(publicMusicStats(snapshot, range), { headers });
+    return Response.json(history ? history.stats(range) : publicMusicStats(snapshot, range), { headers });
   } catch {
     return Response.json({ error: "Statistics are temporarily unavailable. Please try again shortly." }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }

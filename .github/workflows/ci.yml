@@ -13,4 +13,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:scene
+      - run: npm run test:music
+      - run: python -m unittest discover -s tests -p 'test_*.py' -v
       - run: npm run check
