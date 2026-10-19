@@ -1,6 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { dayKey, durationMs, playbackCount, rangeDays, shiftDay, type DateRange, type MusicSnapshot } from "./music-stats";
 import type { PublicMusicStats } from "./music-public";
 
@@ -128,6 +129,7 @@ export class MusicHistoryStore {
     this.earliest = String(db.prepare("select min(day) day from time_facts").get()?.day ?? dayKey(snapshot.generatedAt));
   }
   close() { this.db.close(); }
+  updateSnapshot(snapshot: MusicSnapshot) { this.snapshot = snapshot; }
   private totals(range: DateRange) {
     const row = this.db.prepare(`select coalesce(sum(stream_count),0) streams,coalesce(sum(milliseconds),0) milliseconds,
       count(distinct day) activeDays from time_facts where day between ? and ?`).get(range.start, range.end)!;
@@ -139,7 +141,7 @@ export class MusicHistoryStore {
   }
   stats(range: DateRange): PublicMusicStats {
     const key = `${range.start}:${range.end}`, cached = this.results.get(key);
-    if (cached) return cached;
+    if (cached) return { ...cached, today: dayKey(new Date()), lastCollection: this.snapshot.lastCollection, partial: this.snapshot.truncated };
     const args = [range.start, range.end];
     const groups = (column: string) => this.db.prepare(`select ${column} label,sum(stream_count) count,sum(milliseconds) milliseconds from time_facts where day between ? and ? group by ${column}`).all(...args);
     const days = new Map(groups("day").map(r => [String(r.label), r]));
@@ -157,7 +159,7 @@ export class MusicHistoryStore {
           id: String(r.id).startsWith("unknown:") || /^[a-f0-9]{64}$/.test(String(r.id)) ? `unmatched-${index}` : String(r.id), name: String(r.name), detail: String(r.detail),
           count: Number(r.count), milliseconds: Number(r.milliseconds), artwork: r.artwork as string | null, url: r.url as string | null }));
     };
-    const result: PublicMusicStats = { today: dayKey(this.snapshot.generatedAt), earliest: this.earliest, range, lastCollection: this.snapshot.lastCollection,
+    const result: PublicMusicStats = { today: dayKey(new Date()), earliest: this.earliest, range, lastCollection: this.snapshot.lastCollection,
       summary: this.totals(range), previous: this.totals({ start: shiftDay(range.start, -rangeDays(range)), end: shiftDay(range.start, -1) }),
       daily: Array.from({ length: rangeDays(range) }, (_, i) => { const day = shiftDay(range.start, i), row = days.get(day); return { day, count: Number(row?.count ?? 0), milliseconds: Number(row?.milliseconds ?? 0) }; }),
       hours: Array.from({ length: 24 }, (_, hour) => ({ label: String(hour), count: Number(hours.get(hour)?.count ?? 0), minutes: Number(hours.get(hour)?.milliseconds ?? 0) / 60000 })),
@@ -173,20 +175,26 @@ export class MusicHistoryStore {
 }
 
 let cached: { key: string; store: MusicHistoryStore } | undefined;
+export function historySnapshotKey(snapshot: MusicSnapshot) {
+  return createHash("sha256").update(JSON.stringify([snapshot.plays, snapshot.artistProfiles ?? {}])).digest("hex");
+}
 export async function localMusicHistory(snapshot: MusicSnapshot) {
   const filename = path.join(process.cwd(), "private-data/music/spotify/spotify-history.sqlite3");
   let info;
   try { info = await stat(filename); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
   const metaFile = path.join(process.cwd(), "private-data/music/spotify/catalog-display.json");
-  let metadata: HistoryMetadata = { artists: {}, covers: {} }, modified = 0;
-  try { modified = (await stat(metaFile)).mtimeMs; metadata = JSON.parse(await readFile(metaFile, "utf8")); }
+  let metadata: HistoryMetadata = { artists: {}, covers: {} };
+  try { metadata = JSON.parse(await readFile(metaFile, "utf8")); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
-  const key = `${info.mtimeMs}:${modified}:${snapshot.generatedAt}:${snapshot.plays.filter(p => p.provider === "apple").length}`;
+  // Ignore refresh timestamps and metadata write timestamps: neither changes facts.
+  const metadataKey = createHash("sha256").update(JSON.stringify([metadata.artists, metadata.covers])).digest("hex");
+  const key = `facts-v1:${info.mtimeMs}:${info.size}:${metadataKey}:${historySnapshotKey(snapshot)}`;
   if (cached?.key !== key) {
     const previous = cached?.store;
     cached = { key, store: new MusicHistoryStore(filename, snapshot, metadata) };
     // Let already-resolved callers finish their synchronous range query first.
     if (previous) setTimeout(() => previous.close(), 0);
   }
+  cached.store.updateSnapshot(snapshot);
   return cached.store;
 }

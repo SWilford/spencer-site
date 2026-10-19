@@ -34,3 +34,11 @@ See [catalog enrichment](spotify-catalog-enrichment.md) for the separate artwork
 ## Verification — October 16, 2026
 
 All 33 music tests and 10 Python import tests passed, along with lint, type checking, production build and the collector's Deno check. The lifetime endpoint's daily durations sum exactly to its summary duration. The hosted collector completed its scheduled 1:20 PM Eastern run while the independent artwork worker was active, with no error or retry deadline. Artist images remain an incremental background task; unresolved or ambiguous public catalog matches retain their placeholders rather than receiving an unrelated portrait.
+
+## Loading performance — October 19, 2026
+
+The web route reads its last good private collector snapshot immediately, then schedules a single shared remote refresh after responding. A remote timeout retains saved data and does not trigger collection. Last collected continues to report the actual collection timestamp, and calendar navigation uses the current Eastern date even while offline. No previously saved snapshot means the first successful remote read is still required.
+
+Historical cache identity includes source database identity, actual play/catalog content, and the Apple inclusion result; refresh timestamps alone do not rebuild facts. The existing in-memory projections and range results stay reusable while those inputs are unchanged; collection freshness updates independently. A server restart still requires an initial projection build. The source database remains read-only. Apple input mapping is reused for unchanged snapshots and import/enrichment files; no Apple service is queried.
+
+Verification: 36 music tests, targeted lint and the final production build/type check passed. With the production server running alone, the first month API response after restart took 5,878 ms, its repeat took 152 ms, the first lifetime query took 1,433 ms and its repeat took 155 ms. Daily durations still reconciled exactly to summary durations. These measure API responses, not full browser paint time; a busy computer and genuine source changes can still add preparation cost.

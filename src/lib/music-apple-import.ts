@@ -65,13 +65,24 @@ export function includeAppleImport(snapshot: MusicSnapshot, input: AppleInput, e
   return { ...snapshot, artistProfiles, plays: [...spotify, ...imported] };
 }
 
+const localInputs = new WeakMap<MusicSnapshot, { key: string; value: MusicSnapshot }>();
 export async function withLocalAppleImport(snapshot: MusicSnapshot) {
   if (process.env.MUSIC_INCLUDE_APPLE_IMPORT !== "true") return snapshot;
   const filename = path.join(process.cwd(), "private-data/music/apple/apple-dashboard.json");
-  if ((await stat(filename)).size > 25000000) throw new Error("Apple dashboard input exceeds limit");
+  const info = await stat(filename);
+  if (info.size > 25000000) throw new Error("Apple dashboard input exceeds limit");
+  const enrichmentFile = path.join(process.cwd(), "private-data/music/apple/spotify-enrichment.json");
+  let enrichmentModified = 0;
+  try { enrichmentModified = (await stat(enrichmentFile)).mtimeMs; }
+  catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+  const key = `${info.mtimeMs}:${info.size}:${enrichmentModified}`;
+  const cached = localInputs.get(snapshot);
+  if (cached?.key === key) return cached.value;
   const input = JSON.parse(await readFile(filename, "utf8")) as AppleInput;
   let enrichment: AppleEnrichment | undefined;
-  try { enrichment = JSON.parse(await readFile(path.join(process.cwd(), "private-data/music/apple/spotify-enrichment.json"), "utf8")); }
+  try { enrichment = JSON.parse(await readFile(enrichmentFile, "utf8")); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
-  return includeAppleImport(snapshot, input, true, enrichment);
+  const value = includeAppleImport(snapshot, input, true, enrichment);
+  localInputs.set(snapshot, { key, value });
+  return value;
 }
