@@ -93,3 +93,7 @@ Owner-only authorization on every admin request; a generic authenticated user is
 Collection endpoint checks a server secret, rate limits, and an atomic database lease with expiry. Use run IDs/fencing where needed so stale executions cannot overwrite a newer cursor. Tokens stay server-side; refresh failures and revoked access become visible collection states. Respect provider retry timing and backoff; never print secrets in logs.
 
 Use structured redacted diagnostics and import/collection status. Retain original files until Spencer chooses retention policy. Plan database and object-storage backups/restore together before relying on this as the sole history archive.
+
+## Plain navigation motion
+
+Header text links, For Fun trigger, social icons and mobile toggle retain their existing appearance. Only inner faces move: 2px lift, local 26px mouse attraction (at most 3.5px horizontal / 2px vertical), nearest target only, and short weighted press. Hit areas and focus outlines remain fixed. Pointer work is requestAnimationFrame-throttled without React state or idle animation. Hidden navigation is excluded; scroll, blur, exit and visibility changes reset it. Touch has press feedback, reduced motion disables translation. The Music Stats glass dropdown item remains unchanged.
