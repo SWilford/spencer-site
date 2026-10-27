@@ -6,6 +6,7 @@ import { hostedMusicEnabled, hostedMusicDirectory, fetchSavedMusic } from "@/lib
 export const maxDuration = 60;
 import path from "node:path";
 import { publicMusicStats, calendarRange, validMusicDate } from "@/lib/music-public";
+import { MUSIC_BROWSE_START, permitsMusicBrowsing } from "@/lib/music-browsing";
 import { dayKey, rangeDays, type MusicSnapshot } from "@/lib/music-stats";
 import { withLocalAppleImport } from "@/lib/music-apple-import";
 import { localMusicHistory } from "@/lib/music-history-store";
@@ -43,6 +44,9 @@ export async function GET(request: Request) {
       ["anchor", "start", "end"].some(key => input.has(key) && !validMusicDate(input.get(key)!))) {
     return Response.json({ error: "Choose a supported timeframe and valid dates." }, { status: 400, headers: { "Cache-Control": "no-store" } });
   }
+  if (!permitsMusicBrowsing(input.get("preset") ?? "month", [input.get("anchor"), input.get("start"), input.get("end")])) {
+    return Response.json({ error: "Individual timeframes are available from 2021 onward." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+  }
   const headers = { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=120", "X-Content-Type-Options": "nosniff" };
   try {
     let snapshot = await snapshots.get();
@@ -60,6 +64,8 @@ export async function GET(request: Request) {
     const anchor = params.get("anchor") ?? today;
     if (!validMusicDate(anchor) || anchor > today) return Response.json({ error: "Choose a valid date up to today." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     const range = preset === "custom" ? { start: params.get("start") ?? "", end: params.get("end") ?? "" } : calendarRange(preset, anchor, today, earliest);
+    // A week straddling New Year begins at the public browsing boundary.
+    if (preset !== "lifetime" && range.start < MUSIC_BROWSE_START) range.start = MUSIC_BROWSE_START;
     if (!validMusicDate(range.start) || !validMusicDate(range.end) || range.start > range.end || range.end > today || rangeDays(range) > 10958) {
       return Response.json({ error: "Choose a valid range of up to 30 years." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }

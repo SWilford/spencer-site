@@ -5,6 +5,7 @@ import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { EnvelopeSimple } from "@phosphor-icons/react/dist/csr/EnvelopeSimple";
 import { GithubLogo } from "@phosphor-icons/react/dist/csr/GithubLogo";
 import { LinkedinLogo } from "@phosphor-icons/react/dist/csr/LinkedinLogo";
+import { MagneticLink } from "./magnetic-link";
 import { profile } from "@/content/profile";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -45,11 +46,11 @@ export function SiteHeader() {
       </button>
       <nav id="main-navigation" aria-label="Main navigation" className={mobileOpen ? "main-nav is-open" : "main-nav"}>
         {mainLinks.map(([label, href]) => <Link prefetch={true} key={label} href={href} aria-current={pathname === href ? "page" : undefined} onClick={close}>{label}</Link>)}
-        <div className="fun-disclosure" ref={funRef}>
+        <div className="fun-disclosure" ref={funRef} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFunOpen(false); }}>
           <button ref={funButton} className="fun-trigger" aria-expanded={funOpen} aria-controls="fun-links"
             onClick={() => setFunOpen(!funOpen)}>For fun <CaretDown size={13} className={funOpen ? "turned" : ""} /></button>
           <ul id="fun-links" className={funOpen ? "fun-links is-open" : "fun-links"} inert={!funOpen}>
-            <li><Link href="/music" prefetch={true} aria-current={pathname === "/music" ? "page" : undefined} onClick={close}>Music Stats</Link></li>
+            <li><MagneticLink href="/music" ariaCurrent={pathname === "/music" ? "page" : undefined} onClick={close}>Music Stats</MagneticLink></li>
           </ul>
         </div>
       </nav>

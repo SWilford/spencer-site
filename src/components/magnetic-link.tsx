@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useEffect, useRef, type AnchorHTMLAttributes, type CSSProperties, type ReactNode } from "react";
 
-export function MagneticLink({href,children,download}:{href:string;children:string;download?:string}) {
+export function MagneticLink({href,children,download,onClick,ariaCurrent}:{href:string;children:string;download?:string;onClick?:AnchorHTMLAttributes<HTMLAnchorElement>["onClick"];ariaCurrent?:"page"}) {
   const reset=(element:HTMLAnchorElement)=>{
     for(const property of ["--mag-x","--mag-y"]) element.style.setProperty(property,"0px");
     for(const property of ["--tilt-x","--tilt-y"]) element.style.setProperty(property,"0deg");
     delete element.dataset.pressed;
   };
   const interaction:AnchorHTMLAttributes<HTMLAnchorElement> = {
-    className:"hero-button",
+    className:"hero-button", onClick, "aria-current":ariaCurrent,
     onPointerLeave:event=>reset(event.currentTarget),
     onPointerDown:event=>{event.currentTarget.dataset.pressed="true";},
     onPointerUp:event=>{delete event.currentTarget.dataset.pressed;},

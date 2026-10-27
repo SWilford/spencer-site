@@ -27,6 +27,7 @@ import { MusicButton, MusicInteractions, MusicLink } from "./music-interactions"
 
 import { shiftDay, type RangePreset, type RankingKind } from "@/lib/music-stats";
 
+import { MUSIC_BROWSE_START } from "@/lib/music-browsing";
 import type { PublicMusicStats } from "@/lib/music-public";
 
 
@@ -205,7 +206,7 @@ export function MusicDashboard() {
 
   const chooseRange = (next: RangePreset) => {
 
-    if (next === "custom" && !custom.start && data) setCustom(data.range);
+    if (next === "custom" && !custom.start && data) setCustom({ start: data.range.start < MUSIC_BROWSE_START ? MUSIC_BROWSE_START : data.range.start, end: data.range.end });
 
     setPreset(next);
 
@@ -223,7 +224,8 @@ export function MusicDashboard() {
 
     else { const date = new Date(`${period.slice(0, 7)}-01T12:00:00Z`); if (preset === "year") date.setUTCFullYear(date.getUTCFullYear() + direction); else date.setUTCMonth(date.getUTCMonth() + direction); next = date.toISOString().slice(0, 10); }
 
-    if (data && next <= data.today && next >= "2000-01-01") setAnchor(next);
+    if (next < MUSIC_BROWSE_START) next = MUSIC_BROWSE_START;
+    if (data && next <= data.today) setAnchor(next);
 
   };
 
@@ -263,7 +265,7 @@ export function MusicDashboard() {
 
     <div className="stats-timeframe" aria-label="Timeframe">
 
-      <div className="stats-period-picker"><MusicButton aria-label="Previous period" onClick={() => navigate(-1)} disabled={!data || !["day", "week", "month", "year"].includes(preset)}><CaretLeft size={18} /></MusicButton><strong>{periodName}</strong><MusicButton aria-label="Next period" onClick={() => navigate(1)} disabled={!data || !["day", "week", "month", "year"].includes(preset) || data.range.end >= data.today}><CaretRight size={18} /></MusicButton></div>
+      <div className="stats-period-picker"><MusicButton aria-label="Previous period" onClick={() => navigate(-1)} disabled={!data || !["day", "week", "month", "year"].includes(preset) || data.range.start <= MUSIC_BROWSE_START}><CaretLeft size={18} /></MusicButton><strong>{periodName}</strong><MusicButton aria-label="Next period" onClick={() => navigate(1)} disabled={!data || !["day", "week", "month", "year"].includes(preset) || data.range.end >= data.today}><CaretRight size={18} /></MusicButton></div>
 
       <div className="stats-range-tabs">{primaryRanges.map(value => <MusicButton className={value === "week" || value === "year" ? "range-secondary" : ""} key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</MusicButton>)}
 
@@ -273,7 +275,7 @@ export function MusicDashboard() {
 
       </div>
 
-      {preset === "custom" && <div className="stats-custom-range"><label>From<input type="date" value={custom.start} max={custom.end || data?.today} onChange={e => setCustom({ ...custom, start: e.target.value })} /></label><label>To<input type="date" value={custom.end} min={custom.start} max={data?.today} onChange={e => setCustom({ ...custom, end: e.target.value })} /></label></div>}
+      {preset === "custom" && <div className="stats-custom-range"><label>From<input type="date" min={MUSIC_BROWSE_START} value={custom.start} max={custom.end || data?.today} onChange={e => setCustom({ ...custom, start: e.target.value && e.target.value < MUSIC_BROWSE_START ? MUSIC_BROWSE_START : e.target.value })} /></label><label>To<input type="date" value={custom.end} min={custom.start || MUSIC_BROWSE_START} max={data?.today} onChange={e => setCustom({ ...custom, end: e.target.value && e.target.value < MUSIC_BROWSE_START ? MUSIC_BROWSE_START : e.target.value })} /></label></div>}
 
     </div>
 

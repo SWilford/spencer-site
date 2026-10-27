@@ -78,3 +78,7 @@ The hourly-chart correction was documented from the contract append, `music-char
 ## October 26: consistent music hover feedback
 
 Music Stats controls reuse native buttons/links with a moving inner face and fixed hit area. One requestAnimationFrame-throttled pointer listener considers only enabled, visible targets within a 28px local radius; only the nearest target attracts (3px horizontal, 2px vertical). Controls lift 2px, press down 2px and compress to .96. Artwork keeps a fixed wrapper while the image surface lifts 3px and tilts at most 1.5 degrees. Grid/list sizes and existing selection/tooltip/dropdown behavior remain intact. Touch has press feedback without cursor attraction; reduced motion removes movement, and scroll/blur/hidden-page/exit cleanup settles the active target. No animation loop runs while idle, and pointer updates do not update React state. Coverage includes Stats/Top, period arrows, timeframe choices and disclosures, ranking tabs, filter/sort options, layout cycling, Show more, Spotify attribution, ranking links and artwork. Collection, imports and public data permissions are unchanged.
+
+### January 2021 browsing boundary
+
+The shared music-browsing policy limits selected calendar/custom dates to 2021 onward. Previous navigation stops at the boundary, custom inputs enforce it, and direct pre-boundary API requests return 400 before loading data. Boundary weeks are clipped to January 1. Lifetime retains the original archive, totals, rankings and chart contributions; imports and collection remain unchanged.

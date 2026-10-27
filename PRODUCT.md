@@ -76,3 +76,5 @@ The open-layout-v6 visual concept is approved for a first code draft. Latest use
 
 
 October 26 launch: Spencer bought spencerwilford.com, deployed spencer-site to Vercel and connected DNS, then authorized security patches, hosted Music Stats, mobile interaction fixes and SEO release. Publication is now authorized for this project. The collector remains independent in Supabase. See docs/hosted-music-stats.md for the private read-replica architecture, read-only production credentials, automatic saved-play refresh and artwork publication. Historical statements above about remaining unpublished/local-only are superseded by this launch update.
+
+October 27 browsing preference: retain all 2020-and-earlier history in Lifetime statistics and rankings, but limit individually selectable timeframes to January 1, 2021 onward, enforced by both controls and the public stats endpoint. This is a presentation choice, not deletion or a promise to hide older contributions within Lifetime.
