@@ -1,5 +1,9 @@
 import { readFile, writeFile, rename } from "node:fs/promises";
 import { after } from "next/server";
+import { createMusicRequestLimit } from "@/lib/music-request-limit";
+const admit = createMusicRequestLimit();
+import { hostedMusicEnabled, hostedMusicDirectory, fetchSavedMusic } from "@/lib/hosted-music-data";
+export const maxDuration = 60;
 import path from "node:path";
 import { publicMusicStats, calendarRange, validMusicDate } from "@/lib/music-public";
 import { dayKey, rangeDays, type MusicSnapshot } from "@/lib/music-stats";
@@ -9,9 +13,11 @@ import { MusicSnapshotCache, StaleMusicSnapshotError } from "@/lib/music-snapsho
 
 const snapshotFile = path.join(process.cwd(), "private-data/music/collector-snapshot.json");
 const snapshots = new MusicSnapshotCache(async () => {
+  if (hostedMusicEnabled()) return;
   try { return JSON.parse(await readFile(snapshotFile, "utf8")) as MusicSnapshot; }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
 }, async () => {
+  if (hostedMusicEnabled()) return await fetchSavedMusic() as MusicSnapshot;
   const config = process.env.MUSIC_COLLECTOR_KEY && process.env.MUSIC_SUPABASE_PROJECT_ID
     ? { key: process.env.MUSIC_COLLECTOR_KEY, project_id: process.env.MUSIC_SUPABASE_PROJECT_ID }
     : JSON.parse(await readFile(path.join(process.cwd(), "private-data/music/collector-bootstrap.json"), "utf8"));
@@ -22,18 +28,28 @@ const snapshots = new MusicSnapshotCache(async () => {
   if (!response.ok) throw new Error("unavailable");
   return await response.json() as MusicSnapshot;
 }, async snapshot => {
+  if (hostedMusicEnabled()) return;
   const temporary = `${snapshotFile}.web-next`;
   await writeFile(temporary, JSON.stringify(snapshot), { mode: 0o600 });
   await rename(temporary, snapshotFile);
 });
 
 export async function GET(request: Request) {
-  const headers = { "Cache-Control": "public, max-age=30, s-maxage=60", "X-Content-Type-Options": "nosniff" };
+  const client = (request.headers.get("x-vercel-forwarded-for") ?? request.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+  if (!admit(client)) return Response.json({ error: "Too many statistics requests. Please wait a minute." }, { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": "60" } });
+  const input = new URL(request.url).searchParams;
+  if ([...input.keys()].some(key => !["preset", "anchor", "start", "end"].includes(key)) ||
+      !["day", "week", "month", "year", "past-year", "ytd", "lifetime", "custom"].includes(input.get("preset") ?? "month") ||
+      ["anchor", "start", "end"].some(key => input.has(key) && !validMusicDate(input.get(key)!))) {
+    return Response.json({ error: "Choose a supported timeframe and valid dates." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+  }
+  const headers = { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=120", "X-Content-Type-Options": "nosniff" };
   try {
     let snapshot = await snapshots.get();
     after(() => snapshots.refresh());
-    snapshot = await withLocalAppleImport(snapshot);
-    const history = await localMusicHistory(snapshot);
+    const directory = hostedMusicEnabled() ? await hostedMusicDirectory() : undefined;
+    snapshot = await withLocalAppleImport(snapshot, directory);
+    const history = await localMusicHistory(snapshot, directory);
     const params = new URL(request.url).searchParams;
     const today = dayKey(new Date());
     const earliest = history?.earliest ?? (snapshot.plays.length ? snapshot.plays.map(p => dayKey(p.at)).sort()[0] : today);

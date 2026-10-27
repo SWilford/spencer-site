@@ -1,5 +1,6 @@
+import { pageMetadata } from "@/lib/site-metadata";
 import { projects } from "@/content/profile";
-export const metadata = { title: "Projects · Spencer Wilford" };
+export const metadata = pageMetadata('Projects', 'Personal and team projects in full-stack development and software engineering.', "/projects", true);
 export default function ProjectsPage() { return <main id="main" className="page-content interior-page">
   <div className="page-heading"><h1>Projects</h1><p>Full-stack applications, AI platforms, and interactive software projects.</p></div>
   <div className="projects-flow">{projects.map((project,index) => <article className={`project project-${index}`} key={project.title}>

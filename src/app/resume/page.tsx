@@ -1,6 +1,7 @@
+import { pageMetadata } from "@/lib/site-metadata";
 import Image from "next/image";
 import { MagneticActions, MagneticLink } from "@/components/magnetic-link";
-export const metadata = { title: "Resume · Spencer Wilford" };
+export const metadata = pageMetadata('Resume', 'View and download Spencer Wilford’s resume.', "/resume", true);
 export default function ResumePage() { return <main id="main" className="page-content interior-page resume-document-page">
   <div className="page-heading"><h1>Resume</h1><p>Education, software engineering experience, projects, leadership, and technical skills.</p></div>
   <MagneticActions label="Resume actions" className="resume-document-actions"><MagneticLink href="/resume/spencer-wilford-resume.pdf" download="Spencer Wilford Resume.pdf">Download Resume</MagneticLink></MagneticActions>

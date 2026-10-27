@@ -35,10 +35,11 @@ export function SurveyScrollbar() {
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(measure); };
     const configure = () => {
-      const enabled = fine.matches && !forced.matches;
+      const enabled = !forced.matches;
+      element.dataset.touch = String(!fine.matches);
       document.documentElement.classList.toggle("survey-scroll-enabled", enabled);
       element.dataset.enabled = String(enabled);
-      element.tabIndex = enabled ? 0 : -1;
+      element.tabIndex = enabled && fine.matches ? 0 : -1;
       schedule();
     };
     const onScroll = () => { schedule(); show(); };
@@ -78,7 +79,7 @@ export function SurveyScrollbar() {
 
   return <div ref={rail} className="survey-scrollbar" role="scrollbar" aria-label="Page scroll position" aria-controls="main" aria-orientation="vertical" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0} tabIndex={-1}
     onPointerDown={event => {
-      if (event.button !== 0) return;
+      if (event.pointerType === "touch" || event.button !== 0) return;
       event.preventDefault();
       const element = event.currentTarget, bounds = element.getBoundingClientRect();
       const thumb = Number.parseFloat(element.style.getPropertyValue("--survey-thumb"));

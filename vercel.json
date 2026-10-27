@@ -3,7 +3,8 @@
   "services": {
     "app": {
       "root": ".",
-      "framework": "nextjs"
+      "framework": "nextjs",
+      "buildCommand": "node --experimental-strip-types scripts/music/prepare-vercel-data.mjs && next build"
     }
   },
   "rewrites": [

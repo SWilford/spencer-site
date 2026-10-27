@@ -66,12 +66,12 @@ export function includeAppleImport(snapshot: MusicSnapshot, input: AppleInput, e
 }
 
 const localInputs = new WeakMap<MusicSnapshot, { key: string; value: MusicSnapshot }>();
-export async function withLocalAppleImport(snapshot: MusicSnapshot) {
+export async function withLocalAppleImport(snapshot: MusicSnapshot, directory = path.join(process.cwd(), "private-data/music")) {
   if (process.env.MUSIC_INCLUDE_APPLE_IMPORT !== "true") return snapshot;
-  const filename = path.join(process.cwd(), "private-data/music/apple/apple-dashboard.json");
+  const filename = path.join(directory, "apple/apple-dashboard.json");
   const info = await stat(filename);
   if (info.size > 25000000) throw new Error("Apple dashboard input exceeds limit");
-  const enrichmentFile = path.join(process.cwd(), "private-data/music/apple/spotify-enrichment.json");
+  const enrichmentFile = path.join(directory, "apple/spotify-enrichment.json");
   let enrichmentModified = 0;
   try { enrichmentModified = (await stat(enrichmentFile)).mtimeMs; }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }

@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/site-metadata";
 import Link from "next/link";
 import { MagneticActions, MagneticLink } from "@/components/magnetic-link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
@@ -5,7 +6,7 @@ import { EnvelopeSimple } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
 import { GithubLogo } from "@phosphor-icons/react/dist/ssr/GithubLogo";
 import { LinkedinLogo } from "@phosphor-icons/react/dist/ssr/LinkedinLogo";
 import { profile } from "@/content/profile";
-export const metadata = { title: "Contact · Spencer Wilford" };
+export const metadata = pageMetadata('Contact', 'Contact Spencer Wilford by email, LinkedIn, or GitHub.', "/contact", true);
 const channels = [
   {title:"Email",label:profile.email,href:`mailto:${profile.email}`,Icon:EnvelopeSimple},
   {title:"LinkedIn",label:"linkedin.com/in/spencerwilford",href:profile.linkedin,Icon:LinkedinLogo},

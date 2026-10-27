@@ -178,11 +178,11 @@ let cached: { key: string; store: MusicHistoryStore } | undefined;
 export function historySnapshotKey(snapshot: MusicSnapshot) {
   return createHash("sha256").update(JSON.stringify([snapshot.plays, snapshot.artistProfiles ?? {}])).digest("hex");
 }
-export async function localMusicHistory(snapshot: MusicSnapshot) {
-  const filename = path.join(process.cwd(), "private-data/music/spotify/spotify-history.sqlite3");
+export async function localMusicHistory(snapshot: MusicSnapshot, directory = path.join(process.cwd(), "private-data/music")) {
+  const filename = path.join(directory, "spotify/spotify-history.sqlite3");
   let info;
   try { info = await stat(filename); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
-  const metaFile = path.join(process.cwd(), "private-data/music/spotify/catalog-display.json");
+  const metaFile = path.join(directory, "spotify/catalog-display.json");
   let metadata: HistoryMetadata = { artists: {}, covers: {} };
   try { metadata = JSON.parse(await readFile(metaFile, "utf8")); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }

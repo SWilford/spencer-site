@@ -1,2 +1,3 @@
-export const metadata = { title: "Journal · Spencer Wilford" };
+import { pageMetadata } from "@/lib/site-metadata";
+export const metadata = pageMetadata('Journal', 'Development notes, experiments, and project updates.', "/journal", false);
 export default function JournalPage() { return <main id="main" className="page-content interior-page"><div className="page-heading"><h1>Journal</h1><p>Development notes, experiments, and project updates.</p></div><div className="quiet-placeholder"><h2>The first page is still blank.</h2><p>There’s room here for small discoveries and longer stories. First post to come.</p></div></main>; }

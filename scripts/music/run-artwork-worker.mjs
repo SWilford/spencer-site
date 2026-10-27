@@ -30,6 +30,14 @@ try {
       child.on("exit", code => resolve(code));
       child.on("error", () => resolve(1));
     });
+    // Publish changed display metadata only. This owner credential cannot collect.
+    try {
+      await readFile(new URL("../site-access.json", directory), "utf8");
+      await new Promise(resolve => {
+        const publisher = spawn(process.execPath, [fileURLToPath(new URL("publish-hosted-history.mjs", import.meta.url)), "--artwork-only"], {windowsHide:true,stdio:"inherit"});
+        publisher.on("exit",resolve); publisher.on("error",()=>resolve(1));
+      });
+    } catch { /* Local-only users need no hosted publisher. */ }
     status.batches++;
     let batch;
     try { batch = JSON.parse(await readFile(new URL("artwork-worker-status.json", directory), "utf8")); }

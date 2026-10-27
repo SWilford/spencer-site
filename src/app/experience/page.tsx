@@ -1,5 +1,6 @@
+import { pageMetadata } from "@/lib/site-metadata";
 import { MagneticActions, MagneticLink } from "@/components/magnetic-link";
-export const metadata = { title: "Experience · Spencer Wilford" };
+export const metadata = pageMetadata('Experience', 'Software engineering internships, JMU education, leadership, awards, and mentorship.', "/experience", true);
 const jobs = [
   { organization: "Naval Surface Warfare Center Dahlgren Division", location: "Dahlgren, VA", dates: "May 2026 – August 2026", bullets: [
     "Engineered full-stack features for MADSS, an enterprise mission-assurance platform supporting 15,000+ DoW users in modeling mission dependencies, assessing operational impacts, and monitoring supporting resources.",
