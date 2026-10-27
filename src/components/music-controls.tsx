@@ -1,5 +1,6 @@
 "use client";
 
+import { MusicButton } from "./music-interactions";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 /** A small anchored disclosure: native buttons, keyboard dismissal, no portal or scroll drift. */
@@ -16,7 +17,7 @@ export function StatsMenu({ label, icon, children, className = "" }: { label: st
     return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
   }, [open]);
   return <div ref={root} className={`stats-menu ${className}`} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
-    <button ref={trigger} className="stats-control" aria-label={label} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{icon}<span className="stats-control-label">{label}</span></button>
+    <MusicButton ref={trigger} className="stats-control" aria-label={label} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{icon}<span className="stats-control-label">{label}</span></MusicButton>
     <div id={id} className="stats-menu-panel" data-open={open} inert={!open} onClick={event => { if ((event.target as HTMLElement).closest("button")) { setOpen(false); trigger.current?.focus(); } }}>{children}</div>
   </div>;
 }

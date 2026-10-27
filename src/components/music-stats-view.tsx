@@ -23,6 +23,7 @@ import { Funnel } from "@phosphor-icons/react/dist/csr/Funnel";
 
 import { musicChartSeries, hourLabel } from "@/lib/music-chart-series";
 import { StatsMenu } from "./music-controls";
+import { MusicButton, MusicInteractions, MusicLink } from "./music-interactions";
 
 import { shiftDay, type RangePreset, type RankingKind } from "@/lib/music-stats";
 
@@ -248,13 +249,13 @@ export function MusicDashboard() {
 
   const timeTitle = data?.timeBasis === "song-length-estimate" ? "Song-length estimate" : "Export-reported listening duration";
 
-  return <>
+  return <MusicInteractions>
 
     <div className="stats-title-row"><h1>Music Stats</h1><div className="stats-view-tabs" aria-label="Music view">
 
-      <button aria-pressed={view === "stats"} onClick={() => setView("stats")} aria-label="Stats" title="Stats"><ChartBar size={21} /><span>Stats</span></button>
+      <MusicButton aria-pressed={view === "stats"} onClick={() => setView("stats")} aria-label="Stats" title="Stats"><ChartBar size={21} /><span>Stats</span></MusicButton>
 
-      <button aria-pressed={view === "top"} onClick={() => setView("top")} aria-label="Top" title="Top"><TrendUp size={21} /><span>Top</span></button>
+      <MusicButton aria-pressed={view === "top"} onClick={() => setView("top")} aria-label="Top" title="Top"><TrendUp size={21} /><span>Top</span></MusicButton>
 
     </div></div>
 
@@ -262,13 +263,13 @@ export function MusicDashboard() {
 
     <div className="stats-timeframe" aria-label="Timeframe">
 
-      <div className="stats-period-picker"><button aria-label="Previous period" onClick={() => navigate(-1)} disabled={!data || !["day", "week", "month", "year"].includes(preset)}><CaretLeft size={18} /></button><strong>{periodName}</strong><button aria-label="Next period" onClick={() => navigate(1)} disabled={!data || !["day", "week", "month", "year"].includes(preset) || data.range.end >= data.today}><CaretRight size={18} /></button></div>
+      <div className="stats-period-picker"><MusicButton aria-label="Previous period" onClick={() => navigate(-1)} disabled={!data || !["day", "week", "month", "year"].includes(preset)}><CaretLeft size={18} /></MusicButton><strong>{periodName}</strong><MusicButton aria-label="Next period" onClick={() => navigate(1)} disabled={!data || !["day", "week", "month", "year"].includes(preset) || data.range.end >= data.today}><CaretRight size={18} /></MusicButton></div>
 
-      <div className="stats-range-tabs">{primaryRanges.map(value => <button className={value === "week" || value === "year" ? "range-secondary" : ""} key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</button>)}
+      <div className="stats-range-tabs">{primaryRanges.map(value => <MusicButton className={value === "week" || value === "year" ? "range-secondary" : ""} key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</MusicButton>)}
 
-        <div className="stats-extended-ranges">{(["past-year", "ytd", "custom"] as const).map(value => <button key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</button>)}</div>
+        <div className="stats-extended-ranges">{(["past-year", "ytd", "custom"] as const).map(value => <MusicButton key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</MusicButton>)}</div>
 
-        <StatsMenu className="stats-range-menu" label="More timeframes" icon={<List size={21} />}>{(["week", "year", "past-year", "ytd", "custom"] as const).map(value => <button className={value === "week" || value === "year" ? "menu-compact-only" : ""} key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</button>)}</StatsMenu>
+        <StatsMenu className="stats-range-menu" label="More timeframes" icon={<List size={21} />}>{(["week", "year", "past-year", "ytd", "custom"] as const).map(value => <MusicButton className={value === "week" || value === "year" ? "menu-compact-only" : ""} key={value} aria-pressed={preset === value} onClick={() => chooseRange(value)}>{label(value)}</MusicButton>)}</StatsMenu>
 
       </div>
 
@@ -304,11 +305,11 @@ export function MusicDashboard() {
 
     {hasResults && data && view === "top" && <div className="stats-top-content"><div className="stats-top-toolbar">
 
-      <div className="stats-kind-tabs" aria-label="Ranking type">{(["tracks", "artists", "albums"] as const).map(value => <button key={value} aria-pressed={kind === value} onClick={() => { setKind(value); setLimit(30); }}>{value[0].toUpperCase() + value.slice(1)}</button>)}</div>
+      <div className="stats-kind-tabs" aria-label="Ranking type">{(["tracks", "artists", "albums"] as const).map(value => <MusicButton key={value} aria-pressed={kind === value} onClick={() => { setKind(value); setLimit(30); }}>{value[0].toUpperCase() + value.slice(1)}</MusicButton>)}</div>
 
-      <div className="stats-top-options"><a className="stats-spotify-credit" href="https://open.spotify.com" target="_blank" rel="noreferrer" aria-label="Music metadata from Spotify"><SpotifyLogo size={20} /></a><StatsMenu label="Filter" icon={<Funnel size={21} />}><p>Sort by</p><button aria-pressed={sort === "time"} onClick={() => setSort("time")}>Listening time</button><button aria-pressed={sort === "streams"} onClick={() => setSort("streams")}>Streams</button></StatsMenu>
+      <div className="stats-top-options"><MusicLink className="stats-spotify-credit" href="https://open.spotify.com" target="_blank" rel="noreferrer" aria-label="Music metadata from Spotify"><SpotifyLogo size={20} /></MusicLink><StatsMenu label="Filter" icon={<Funnel size={21} />}><p>Sort by</p><MusicButton aria-pressed={sort === "time"} onClick={() => setSort("time")}>Listening time</MusicButton><MusicButton aria-pressed={sort === "streams"} onClick={() => setSort("streams")}>Streams</MusicButton></StatsMenu>
 
-        <button className="stats-control stats-layout-control" aria-label={`Change layout: ${density ?? "responsive"} ${layout}. Cycle 3, 4, 5 columns and list.`} onClick={cycleLayout}>{layout === "list" ? <List size={21} /> : <SquaresFour size={21} />}<span className="stats-control-label">{layout === "list" ? "List" : "Grid"}</span>{layout === "grid" && <small>{density ?? <><i className="grid-default-wide">5</i><i className="grid-default-normal">4</i><i className="grid-default-small">3</i></>}</small>}</button>
+        <MusicButton className="stats-control stats-layout-control" aria-label={`Change layout: ${density ?? "responsive"} ${layout}. Cycle 3, 4, 5 columns and list.`} onClick={cycleLayout}>{layout === "list" ? <List size={21} /> : <SquaresFour size={21} />}<span className="stats-control-label">{layout === "list" ? "List" : "Grid"}</span>{layout === "grid" && <small>{density ?? <><i className="grid-default-wide">5</i><i className="grid-default-normal">4</i><i className="grid-default-small">3</i></>}</small>}</MusicButton>
 
       </div>
 
@@ -318,9 +319,9 @@ export function MusicDashboard() {
 
         {layout === "list" && <span className="stats-list-position">#{index + 1}</span>}
 
-        <div className="stats-rank-surface"><div className="stats-rank-art">{row.artwork && <Image className={kind === "artists" ? "stats-artist-image" : undefined} src={row.artwork} unoptimized alt={kind === "artists" ? `${row.name} artist profile` : ""} width={400} height={400} loading="lazy" />}{!row.artwork && <span className="stats-art-placeholder" aria-label={kind === "artists" ? `No artist profile image available for ${row.name}` : "Artwork unavailable"}>{row.name.slice(0, 1)}</span>}</div>
+        <div className="stats-rank-surface"><div className="stats-art-hit" data-music-magnet="art"><div className="stats-rank-art">{row.artwork && <Image className={kind === "artists" ? "stats-artist-image" : undefined} src={row.artwork} unoptimized alt={kind === "artists" ? `${row.name} artist profile` : ""} width={400} height={400} loading="lazy" />}{!row.artwork && <span className="stats-art-placeholder" aria-label={kind === "artists" ? `No artist profile image available for ${row.name}` : "Artwork unavailable"}>{row.name.slice(0, 1)}</span>}</div></div>
 
-          <div className="stats-rank-text"><h2>{row.url ? <a href={row.url} target="_blank" rel="noreferrer" title={row.name}>{layout === "grid" ? `${index + 1}. ` : ""}{row.name}</a> : <span title={row.name}>{layout === "grid" ? `${index + 1}. ` : ""}{row.name}</span>}</h2>
+          <div className="stats-rank-text"><h2>{row.url ? <MusicLink href={row.url} target="_blank" rel="noreferrer" title={row.name}>{layout === "grid" ? `${index + 1}. ` : ""}{row.name}</MusicLink> : <span title={row.name}>{layout === "grid" ? `${index + 1}. ` : ""}{row.name}</span>}</h2>
 
             <p title={timeTitle}>{n.format(row.milliseconds / 60000)} minutes · {n.format(row.count)} streams</p>{layout === "list" && kind !== "artists" && <span>{row.detail}</span>}
 
@@ -328,10 +329,10 @@ export function MusicDashboard() {
 
       </li>)}</ol> : <p className="stats-empty">No listening records in this timeframe.</p>}
 
-      {ranks.length > limit && <button className="stats-show-more" onClick={() => setLimit(v => v + 30)}>Show more</button>}
+      {ranks.length > limit && <MusicButton className="stats-show-more" onClick={() => setLimit(v => v + 30)}>Show more</MusicButton>}
 
     </div>}
 
-  </>;
+  </MusicInteractions>;
 
 }
