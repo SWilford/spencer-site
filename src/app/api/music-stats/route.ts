@@ -5,7 +5,7 @@ import { publicMusicStats, calendarRange, validMusicDate } from "@/lib/music-pub
 import { dayKey, rangeDays, type MusicSnapshot } from "@/lib/music-stats";
 import { withLocalAppleImport } from "@/lib/music-apple-import";
 import { localMusicHistory } from "@/lib/music-history-store";
-import { MusicSnapshotCache } from "@/lib/music-snapshot-cache";
+import { MusicSnapshotCache, StaleMusicSnapshotError } from "@/lib/music-snapshot-cache";
 
 const snapshotFile = path.join(process.cwd(), "private-data/music/collector-snapshot.json");
 const snapshots = new MusicSnapshotCache(async () => {
@@ -48,7 +48,9 @@ export async function GET(request: Request) {
       return Response.json({ error: "Choose a valid range of up to 30 years." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
     return Response.json(history ? history.stats(range) : publicMusicStats(snapshot, range), { headers });
-  } catch {
-    return Response.json({ error: "Statistics are temporarily unavailable. Please try again shortly." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    return Response.json({ error: error instanceof StaleMusicSnapshotError
+      ? "Couldn’t refresh saved stats from the cloud. The collector runs separately; this does not mean collection has stopped."
+      : "Statistics are temporarily unavailable. Please try again shortly." }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
 }

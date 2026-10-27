@@ -1,7 +1,9 @@
 import type { MusicSnapshot } from "./music-stats";
 
-// A remote freshness check must not delay displaying an already saved snapshot.
+// Recent saved snapshots render immediately. Old copies require a cloud check.
 // Concurrent visitors share one refresh, and failures retain the last good data.
+export class StaleMusicSnapshotError extends Error {}
+const MAX_SAVED_AGE_MS = 15 * 60000;
 export class MusicSnapshotCache {
   private value?: MusicSnapshot;
   private initializing?: Promise<void>;
@@ -15,7 +17,15 @@ export class MusicSnapshotCache {
       if (!this.value) await this.refresh();
     }
     if (!this.value) throw new Error("No saved music snapshot is available");
+    if (this.isOld()) {
+      await this.refresh();
+      if (this.isOld()) throw new StaleMusicSnapshotError("Saved statistics could not be refreshed from the cloud");
+    }
     return this.value;
+  }
+  private isOld() {
+    const generated = Date.parse(this.value!.generatedAt);
+    return !Number.isFinite(generated) || this.now() - generated > MAX_SAVED_AGE_MS;
   }
   refresh(): Promise<void> {
     if (this.pending) return this.pending;

@@ -2,6 +2,8 @@
 
 Updated October 14, 2026.
 
+October 26 operational note: the hosted collector is active and collecting; the apparent October 19 cutoff was stale local display data. The deployed collector uses history/token endpoints only; the older artist-fetch descriptions below are historical, superseded by [catalog isolation](spotify-catalog-enrichment.md). See [the incident audit](spotify-history-import.md#october-26-stale-display-incident) for daily evidence and the saved-snapshot freshness guard. Use `node scripts/music/hosted-collector.mjs snapshot` to update the local display from existing cloud records without making Spotify API calls.
+
 ## Confirmed direction
 
 Spencer currently listens on Spotify. Apple Music history covers a break of a couple of months. Request Spotify Extended Streaming History now and begin prospective collection while the export is prepared. Do not assume the export ends at its request date: inspect its actual coverage on arrival and reconcile overlapping evidence without counting the same play twice.
