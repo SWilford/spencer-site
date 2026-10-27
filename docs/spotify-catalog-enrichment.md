@@ -1,3 +1,38 @@
+## October 26: artwork isolation and unattended resume
+
+Collection remains hosted and scheduled every ten minutes. The local artwork runner
+no longer reads collector credentials or calls its dashboard/collection endpoint.
+It consumes only the saved local snapshot and immutable imported catalog. All
+metadata HTTP requests pass an allowlist for credential-free Spotify oEmbed,
+MusicBrainz and Wikidata; Authorization, cookies, redirects and collector/API hosts
+are rejected before a request. Provider cooldowns remain exclusively in the local
+artwork checkpoint. No cloud collector configuration or tokens were changed.
+
+The old runner ended after 150 batches (375 images). It now continues until complete
+or explicitly stopped, with exponential waits after failed batches, capped at thirty
+minutes. It retains one-runner locking and atomic catalog checkpoints. Use `--once`
+on the runner for one bounded batch. Each normal batch processes up to ten artist
+attempts, with saved Spotify IDs prioritized before external discovery. Missing
+images are retryable after seven days rather than permanently marked complete;
+individual discovery errors defer the affected artist for one hour. Provider-wide
+MusicBrainz/preview cooldowns respect numeric and HTTP-date Retry-After values.
+Cached matches and all listening evidence remain intact.
+
+This is still a local worker: the computer must remain awake for artwork progress.
+Closing it does not stop the independent hosted listening collector. Status/logs
+are private under `private-data/music/spotify/artwork-*-status.json` and `work/`.
+No admin interface or owner chores are required for ordinary retries. Hosted
+historical analytics, database pagination and optional correction tools remain
+separate future work.
+
+Verification: 40 music tests passed, including blocked collector/API requests,
+credential rejection, Retry-After formats, disabled authenticated catalog access,
+history-only collection and its own rate-limit handling. The real detached worker
+advanced from 375 to 392 saved artist images. During that work, a hosted scheduled
+collection succeeded at 2026-10-27 01:00 UTC (October 26, 9 PM Eastern), advancing
+saved recent plays from 588 to 590 with no error or retry deadline. Targeted ESLint
+and `git diff --check` also passed.
+
 # Catalog artwork without collector quota usage
 
 **October 16 supersedes the original bulk lookup design.** Spotify development quota is shared across a developer account, so a second Client ID does not isolate it. The deployed collector (version 9) now makes only token-refresh and recent-history requests. Its catalog action returns HTTP 403 before acquiring credentials; post-collection artist lookups are removed. The ten-minute scheduler remains active and successful runs were verified while artwork processing was underway.

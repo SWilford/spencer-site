@@ -1,5 +1,20 @@
 import { catalogName } from "./spotify-catalog.mjs";
 export const ARTWORK_USER_AGENT = "SpencerSiteMusicStats/1.0 (+https://github.com/SWilford/spencer-site)";
+// This capability deliberately cannot call Spotify's authenticated API or our collector.
+export function artworkFetch(url, options = {}, fetcher = fetch) {
+  const target = new URL(url);
+  const allowed = target.origin === "https://open.spotify.com" && target.pathname === "/oembed"
+    || target.origin === "https://musicbrainz.org" && target.pathname.startsWith("/ws/2/")
+    || target.origin === "https://query.wikidata.org" && target.pathname === "/sparql";
+  const headers = new Headers(options.headers);
+  if (!allowed || target.username || target.password || headers.has("authorization") || headers.has("cookie")) throw new Error("Artwork requests must use credential-free public metadata endpoints");
+  return fetcher(target, { ...options, redirect: "error" });
+}
+export function retrySeconds(response, now = Date.now()) {
+  const value = response.headers.get("retry-after");
+  const seconds = value && /^\d+$/.test(value) ? Number(value) : (Date.parse(value ?? "") - now) / 1000;
+  return Math.max(60, Number.isFinite(seconds) ? Math.ceil(seconds) : 600);
+}
 export function safeThumbnail(value) {
   try {
     const url = new URL(value);
@@ -11,9 +26,9 @@ export async function spotifyPreview(type, id, fetcher = fetch) {
   const url = new URL("https://open.spotify.com/oembed");
   url.searchParams.set("url", `https://open.spotify.com/${type}/${id}`);
   // Deliberately no Authorization, client ID, app token, collector lease or Web API.
-  const response = await fetcher(url, { redirect: "error", signal: AbortSignal.timeout(15000), headers: { "User-Agent": ARTWORK_USER_AGENT, Accept: "application/json" } });
+  const response = await artworkFetch(url, { redirect: "error", signal: AbortSignal.timeout(15000), headers: { "User-Agent": ARTWORK_USER_AGENT, Accept: "application/json" } }, fetcher);
   if (response.status === 429 || response.status >= 500) {
-    const error = new Error(`Preview HTTP ${response.status}`); error.retrySeconds = Math.max(60, Number(response.headers.get("retry-after")) || 600); throw error;
+    const error = new Error(`Preview HTTP ${response.status}`); error.retrySeconds = retrySeconds(response); throw error;
   }
   if (response.status === 404) return { status: "unavailable", image: null };
   if (!response.ok) throw new Error(`Preview HTTP ${response.status}`);
@@ -41,7 +56,7 @@ export async function publicArtistIds(names, fetcher = fetch) {
   const query = `PREFIX hint: <http://www.bigdata.com/queryHints#> SELECT ?name ?spotify WHERE { hint:Query hint:optimizer "None". VALUES ?name { ${labels.map(n => `${JSON.stringify(n)}@en`).join(" ")} } ?artist rdfs:label ?name. ?artist wdt:P1902 ?spotify. }`;
   const url = new URL("https://query.wikidata.org/sparql");
   url.search = new URLSearchParams({ format: "json", query }).toString();
-  const response = await fetcher(url, { redirect: "error", signal: AbortSignal.timeout(60000), headers: { "User-Agent": ARTWORK_USER_AGENT, Accept: "application/sparql-results+json" } });
+  const response = await artworkFetch(url, { redirect: "error", signal: AbortSignal.timeout(60000), headers: { "User-Agent": ARTWORK_USER_AGENT, Accept: "application/sparql-results+json" } }, fetcher);
   if (!response.ok) throw new Error(`Public catalog HTTP ${response.status}`);
   const data = await response.json(), candidates = new Map();
   for (const row of data.results?.bindings ?? []) {

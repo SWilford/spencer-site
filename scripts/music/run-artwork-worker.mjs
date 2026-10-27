@@ -1,6 +1,6 @@
 // Owner-started local worker. It never invokes the authenticated Spotify Web API.
 import { spawn } from "node:child_process";
-import { readFile, writeFile, open, unlink, rename } from "node:fs/promises";
+import { readFile, writeFile, open, unlink } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
@@ -23,38 +23,30 @@ process.on("SIGTERM", () => { stop = true; child?.kill(); });
 process.on("SIGINT", () => { stop = true; child?.kill(); });
 let failures = 0;
 try {
-  for (let cycle = 0; cycle < 150 && !stop; cycle++) {
-    // Read saved collector data solely for catalog IDs/artwork. This action
-    // queries our database; it does not collect or request anything from Spotify.
-    try {
-      const config = JSON.parse(await readFile(new URL("../collector-bootstrap.json", directory), "utf8"));
-      const response = await fetch(`https://${config.project_id}.supabase.co/functions/v1/spotify-collect`, {
-        method: "POST", redirect: "error", signal: AbortSignal.timeout(20000),
-        headers: { Authorization: `Bearer ${config.key}`, "Content-Type": "application/json" }, body: '{"action":"dashboard"}',
-      });
-      if (response.ok) {
-        const temporary = new URL("../collector-snapshot.next.json", directory);
-        await writeFile(temporary, JSON.stringify(await response.json()), { mode: 0o600 });
-        await rename(temporary, new URL("../collector-snapshot.json", directory));
-      }
-    } catch { /* Saved catalog and export remain sufficient for offline progress. */ }
+  for (let cycle = 0; !stop; cycle++) {
+    // Consume the local saved snapshot only. No collector credentials or endpoints.
     const exit = await new Promise(resolve => {
-      child = spawn(process.execPath, [fileURLToPath(new URL("cache-music-artwork.mjs", import.meta.url)), "--wikidata", "--limit", "50", "--covers"], { windowsHide: true, stdio: "inherit" });
+      child = spawn(process.execPath, [fileURLToPath(new URL("cache-music-artwork.mjs", import.meta.url)), "--wikidata", "--limit", "10", "--covers"], { windowsHide: true, stdio: "inherit" });
       child.on("exit", code => resolve(code));
       child.on("error", () => resolve(1));
     });
     status.batches++;
-    const batch = JSON.parse(await readFile(new URL("artwork-worker-status.json", directory), "utf8"));
+    let batch;
+    try { batch = JSON.parse(await readFile(new URL("artwork-worker-status.json", directory), "utf8")); }
+    catch { batch = { status: "paused", error: "Artwork batch status unavailable; retrying independently" }; }
     Object.assign(status, { lastBatch: batch, updatedAt: new Date().toISOString() });
     failures = exit === 0 ? 0 : failures + 1;
-    status.state = failures >= 3 ? "paused_after_provider_errors" : batch.status === "complete" ? "complete" : "running";
+    status.state = batch.status === "complete" ? "complete" : exit === 0 ? "running" : "waiting_to_retry";
     await writeFile(statusFile, JSON.stringify(status, null, 2));
-    if (failures >= 3 || batch.status === "complete" || stop) break;
+    if (batch.status === "complete" || stop || process.argv.includes("--once")) break;
     // Separate provider throttles cannot update any collector retry/lease state.
-    await delay(exit === 0 ? 15000 : 60000);
+    const waitMs = exit === 0 ? 60000 : Math.min(1800000, 60000 * 2 ** Math.min(failures - 1, 5));
+    status.nextBatchAt = new Date(Date.now() + waitMs).toISOString();
+    await writeFile(statusFile, JSON.stringify(status, null, 2));
+    for (let waited = 0; waited < waitMs && !stop; waited += 1000) await delay(Math.min(1000, waitMs - waited));
   }
   if (stop) status.state = "stopped";
-  else if (status.state === "running") status.state = "batch_limit_reached";
+  else if (process.argv.includes("--once")) status.state = "single_batch_finished";
 } finally {
   status.finishedAt = new Date().toISOString();
   await writeFile(statusFile, JSON.stringify(status, null, 2));

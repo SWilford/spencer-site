@@ -2,7 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { readFile, writeFile, rename, mkdir } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { catalogName, quoted, imageUrl } from "./spotify-catalog.mjs";
-import { ARTWORK_USER_AGENT, artistFromRelease, spotifyArtistLink, spotifyPreview, publicArtistIds } from "./public-artwork.mjs";
+import { ARTWORK_USER_AGENT, artworkFetch, retrySeconds, artistFromRelease, spotifyArtistLink, spotifyPreview, publicArtistIds } from "./public-artwork.mjs";
 
 const directory = new URL("../../private-data/music/spotify/", import.meta.url);
 const file = new URL("catalog-enrichment.json", directory);
@@ -12,6 +12,13 @@ let saved;
 try { saved = JSON.parse(await readFile(file, "utf8")); } catch (error) { if (error.code !== "ENOENT") throw error; }
 saved ??= { schemaVersion: 1, artists: {}, covers: {}, responses: {}, completed: {} };
 saved.completed ??= {};
+saved.artistRetryAt ??= {};
+saved.coverRetryAt ??= {};
+// Older versions marked missing/review results completed forever. Retain them,
+// but allow a later catalog pass without overwriting any listening evidence.
+for (const [key, artist] of Object.entries(saved.artists)) if (!artist.image && saved.completed[key]) {
+  delete saved.completed[key];
+}
 const rows = database.prepare(`select artists_json,album,track_id,sum(milliseconds) milliseconds from events group by artists_json,album,track_id order by milliseconds desc`).all();
 const artists = new Map(), albums = new Map();
 const coverKey = (album, credits) => JSON.stringify(["", catalogName(album ?? ""), credits.map(a => catalogName(a.name)).sort()]);
@@ -64,19 +71,26 @@ try {
       const key = catalogName(a.name), queued = artists.get(key) ?? { key, name: a.name, milliseconds: 0, topAlbum: p.album };
       queued.milliseconds += p.actualMs ?? p.songLengthMs ?? 0; artists.set(key, queued);
       const profile = recent.artistProfiles?.[a.id];
-      saved.artists[catalogName(a.name)] ??= { ...a, status: "matched", image: profile?.image ?? null, url: `https://open.spotify.com/artist/${a.id}`, source: "saved-spotify-play" };
+      if (!saved.artists[key]?.id || saved.artists[key].id === a.id && !saved.artists[key].image) {
+        const newIdentity = saved.artists[key]?.id !== a.id;
+        saved.artists[key] = { ...a, status: "matched", image: profile?.image ?? null, url: `https://open.spotify.com/artist/${a.id}`, source: "saved-spotify-play" };
+        if (newIdentity) delete saved.artistRetryAt[key];
+      }
     }
   }
 } catch (error) { if (error.code !== "ENOENT") throw error; }
 await save();
-const queue = [...artists.values()].sort((a, b) => b.milliseconds - a.milliseconds);
+const queue = [...artists.values()].sort((a, b) => Number(Boolean(saved.artists[b.key]?.id)) - Number(Boolean(saved.artists[a.key]?.id)) || b.milliseconds - a.milliseconds);
 const state = { startedAt: new Date().toISOString(), status: "running", totalArtists: queue.length, completedArtists: 0, images: 0, authenticatedSpotifyRequests: 0 };
 const report = async () => {
   state.images = queue.filter(a => saved.artists[a.key]?.image).length;
   state.completedArtists = queue.filter(a => saved.completed[a.key]).length;
+  state.deferredArtists = queue.filter(a => Date.parse(saved.artistRetryAt[a.key] ?? "") > Date.now()).length;
+  state.providerRetryAt = { musicbrainz: saved.brainzRetryAt ?? null, previews: saved.previewRetryAt ?? null };
   await writeFile(stateFile, JSON.stringify({ ...state, updatedAt: new Date().toISOString() }, null, 2));
   console.log(JSON.stringify({ status: state.status, images: state.images, processed: state.completedArtists, total: state.totalArtists }));
 };
+await report();
 let lastBrainz = 0;
 async function brainz(resource, params) {
   const url = new URL(`https://musicbrainz.org/ws/2/${resource}`);
@@ -84,8 +98,8 @@ async function brainz(resource, params) {
   if (saved.responses[url.href]) return saved.responses[url.href];
   if (saved.brainzRetryAt && Date.parse(saved.brainzRetryAt) > Date.now()) throw new Error("MusicBrainz backoff active; collector is unaffected");
   await delay(Math.max(0, 1100 - (Date.now() - lastBrainz))); lastBrainz = Date.now();
-  const response = await fetch(url, { redirect: "error", signal: AbortSignal.timeout(15000), headers: { "User-Agent": ARTWORK_USER_AGENT, Accept: "application/json" } });
-  if (response.status === 429 || response.status >= 500) { saved.brainzRetryAt = new Date(Date.now() + Math.max(60, Number(response.headers.get("retry-after")) || 600) * 1000).toISOString(); await save(); throw new Error(`MusicBrainz HTTP ${response.status}; only artwork is paused`); }
+  const response = await artworkFetch(url, { redirect: "error", signal: AbortSignal.timeout(15000), headers: { "User-Agent": ARTWORK_USER_AGENT, Accept: "application/json" } });
+  if (response.status === 429 || response.status >= 500) { saved.brainzRetryAt = new Date(Date.now() + retrySeconds(response) * 1000).toISOString(); await save(); throw new Error(`MusicBrainz HTTP ${response.status}; only artwork is paused`); }
   if (!response.ok) throw new Error(`MusicBrainz HTTP ${response.status}`);
   return saved.responses[url.href] = await response.json();
 }
@@ -93,6 +107,49 @@ const flag = process.argv.indexOf("--limit"), limit = flag >= 0 ? Number(process
 if (!Number.isInteger(limit) || limit < 1 || limit > 10000) throw new Error("Invalid artwork limit");
 let attempted = 0;
 try {
+  if (!process.argv.includes("--seed-only")) for (const artist of queue) {
+    if (saved.completed[artist.key] || saved.artists[artist.key]?.image) { saved.completed[artist.key] = true; continue; }
+    if (Date.parse(saved.artistRetryAt[artist.key] ?? "") > Date.now()) continue;
+    let match = saved.artists[artist.key];
+    if (!match?.id) {
+      if (saved.brainzRetryAt && Date.parse(saved.brainzRetryAt) > Date.now()) continue;
+      if (attempted++ >= limit) break;
+      let mbid;
+      try {
+      if (artist.topAlbum) {
+        const releases = await brainz("release-group", { query: `artist:"${quoted(artist.name)}" AND releasegroup:"${quoted(artist.topAlbum)}"`, limit: "10" });
+        mbid = artistFromRelease(artist.name, artist.topAlbum, releases["release-groups"] ?? []);
+      }
+      if (!mbid) {
+        const data = await brainz("artist", { query: `artist:"${quoted(artist.name)}"`, limit: "10" });
+        const exact = (data.artists ?? []).filter(a => catalogName(a.name) === artist.key && Number(a.score) === 100);
+        if (exact.length === 1) mbid = exact[0].id;
+      }
+      if (mbid) {
+        const entity = await brainz(`artist/${mbid}`, { inc: "url-rels" });
+        const id = spotifyArtistLink(entity);
+        if (id) match = { id, name: artist.name, source: "musicbrainz-spotify-link", mbid };
+      }
+      } catch (error) {
+        if (saved.brainzRetryAt && Date.parse(saved.brainzRetryAt) > Date.now()) { state.note = error.message; continue; }
+        saved.artistRetryAt[artist.key] = new Date(Date.now() + 3600000).toISOString();
+        state.note = `Artist discovery deferred: ${error.message}`; continue;
+      }
+    }
+    if (match?.id) {
+      saved.artists[artist.key] = match;
+      if (saved.previewRetryAt && Date.parse(saved.previewRetryAt) > Date.now()) continue;
+      if (attempted++ >= limit) break;
+      await delay(300);
+      const preview = await spotifyPreview("artist", match.id);
+      if (preview.status === "matched" && catalogName(preview.title) === artist.key) saved.artists[artist.key] = { ...match, status: "matched", image: preview.image, url: preview.url };
+      else saved.artists[artist.key] = { ...match, status: "review", image: null };
+    } else saved.artists[artist.key] = { status: "unresolved", name: artist.name, image: null };
+    if (saved.artists[artist.key]?.image) saved.completed[artist.key] = true;
+    else saved.artistRetryAt[artist.key] = new Date(Date.now() + 7 * 86400000).toISOString();
+    await save();
+    if (attempted % 10 === 0) await report();
+  }
   if (process.argv.includes("--wikidata")) {
     saved.wikidataChecked ??= {};
     saved.wikidataFailures ??= {};
@@ -112,49 +169,16 @@ try {
       await save(); await report(); await delay(1100);
     }
   }
-  if (!process.argv.includes("--seed-only")) for (const artist of queue) {
-    if (saved.completed[artist.key] || saved.artists[artist.key]?.image) { saved.completed[artist.key] = true; continue; }
-    if (attempted++ >= limit) break;
-    let match = saved.artists[artist.key];
-    if (!match?.id) {
-      if (saved.brainzRetryAt && Date.parse(saved.brainzRetryAt) > Date.now()) continue;
-      let mbid;
-      try {
-      if (artist.topAlbum) {
-        const releases = await brainz("release-group", { query: `artist:"${quoted(artist.name)}" AND releasegroup:"${quoted(artist.topAlbum)}"`, limit: "10" });
-        mbid = artistFromRelease(artist.name, artist.topAlbum, releases["release-groups"] ?? []);
-      }
-      if (!mbid) {
-        const data = await brainz("artist", { query: `artist:"${quoted(artist.name)}"`, limit: "10" });
-        const exact = (data.artists ?? []).filter(a => catalogName(a.name) === artist.key && Number(a.score) === 100);
-        if (exact.length === 1) mbid = exact[0].id;
-      }
-      if (mbid) {
-        const entity = await brainz(`artist/${mbid}`, { inc: "url-rels" });
-        const id = spotifyArtistLink(entity);
-        if (id) match = { id, name: artist.name, source: "musicbrainz-spotify-link", mbid };
-      }
-      } catch (error) {
-        if (saved.brainzRetryAt && Date.parse(saved.brainzRetryAt) > Date.now()) { state.note = error.message; continue; }
-        throw error;
-      }
-    }
-    if (match?.id) {
-      if (saved.previewRetryAt && Date.parse(saved.previewRetryAt) > Date.now()) throw new Error("Spotify previews are backing off; collector is unaffected");
-      await delay(300);
-      const preview = await spotifyPreview("artist", match.id);
-      if (preview.status === "matched" && catalogName(preview.title) === artist.key) saved.artists[artist.key] = { ...match, status: "matched", image: preview.image, url: preview.url };
-      else saved.artists[artist.key] = { ...match, status: "review", image: null };
-    } else saved.artists[artist.key] = { status: "unresolved", name: artist.name, image: null };
-    saved.completed[artist.key] = true;
-    await save();
-    if (attempted % 10 === 0) await report();
-  }
+  let coverAttempts = 0;
   if (process.argv.includes("--covers")) for (const album of [...albums.values()].sort((a, b) => b.milliseconds - a.milliseconds).slice(0, 200)) {
+    if (Date.parse(saved.coverRetryAt[album.key] ?? "") > Date.now()) continue;
     if (saved.covers[album.key] || !/^spotify:track:[A-Za-z0-9]{22}$/.test(album.uri)) continue;
+    if (saved.previewRetryAt && Date.parse(saved.previewRetryAt) > Date.now()) break;
+    if (coverAttempts++ >= limit) break;
     await delay(300);
     const preview = await spotifyPreview("track", album.uri.split(":")[2]);
     if (preview.image) saved.covers[album.key] = preview.image;
+    else saved.coverRetryAt[album.key] = new Date(Date.now() + 7 * 86400000).toISOString();
     await save();
   }
   state.status = process.argv.includes("--seed-only") ? "seeded" : queue.some(a => !saved.completed[a.key]) ? "partial" : "complete";
