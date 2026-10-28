@@ -36,3 +36,7 @@ The restored Rugby and THAW demos are sandboxed with scripts only, both in ifram
 ## Portfolio preview correction
 
 Spencer rejected a reduced recreation and any visible Inception/level explanation. The Spencer Site project now embeds the real portfolio at /, with all real routes, Resume downloads and public Music Stats intact. Only this trusted same-origin site iframe is unsandboxed; the separately restored Rugby and THAW apps retain their scripts-only sandbox and response CSP. Global SAMEORIGIN framing remains on the portfolio. A hidden depth guard changes the next launch into a normal new tab after three embedded levels; it removes no pages or features within any loaded copy. There is no separate Inception build or fake Resume/Music screen. Expanding a preview scrolls its browser toolbar into view.
+
+## Project presentation refinement
+
+Use real captures of each running homepage behind a single play / Launch demo control. Do not synthesize branded title covers or show preservation/restoration labels in the outer frame. Technology lists cover the original project's languages, frameworks, data services, and hosting, rather than implying every original backend is active in the sandbox. THAW's sample-data notice remains inside its demo. Spencer confirmed his THAW contribution as backend development and site polish; its description also uses the verified experience entry for Supabase, Gemini, structured responses, and agentic workflows. Only launch creates an iframe; normal browsing does not start three applications.
