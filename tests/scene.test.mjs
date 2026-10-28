@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces, formationProgress } from '../src/lib/scene-geometry.ts';
+import { shapeVertexCounts, target, shapeNames, shapeEdges, shapeFaces, formationProgress, cursorHitsShape, rotate } from '../src/lib/scene-geometry.ts';
 import { collide, confine, gridCell, gridNodes, gridExtent, gridNodePosition, constructionAnchors } from '../src/lib/scene-physics.ts';
 test('grid recycling preserves node identities and continuous world positions',()=>{
   const epsilon=.00001;
@@ -77,4 +77,30 @@ test('grid extends past both viewport sides at its furthest plane on wide displa
     assert.ok(width*.3+(radius-1)*1.25*size*scale>width);
     assert.ok(width*.3-(radius-1)*1.25*size*scale<0);
   }
+});
+
+
+test('cursor covers all projected shape faces and vertices at different rotations and depths',()=>{
+  for(let shape=0;shape<shapeNames.length;shape++) for(const yaw of [0,.8,2.4]) for(const depth of [0,7]) {
+    const vertices=Array.from({length:shapeVertexCounts[shape]},(_,i)=>{
+      const p=rotate(target(i,shape),yaw,.4), scale=7/(7+depth+p.z);
+      return {x:400+p.x*100*scale,y:300+p.y*100*scale,visible:true};
+    });
+    for(const vertex of vertices) assert.equal(cursorHitsShape(vertex,vertices,shapeFaces[shape],0),true,`${shapeNames[shape]} vertex`);
+    for(const face of shapeFaces[shape]) {
+      const center=face.reduce((p,i)=>({x:p.x+vertices[i].x/face.length,y:p.y+vertices[i].y/face.length}),{x:0,y:0});
+      assert.equal(cursorHitsShape(center,vertices,shapeFaces[shape],0),true,`${shapeNames[shape]} face`);
+    }
+    assert.equal(cursorHitsShape({x:1000,y:1000},vertices,shapeFaces[shape]),false);
+  }
+});
+test('cursor follows silhouette rather than bounding box, with a small edge tolerance',()=>{
+  const vertices=[{x:0,y:50,visible:true},{x:50,y:0,visible:true},{x:100,y:50,visible:true},{x:50,y:100,visible:true}];
+  const faces=[[0,1,2,3]];
+  assert.equal(cursorHitsShape({x:50,y:50},vertices,faces),true);
+  assert.equal(cursorHitsShape({x:2,y:2},vertices,faces),false);
+  assert.equal(cursorHitsShape({x:105,y:50},vertices,faces),true);
+  assert.equal(cursorHitsShape({x:110,y:50},vertices,faces),false);
+  assert.equal(cursorHitsShape({x:50,y:50},vertices,[[3,2,1,0]]),true);
+  assert.equal(cursorHitsShape({x:50,y:50},vertices.map(p=>({...p,visible:false})),faces),false);
 });

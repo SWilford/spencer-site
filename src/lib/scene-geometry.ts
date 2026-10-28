@@ -66,3 +66,26 @@ export function formationProgress(age: number): number {
   const progress=Math.max(0,Math.min(1,age/2.52));
   return progress*progress*(3-2*progress);
 }
+
+/** Cursor-only screen-space test. All drawn faces count, regardless of depth/winding.
+ * Uses the renderer's final vertices, so rotation, assembly and wall correction agree.
+ * This deliberately does not participate in 3D body/body collision detection.
+ */
+export function cursorHitsShape(cursor: Pick<Point, "x" | "y">, vertices: Pick<ScreenPoint, "x" | "y" | "visible">[], faces: number[][], padding = 8): boolean {
+  const tolerance = Math.max(0, padding) ** 2;
+  for (const indices of faces) {
+    const polygon = indices.map(index => vertices[index]);
+    if (polygon.length < 3 || polygon.some(vertex => !vertex?.visible)) continue;
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const a = polygon[j], b = polygon[i];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const lengthSquared = dx * dx + dy * dy;
+      const t = lengthSquared ? Math.max(0, Math.min(1, ((cursor.x - a.x) * dx + (cursor.y - a.y) * dy) / lengthSquared)) : 0;
+      if ((cursor.x - a.x - t * dx) ** 2 + (cursor.y - a.y - t * dy) ** 2 <= tolerance + 1e-8) return true;
+      if ((a.y > cursor.y) !== (b.y > cursor.y) && cursor.x < (b.x - a.x) * (cursor.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+    }
+    if (inside) return true;
+  }
+  return false;
+}

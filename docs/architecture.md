@@ -97,3 +97,7 @@ Use structured redacted diagnostics and import/collection status. Retain origina
 ## Plain navigation motion
 
 Header text links, For Fun trigger, social icons and mobile toggle retain their existing appearance. Only inner faces move: 2px lift, local 26px mouse attraction (at most 3.5px horizontal / 2px vertical), nearest target only, and short weighted press. Hit areas and focus outlines remain fixed. Pointer work is requestAnimationFrame-throttled without React state or idle animation. Hidden navigation is excluded; scroll, blur, exit and visibility changes reset it. Touch has press feedback, reduced motion disables translation. The Music Stats glass dropdown item remains unchanged.
+
+## Cursor silhouette collisions
+
+Cursor contact uses the union of all rendered projected faces (both windings/depths), with 8 CSS pixels of edge tolerance. It reads the same assembled/rotated vertices after wall correction used for drawing, replacing the undersized center-circle test. Cursor impulses retain their existing force and cooldown and apply on the next physics step. Grid projection, shape-to-shape 3D collision detection and fragment collision logic remain unchanged. Geometry tests cover every shape at multiple rotations/depths, face interiors, outer vertices, edge tolerance and rejection of empty bounding-box corners.

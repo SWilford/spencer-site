@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, formationProgress, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
+import { shapeVertexCounts, shapeNames, shapeFaces, shapeEdges, formationProgress, cursorHitsShape, target, rotate, type Point, type ScreenPoint } from "@/lib/scene-geometry";
 import { collide, confine, gridNodes, gridExtent, gridNodePosition, constructionAnchors, type GridNode } from "@/lib/scene-physics";
 
 export function WireframeBackground() {
@@ -129,18 +129,7 @@ export function WireframeBackground() {
           return {center:{x:-2.8,y:.6+body.lane,z:8},formed:0,travel:(elapsed-body.birth)/body.period};
         }
         const center={x:base.x+body.offset.x,y:base.y+body.offset.y,z:base.z+body.offset.z};
-        const screen=worldProject(center);
         const formed=formationProgress(reduced ? 2.52 : elapsed-body.birth-.55);
-        const dx=screen.x-pointer.x*width,dy=screen.y-pointer.y*height;
-        if(!reduced && pointer.strength>0 && elapsed>body.cooldown && formed>.45 && screen.visible && Math.hypot(dx,dy)<worldSize*screen.scale*1.15*body.size+12) {
-          const speed=Math.hypot(pointer.vx,pointer.vy);
-          const force=.65+Math.min(2.8,speed/600);
-          const distance=Math.hypot(dx,dy)||1;
-          body.velocity.x+=(pointer.vx/900+dx/distance*.8)*force;
-          body.velocity.y+=(pointer.vy/900+dy/distance*.8)*force;
-          body.spin+=(random()-.5)*force;
-          body.cooldown=elapsed+.3; kicks++;
-        }
         for(const axis of ['x','y','z'] as const) {
           body.offset[axis]+=body.velocity[axis]*dt;
           body.velocity[axis]*=Math.exp(-dt*.22);
@@ -209,6 +198,19 @@ export function WireframeBackground() {
         if(wall.x) {if(body.velocity.x<0) body.strain+=Math.abs(body.velocity.x)*.15;body.velocity.x=Math.max(.25,Math.abs(body.velocity.x)*.75);}
         if(wall.y) {if(body.velocity.y*wall.y<0) body.strain+=Math.abs(body.velocity.y)*.15;body.velocity.y=(wall.y>0 ? 1 : -1)*Math.max(.25,Math.abs(body.velocity.y)*.75);}
         wallHits++;
+      }
+      // Cursor sees the full rendered silhouette, including rear/side faces. Body
+      // collisions above remain in world space, with no screen-space substitution.
+      if(!reduced && pointer.strength>0 && elapsed>body.cooldown && assembly>.45 && cursorHitsShape({x:pointer.x*width,y:pointer.y*height},screens,shapeFaces[shape])) {
+        const screen=worldProject(center);
+        const dx=screen.x+wall.x-pointer.x*width,dy=screen.y+wall.y-pointer.y*height;
+        const speed=Math.hypot(pointer.vx,pointer.vy);
+        const force=.65+Math.min(2.8,speed/600);
+        const distance=Math.hypot(dx,dy)||1;
+        body.velocity.x+=(pointer.vx/900+dx/distance*.8)*force;
+        body.velocity.y+=(pointer.vy/900+dy/distance*.8)*force;
+        body.spin+=(random()-.5)*force;
+        body.cooldown=elapsed+.3; kicks++;
       }
       const completion = assembly*assembly;
       for (const indices of shapeFaces[shape]) {
