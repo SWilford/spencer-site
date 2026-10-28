@@ -1,0 +1,1 @@
+import{m as e}from"./index-BHSCktkH.js";var t=e();function n(){return(0,t.jsxs)(`section`,{className:`surface-card mt-8 p-8 text-center`,children:[(0,t.jsx)(`h1`,{className:`text-3xl font-bold`,children:`Not Found`}),(0,t.jsx)(`p`,{className:`mt-3 text-jmuSlate`,children:`The page you requested does not exist.`})]})}export{n as default};

@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   devIndicators: false,
   async headers() {
-    return [{ source: "/(.*)", headers: [
+    return [{source:"/demos/:path*",headers:[{key:"X-Robots-Tag",value:"noindex, nofollow"},{key:"Access-Control-Allow-Origin",value:"*"},{key:"Content-Security-Policy",value:"sandbox allow-scripts"}]},{ source: "/((?!demos/).*)", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "X-Frame-Options", value: "SAMEORIGIN" },
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }

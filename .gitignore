@@ -54,3 +54,5 @@ next-env.d.ts
 /.eslintcache
 __pycache__/
 *.pyc
+
+/showcase/node_modules/

@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
+    "test:showcases": "node --test tests/showcase.test.mjs",
+    "build:showcases": "npm run build --prefix showcase",
     "test:scene": "node --experimental-strip-types --test tests/scene.test.mjs",
     "test:music": "tsx --test tests/spotify-client.test.mjs tests/music-stats.test.mjs tests/music-public.test.mjs tests/music-browsing.test.mjs tests/music-chart-series.test.mjs tests/music-apple-import.test.mjs tests/spotify-catalog.test.mjs tests/music-catalog-endpoint.test.mjs tests/music-history-store.test.mjs tests/music-snapshot-cache.test.mjs tests/public-artwork.test.mjs tests/music-site-data.test.mjs tests/music-request-limit.test.mjs tests/hosted-music-data.test.mjs",
     "music:connect": "node scripts/music/connect-spotify.mjs",

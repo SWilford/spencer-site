@@ -1,0 +1,14 @@
+{
+  "rugby": {
+    "repo": "SWilford/jmu-rugby-site",
+    "commit": "49d7bc8c739490d9c97aad39aed123103f0ff0a7"
+  },
+  "thaw": {
+    "repo": "sambriggs262/thaw",
+    "commit": "d0cb7fa468f7d1786927c6e63417645df65eb95c"
+  },
+  "inception": {
+    "repo": "SWilford/spencer-site",
+    "mode": "shared original components"
+  }
+}

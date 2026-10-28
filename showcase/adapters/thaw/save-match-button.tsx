@@ -1,0 +1,2 @@
+import {useState} from 'react';
+export function SaveMatchButton({targetProfileId,initialSaved=false}:any){const[saved,setSaved]=useState(initialSaved);return <button aria-pressed={saved} onClick={()=>{setSaved(!saved);window.dispatchEvent(new CustomEvent('thaw-demo-save',{detail:{id:targetProfileId,saved:!saved}}))}} className="rounded-full border border-teal-500/30 px-4 py-2 text-sm text-teal-700 dark:text-cyan-300">{saved?'Saved':'Save'}</button>;}
