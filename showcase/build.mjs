@@ -19,7 +19,7 @@ function output(name) {
         throw Error('Showcase output escaped its generated directory');
     return target;
 }
-const originals = { rugby: process.env.RUGBY_SHOWCASE_SOURCE || "C:/Users/sawil/Documents/Codex/2026-08-31/fo/work/jmu-rugby-site-fix", thaw: path.join(work, "thaw-source") };
+const originals = { rugby: process.env.RUGBY_SHOWCASE_SOURCE || path.join(work, "rugby-source"), thaw: path.join(work, "thaw-source") };
 const pins = { rugby: "49d7bc8c739490d9c97aad39aed123103f0ff0a7", thaw: "d0cb7fa468f7d1786927c6e63417645df65eb95c" };
 async function source(name) {
     const dest = path.join(work, `showcase-${name}`);
@@ -117,10 +117,5 @@ await cp(path.join(here, "fonts/space-grotesk-latin.woff2"), path.join(thaw, "pu
 await cp(path.join(here, "fonts/SpaceGrotesk-OFL.txt"), path.join(thaw, "public/fonts/SpaceGrotesk-OFL.txt"));
 await writeFile(path.join(thaw, "fonts.css"), (await readFile(path.join(thaw, "fonts.css"), "utf8")) + '\n@font-face{font-family:"Space Grotesk";font-style:normal;font-weight:400 700;font-display:swap;src:url(/demos/thaw/fonts/space-grotesk-latin.woff2) format("woff2")}\n:root{--font-manrope:Manrope,sans-serif;--font-space-grotesk:"Space Grotesk",sans-serif}body{font-family:var(--font-manrope)}');
 await build({ configFile: false, root: thaw, base: "/demos/thaw/", plugins: [react()], resolve: { alias: { ...aliases, "@": thaw, "next/link": path.join(thaw, "next-link.tsx"), "next/image": path.join(thaw, "next-image.tsx"), react: path.join(here, "node_modules/react"), "react-dom": path.join(here, "node_modules/react-dom") } }, css: { postcss: { plugins: [thawTailwind({ ...thawLoadConfig(path.join(thaw, "tailwind.config.ts")), content: [`${thaw.replaceAll("\\", "/")}/app/**/*.{ts,tsx}`, `${thaw.replaceAll("\\", "/")}/components/**/*.{ts,tsx}`, `${thaw.replaceAll("\\", "/")}/*.tsx`] }), autoprefixer()] } }, build: { outDir: output("thaw"), emptyOutDir: true, sourcemap: false } });
-const inception = path.join(work, "showcase-inception");
-await mkdir(inception, { recursive: true });
-await cp(path.join(here, "adapters/inception"), inception, { recursive: true });
-await copyPortfolioFonts(inception, "/demos/inception");
-await build({ configFile: false, root: inception, base: "/demos/inception/", plugins: [react()], resolve: { alias: { ...aliases, "@": path.join(root, "src"), "next/link": path.join(thaw, "next-link.tsx"), "next/navigation": path.join(inception, "navigation.ts"), react: path.join(here, "node_modules/react"), "react-dom": path.join(here, "node_modules/react-dom") } }, build: { outDir: output("inception"), emptyOutDir: true, sourcemap: false } });
-await writeFile(path.join(out, "provenance.json"), JSON.stringify({ rugby: { repo: "SWilford/jmu-rugby-site", commit: pins.rugby }, thaw: { repo: "sambriggs262/thaw", commit: pins.thaw }, inception: { repo: "SWilford/spencer-site", mode: "shared original components" } }, null, 2));
+await writeFile(path.join(out, "provenance.json"), JSON.stringify({ rugby: { repo: "SWilford/jmu-rugby-site", commit: pins.rugby }, thaw: { repo: "sambriggs262/thaw", commit: pins.thaw }, inception: { repo: "SWilford/spencer-site", mode: "full live website in a same-origin iframe" } }, null, 2));
 console.log("Showcases built. Rugby uses anonymous public reads; THAW is local sample data; no live AI or outreach.");

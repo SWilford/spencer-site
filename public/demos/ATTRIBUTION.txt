@@ -2,6 +2,6 @@ Project showcase sources
 
 JMU Men’s Rugby — SWilford/jmu-rugby-site. Original frontend by Spencer Wilford, preserved as an anonymous read-only showcase.
 THAW — sambriggs262/thaw, built by the HooHacks 2026 team, including Spencer Wilford. Repository README declares MIT. Original landing page, UI components, matching engine and sample profiles are reused with standalone demo adapters. Original service integrations are excluded.
-Inception — SWilford/spencer-site. Uses the original portfolio’s React components.
+Spencer Site — SWilford/spencer-site. The preview loads the full live website, without a separate clone.
 
 Exact source revisions are recorded in provenance.json. Public rugby content and media remain supplied by the original team’s public services.

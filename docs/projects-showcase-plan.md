@@ -5,7 +5,7 @@
 - THAW is no longer live. Its repository remains available; investigate rebuilding a hosted interactive demo from its source rather than describing it as a live service.
 - Byte-Builder no longer feels representative of Spencer's strongest work. Proposed: remove it from the featured lineup; final archival treatment remains undecided.
 - JMU Men's Rugby remains live. Spencer wants a portfolio-hosted copy of his implementation that remains available if the original domain later redirects to a replacement site. A simple iframe of the original live domain would not preserve this.
-- Include this portfolio as an interactive self-referential project, tentatively called Inception.
+- Include the complete live portfolio as Spencer Site. Leave the self-reference as an easter egg; no visible Inception name or level explanations.
 
 ## Agreed presentation
 
@@ -15,7 +15,7 @@ THAW: inspect the actual repository and dependencies before choosing what can ru
 
 Rugby: retain a versioned build of Spencer's original frontend, independent of redirects at the existing domain. Spencer confirmed retaining the existing public-data connections in an embedded-looking copy. Admin editing is disabled in the showcase, including for a visitor with valid credentials; this restriction applies to the demo build and does not revoke real team administrators. Exclude admin routes and editing modules from the demo build, rather than merely hiding navigation. Existing rugby infrastructure remains unchanged.
 
-Inception: embed a constrained portfolio preview with a visible way to enter/exit the next level. Bound nesting (for example, three levels) and activate only the visible preview so recursive rendering does not multiply animation loops, stats polling or network requests. Consider a focused demo mode with the same shared site components and no automatic Music Stats fetching.
+Spencer Site: embed the full live portfolio, with all real pages and features. Keep recursion bounded internally without presenting a reduced recreation or explanatory level labels.
 
 ## Evidence and next decisions
 
@@ -29,6 +29,10 @@ The Projects page features Rugby, THAW and Inception; Byte-Builder is removed fr
 
 Rugby uses the original frontend with HashRouter, no admin routes/imports/nav, no persisted auth, and a custom fetch that rejects writes/auth/functions and forces the existing anonymous public key on all REST reads. THAW reuses the original landing page, match cards, sample profiles and deterministic matching/narrative functions. Perspective, search, saved cards and profile details work locally. No Auth0, Supabase service credentials, Gemini or outreach code enters that demo bundle. The original service is not represented as live.
 
-Inception uses shared portfolio homepage, name animation, background, header, experience and contact components. Projects inside the preview opens another iframe only on request, up to level three. While nested, the outer demo unmounts its own background renderer. It has no Music Stats endpoint calls. Resume/Music navigation shows a clear link-out explanation rather than fabricating those apps.
+Spencer Site embeds the real website at /. Resume, Music Stats and the other routes work as on the main site. It uses the same-origin framing policy already used by the portfolio. The other restored applications remain in strict opaque-origin sandboxes.
 
-All demos are sandboxed with scripts only, both in iframe attributes and an HTTP CSP sandbox. They cannot access parent sessions, submit forms or open popups. Static demo CORS permits module/font loads from the opaque sandbox origin. Demos are noindex and excluded from robots discovery; the portfolio’s global frame restriction remains on non-demo routes. This changes no existing backend permissions. Defense-in-depth client restrictions do not revoke legitimate administrators on the real rugby site.
+The restored Rugby and THAW demos are sandboxed with scripts only, both in iframe attributes and an HTTP CSP sandbox. They cannot access parent sessions, submit forms or open popups. Static demo CORS permits module/font loads from the opaque sandbox origin. Demos are noindex and excluded from robots discovery; the portfolio’s global frame restriction remains on non-demo routes. This changes no existing backend permissions. Defense-in-depth client restrictions do not revoke legitimate administrators on the real rugby site.
+
+## Portfolio preview correction
+
+Spencer rejected a reduced recreation and any visible Inception/level explanation. The Spencer Site project now embeds the real portfolio at /, with all real routes, Resume downloads and public Music Stats intact. Only this trusted same-origin site iframe is unsandboxed; the separately restored Rugby and THAW apps retain their scripts-only sandbox and response CSP. Global SAMEORIGIN framing remains on the portfolio. A hidden depth guard changes the next launch into a normal new tab after three embedded levels; it removes no pages or features within any loaded copy. There is no separate Inception build or fake Resume/Music screen. Expanding a preview scrolls its browser toolbar into view.

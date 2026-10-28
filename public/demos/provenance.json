@@ -9,6 +9,6 @@
   },
   "inception": {
     "repo": "SWilford/spencer-site",
-    "mode": "shared original components"
+    "mode": "full live website in a same-origin iframe"
   }
 }

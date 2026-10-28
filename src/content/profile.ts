@@ -13,7 +13,7 @@ export const projects = [
   { id:"thaw", title:"THAW", category:"HooHacks 2026 · Best First Time Hack",
     description:"An AI-powered platform for matching startups, investors, and partners. The original service is offline; this restored demo preserves the interface and matching engine with the team's sample profiles.",
     stack:["Next.js", "React", "Supabase", "Auth0", "Gemini"], href:null, source:"https://github.com/sambriggs262/thaw", status:"Restored demo · Sample data", demo:"/demos/thaw/index.html" },
-  { id:"inception", title:"Spencer Site — Inception", category:"Interactive portfolio",
-    description:"The site you're on, inside the site you're on. Play with the same letter animations, geometry, and navigation, then visit Projects inside the preview to go another level deeper.",
-    stack:["Next.js", "TypeScript", "Canvas", "Supabase"], href:null, source:"https://github.com/SWilford/spencer-site", status:"Three levels deep", demo:"/demos/inception/index.html?depth=1" },
+  { id:"inception", title:"Spencer Site", category:"Personal portfolio",
+    description:"A personal portfolio with custom geometric backgrounds, animated typography, and a music statistics dashboard. Built to share my experience, projects, and interests.",
+    stack:["Next.js", "TypeScript", "Canvas", "Supabase"], href:null, source:"https://github.com/SWilford/spencer-site", status:"Live website", demo:"/" },
 ];
