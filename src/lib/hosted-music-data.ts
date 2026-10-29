@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { gunzipSync } from "node:zlib";
 
-import { musicDataUrl } from "./music-saved-data";
-export { hostedMusicEnabled, musicDataUrl, fetchSavedMusic } from "./music-saved-data";
+import { musicDataUrl } from "./music-saved-data.mjs";
+export { hostedMusicEnabled, musicDataUrl, fetchSavedMusic } from "./music-saved-data.mjs";
 const files = { "history.sqlite3": "spotify/spotify-history.sqlite3", "apple.json": "apple/apple-dashboard.json", "apple-enrichment.json": "apple/spotify-enrichment.json", "catalog.json": "spotify/catalog-display.json" };
 let pending: Promise<string> | undefined;
 export function hostedMusicDirectory() {

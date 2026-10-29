@@ -16,5 +16,7 @@ jobs:
       - run: npm run test:music
       - run: npm run test:scrollbar
       - run: npm run test:showcases
+      - name: Check native deployment imports
+        run: node --experimental-strip-types --input-type=module -e "import './src/lib/hosted-music-data.ts'"
       - run: python -m unittest discover -s tests -p 'test_*.py' -v
       - run: npm run check

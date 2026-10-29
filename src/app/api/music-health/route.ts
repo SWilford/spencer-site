@@ -1,5 +1,5 @@
 import { createMusicHealthCheck } from "@/lib/music-health";
-import { fetchSavedMusic, hostedMusicEnabled } from "@/lib/music-saved-data";
+import { fetchSavedMusic, hostedMusicEnabled } from "@/lib/music-saved-data.mjs";
 import { createMusicRequestLimit } from "@/lib/music-request-limit";
 
 const admit = createMusicRequestLimit();
