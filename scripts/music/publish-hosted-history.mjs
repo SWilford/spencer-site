@@ -1,22 +1,16 @@
 // Owner-only publication; never reads collector credentials or calls Spotify.
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { gzipSync } from "node:zlib";
+import { publicationAssets } from "./hosted-publication-assets.mjs";
 const directory = new URL("../../private-data/music/", import.meta.url);
 const access = JSON.parse(await readFile(new URL("site-access.json", directory), "utf8"));
-const manifest = JSON.parse(await readFile(new URL("hosted/manifest.json", directory), "utf8"));
 const artworkOnly = process.argv.includes("--artwork-only");
+const assets = await publicationAssets(directory, artworkOnly);
 if (artworkOnly) {
-  const compressed = gzipSync(await readFile(new URL("spotify/catalog-display.json", directory)));
-  const checksum = createHash("sha256").update(compressed).digest("hex");
+  const checksum = assets[0].asset.sha256;
   try { if ((await readFile(new URL("hosted/published-artwork.sha", directory),"utf8")) === checksum) process.exit(0); } catch { /* first publication */ }
-  await writeFile(new URL("hosted/catalog.json.gz", directory),compressed,{mode:0o600});
-  manifest["catalog.json"]={sha256:checksum,bytes:compressed.length};
 }
-for (const [name, asset] of Object.entries(manifest)) {
-  if (artworkOnly && name !== "catalog.json") continue;
-  const data = await readFile(new URL(`hosted/${name}.gz`, directory));
-  if (data.length !== asset.bytes || createHash("sha256").update(data).digest("hex") !== asset.sha256) throw new Error("Asset checksum mismatch");
+for (const { name, asset, data } of assets) {
   const url = new URL("https://ijoeuoebqxsiqpyiqqoz.supabase.co/functions/v1/music-site-data");
   url.searchParams.set("asset", `${name}.gz`); url.searchParams.set("sha", asset.sha256);
   const signed = await fetch(url, { method: "POST", headers: { Authorization: `Bearer ${access.writeKey}` }, redirect: "error", signal: AbortSignal.timeout(30000) });

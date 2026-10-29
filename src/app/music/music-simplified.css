@@ -80,8 +80,8 @@
 .stats-rank-text h2 a,.stats-rank-text h2 span { display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
 .stats-rank-text p { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:4px; font-variant-numeric:tabular-nums; }
 .stats-rank-text > span { display:block; font-size:12px; color:var(--muted); margin-top:3px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
-.stats-ranks.list { display:grid; gap:12px; }
-.stats-ranks.list li { display:flex; align-items:center; gap:18px; }
+.stats-ranks.list { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+.stats-ranks.list li { display:flex; align-items:center; gap:18px; min-width:0; }
 .stats-list-position { width:40px; flex-shrink:0; font-size:20px; font-weight:600; }
 .stats-ranks.list .stats-rank-surface { display:flex; gap:17px; padding:13px 17px; align-items:center; background:var(--surface); border-radius:13px; width:100%; min-width:0; }
 .stats-ranks.list .stats-rank-art { width:67px; height:67px; flex-shrink:0; border-radius:6px; overflow:hidden; }

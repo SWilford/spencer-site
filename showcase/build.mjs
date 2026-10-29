@@ -105,7 +105,7 @@ let reveal = await readFile(path.join(thaw, "components/ui/reveal.tsx"), "utf8")
 reveal = reveal.replace('motion, type Variants', 'motion, useReducedMotion, type Variants').replace('  return (', '  const reduced=useReducedMotion();\n  return (').replace('initial="hidden"', 'initial={reduced ? false : "hidden"}');
 await writeFile(path.join(thaw, "components/ui/reveal.tsx"), reveal);
 let landing = await readFile(path.join(thaw, "app/page.tsx"), "utf8");
-landing = landing.replace('import { getOptionalSessionUser } from "@/lib/auth/session";', "").replace("export default async function LandingPage()", "export default function LandingPage()").replace("const user = await getOptionalSessionUser();", "const user = { name: 'Demo visitor' };").replaceAll('href={plan.href}', 'href="#/matches"');
+landing = landing.replace('import { getOptionalSessionUser } from "@/lib/auth/session";', "").replace("export default async function LandingPage()", "export default function LandingPage()").replace("const user = await getOptionalSessionUser();", "const user = { name: 'Demo visitor' };").replaceAll('href={plan.href}', 'href="#/matches"').replaceAll('"/dashboard"', '"#/dashboard"');
 await writeFile(path.join(thaw, "app/page.tsx"), landing);
 for (const file of ["main.tsx", "next-link.tsx", "next-image.tsx", "save-match-button.tsx"]) {
     const target = file === "save-match-button.tsx" ? path.join(thaw, "components/matches", file) : path.join(thaw, file);

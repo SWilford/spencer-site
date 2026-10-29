@@ -40,5 +40,7 @@ Actual unauthenticated endpoint access returned 401, as did an upload attempt us
 
 No routine admin UI is required. Database-backed historical aggregation/pagination can replace this private read replica later if history growth or cold query cost warrants it; existing original-source provenance remains the basis for that migration.
 
+October 29 reliability review: artwork-only publication now builds an independent in-memory payload and leaves the pinned historical manifest and archives untouched. Full publication verifies all assets before beginning uploads. `/api/music-health` uses the existing website read capability only, returns status without playback records, and reports stale collection after 30 minutes. See [v1 readiness](v1-readiness.md) for the complete audit, monitoring setup and recovery runbook.
+
 
 Release checks: 45 music/security tests passed; ESLint, TypeScript, Next.js production build and strict Deno checking passed. The dependency audit reports zero known vulnerabilities. Output tracing contains exactly nine private files, all inside site-bundle; no raw source directories, collector credential, owner-upload key or local snapshot is included. The mechanical UI scan's max-height animation finding was fixed with a bounded clip reveal; its survey-thumb stripe is the explicitly approved scrollbar indicator, and pre-existing palette/type advisories were left outside this scope.

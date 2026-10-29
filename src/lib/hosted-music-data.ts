@@ -4,17 +4,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { gunzipSync } from "node:zlib";
 
-export const hostedMusicEnabled = () => Boolean(process.env.MUSIC_SITE_READ_KEY);
-export function musicDataUrl() {
-  const project = process.env.MUSIC_SUPABASE_PROJECT_ID;
-  if (!project || !/^[a-z]{20}$/.test(project)) throw new Error("Music data project is not configured");
-  return `https://${project}.supabase.co/functions/v1/music-site-data`;
-}
-export async function fetchSavedMusic() {
-  const response = await fetch(musicDataUrl(), { headers: { Authorization: `Bearer ${process.env.MUSIC_SITE_READ_KEY}` }, cache: "no-store", redirect: "error", signal: AbortSignal.timeout(20000) });
-  if (!response.ok) throw new Error("Saved music unavailable");
-  return response.json();
-}
+import { musicDataUrl } from "./music-saved-data";
+export { hostedMusicEnabled, musicDataUrl, fetchSavedMusic } from "./music-saved-data";
 const files = { "history.sqlite3": "spotify/spotify-history.sqlite3", "apple.json": "apple/apple-dashboard.json", "apple-enrichment.json": "apple/spotify-enrichment.json", "catalog.json": "spotify/catalog-display.json" };
 let pending: Promise<string> | undefined;
 export function hostedMusicDirectory() {
