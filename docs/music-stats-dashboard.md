@@ -82,3 +82,11 @@ Music Stats controls reuse native buttons/links with a moving inner face and fix
 ### January 2021 browsing boundary
 
 The shared music-browsing policy limits selected calendar/custom dates to 2021 onward. Previous navigation stops at the boundary, custom inputs enforce it, and direct pre-boundary API requests return 400 before loading data. Boundary weeks are clipped to January 1. Lifetime retains the original archive, totals, rankings and chart contributions; imports and collection remain unchanged.
+
+## November 3 — catalog inspection and falling artwork
+
+Names and artwork now open a native, focus-contained detail dialog for artists, tracks and albums. The existing stats endpoint accepts a paired entityKind/entityKey selection, validates it before loading history and returns aggregates only. SHA-256 catalog references stay stable across ranges and sort orders, including unmatched entries; raw source identifiers/plays stay private. Details share the current timeframe, expose a separate lifetime summary, and reuse the same duration/stream rules, daily/hourly charts and related rankings. The read-only history store retains a source view for on-demand filtered queries and still reconciles live estimates with exported records before any detail aggregation.
+
+Filter now has a Display section: Rankings or Falling balls. Ball size scales with listening time or streams, using square-root radius scaling so area carries weight within readable minimum/maximum sizes. All currently shown ranking entries participate, and Show more adds the next batch. Physics uses a fixed timestep, area-based mass and local spatial buckets for circle collisions. Mouse/touch drag throws; clicks and keyboard Enter inspect; arrow keys nudge. Pause/reset controls, static initial reduced-motion packing, hidden/offscreen suspension and stable-content refreshes prevent unnecessary replay or animation. The arena grows for dense mobile selections. No new dependencies or Spotify requests are introduced.
+
+Verification covers aliases/namesakes, unmatched references, selected-range and lifetime totals, skipped time, export/live/Apple conservation, invalid selectors, finite bounded dynamics and unequal-mass collision momentum. Existing collection, artwork, health monitoring and private storage access are unchanged.

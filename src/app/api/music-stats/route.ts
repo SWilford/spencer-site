@@ -5,6 +5,7 @@ const admit = createMusicRequestLimit();
 import { hostedMusicEnabled, hostedMusicDirectory, fetchSavedMusic } from "@/lib/hosted-music-data";
 export const maxDuration = 60;
 import path from "node:path";
+import { publicMusicDetail, validMusicSelection } from "@/lib/music-entity-details";
 import { publicMusicStats, calendarRange, validMusicDate } from "@/lib/music-public";
 import { MUSIC_BROWSE_START, permitsMusicBrowsing } from "@/lib/music-browsing";
 import { dayKey, rangeDays, type MusicSnapshot } from "@/lib/music-stats";
@@ -39,11 +40,13 @@ export async function GET(request: Request) {
   const client = (request.headers.get("x-vercel-forwarded-for") ?? request.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
   if (!admit(client)) return Response.json({ error: "Too many statistics requests. Please wait a minute." }, { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": "60" } });
   const input = new URL(request.url).searchParams;
-  if ([...input.keys()].some(key => !["preset", "anchor", "start", "end"].includes(key)) ||
+  if ([...input.keys()].some(key => !["preset", "anchor", "start", "end", "entityKind", "entityKey"].includes(key)) ||
       !["day", "week", "month", "year", "past-year", "ytd", "lifetime", "custom"].includes(input.get("preset") ?? "month") ||
       ["anchor", "start", "end"].some(key => input.has(key) && !validMusicDate(input.get(key)!))) {
     return Response.json({ error: "Choose a supported timeframe and valid dates." }, { status: 400, headers: { "Cache-Control": "no-store" } });
   }
+  const selection = validMusicSelection(input);
+  if (selection === false) return Response.json({ error: "Choose a valid music item." }, { status: 400, headers: { "Cache-Control": "no-store" } });
   if (!permitsMusicBrowsing(input.get("preset") ?? "month", [input.get("anchor"), input.get("start"), input.get("end")])) {
     return Response.json({ error: "Individual timeframes are available from 2021 onward." }, { status: 400, headers: { "Cache-Control": "no-store" } });
   }
@@ -68,6 +71,10 @@ export async function GET(request: Request) {
     if (preset !== "lifetime" && range.start < MUSIC_BROWSE_START) range.start = MUSIC_BROWSE_START;
     if (!validMusicDate(range.start) || !validMusicDate(range.end) || range.start > range.end || range.end > today || rangeDays(range) > 10958) {
       return Response.json({ error: "Choose a valid range of up to 30 years." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+    }
+    if (selection) {
+      const detail = history ? history.detail(range, selection) : publicMusicDetail(snapshot, range, selection);
+      return detail ? Response.json(detail, { headers }) : Response.json({ error: "This music item is no longer available." }, { status: 404, headers: { "Cache-Control": "no-store" } });
     }
     return Response.json(history ? history.stats(range) : publicMusicStats(snapshot, range), { headers });
   } catch (error) {

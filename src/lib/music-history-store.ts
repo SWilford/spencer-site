@@ -2,8 +2,10 @@ import { DatabaseSync } from "node:sqlite";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { dayKey, durationMs, playbackCount, rangeDays, shiftDay, type DateRange, type MusicSnapshot } from "./music-stats";
+import { dayKey, durationMs, playbackCount, rangeDays, shiftDay, type DateRange, type MusicSnapshot, type MusicPlay, type RankingKind } from "./music-stats";
 import type { PublicMusicStats } from "./music-public";
+import { musicEntityKey } from "./music-entity-key";
+import { publicMusicDetail, type MusicSelection, type PublicMusicDetail } from "./music-entity-details";
 
 type Value = string | number | null;
 type Row = Record<string, Value>;
@@ -17,6 +19,8 @@ const signature = (name: string, album: string | null, artists: string[]) => JSO
 
 export class MusicHistoryStore {
   private db: Database;
+  private details = new Map<string, PublicMusicDetail>();
+  private entityIds: Map<string, { kind: RankingKind; id: string }> | undefined;
   private results = new Map<string, PublicMusicStats>();
   readonly reconciliation = { matched: 0, ambiguous: 0, liveRetained: 0 };
   readonly earliest: string;
@@ -26,7 +30,7 @@ export class MusicHistoryStore {
     db.exec(`
       pragma temp_store=memory;
       create temp table live(id text,at integer,day text,hour integer,weekday integer,milliseconds integer,stream_count integer,
-        track_id text,name text,artists_json text,album_id text,album text,url text,artwork text,estimated integer);
+        track_id text,name text,artists_json text,album_id text,album text,url text,artwork text,estimated integer,provider text);
       create temp table catalog(track_id text primary key,name text,artists_json text,album_id text,album text,url text,artwork text);
       create temp table artist_alias(source_id text primary key,target_id text,name text,image text,url text);
     `);
@@ -79,7 +83,7 @@ export class MusicHistoryStore {
         catalog.run(uri(p.trackId), p.name, JSON.stringify(p.artists), p.albumId, p.album, p.url, p.artwork);
       }
       const find = db.prepare("select event_key,at from events where track_id=? and at>=? and at<=?");
-      const insert = db.prepare("insert into live values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+      const insert = db.prepare("insert into live values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
       const hourFormat = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", hourCycle: "h23" });
       for (const p of snapshot.plays) {
         const at = Date.parse(p.at);
@@ -97,22 +101,21 @@ export class MusicHistoryStore {
         const day = dayKey(p.at), date = new Date(`${day}T12:00:00Z`);
         insert.run(p.id, at, day, Number(hourFormat.format(new Date(at))), (date.getUTCDay() + 6) % 7,
           durationMs(p, "estimated"), playbackCount(p), trackId, p.name, JSON.stringify(p.artists), p.albumId, p.album, p.url, p.artwork,
-          p.actualMs === null && p.songLengthMs !== null ? 1 : 0);
+          p.actualMs === null && p.songLengthMs !== null ? 1 : 0, p.provider);
         this.reconciliation.liveRetained++;
       }
       db.exec("commit");
     } catch (error) { db.exec("rollback"); db.close(); throw error; }
-    db.exec(`create temp view all_plays as
+    db.exec(`create temp view source_plays as
       select e.event_key id,e.at,e.day,e.hour,e.weekday,e.milliseconds,e.stream_count,e.track_id,
         coalesce(c.name,e.name) name,coalesce(c.artists_json,e.artists_json) artists_json,
-        coalesce(c.album_id,e.album_id) album_id,coalesce(c.album,e.album) album,coalesce(c.url,e.url) url,c.artwork,0 estimated
+        coalesce(c.album_id,e.album_id) album_id,coalesce(c.album,e.album) album,coalesce(c.url,e.url) url,c.artwork,0 estimated,'spotify' provider
       from events e left join catalog c on c.track_id=e.track_id
       union all
       select l.id,l.at,l.day,l.hour,l.weekday,l.milliseconds,l.stream_count,l.track_id,
         coalesce(c.name,l.name),coalesce(c.artists_json,l.artists_json),coalesce(c.album_id,l.album_id),coalesce(c.album,l.album),
-        coalesce(c.url,l.url),coalesce(c.artwork,l.artwork),l.estimated from live l left join catalog c on c.track_id=l.track_id;`);
-    db.exec(`create temp table timeline as select *,coalesce((select group_concat(value->>'name',', ') from json_each(p.artists_json)),'Unknown artist') artist_detail from all_plays p;
-      drop view all_plays; alter table timeline rename to all_plays;
+        coalesce(c.url,l.url),coalesce(c.artwork,l.artwork),l.estimated,l.provider from live l left join catalog c on c.track_id=l.track_id;`);
+    db.exec(`create temp table timeline as select *,coalesce((select group_concat(value->>'name',', ') from json_each(p.artists_json)),'Unknown artist') artist_detail from source_plays p; alter table timeline rename to all_plays;
       create index temp.all_plays_day on all_plays(day);
       create temp table artist_facts as select p.day,coalesce(m.target_id,a.value->>'id') id,min(a.value->>'name') name,
         sum(p.stream_count) count,sum(p.milliseconds) milliseconds,max(m.image) artwork,max(m.url) url
@@ -127,6 +130,40 @@ export class MusicHistoryStore {
       create index temp.album_facts_day on album_facts(day);
       drop table all_plays;`);
     this.earliest = String(db.prepare("select min(day) day from time_facts").get()?.day ?? dayKey(snapshot.generatedAt));
+  }
+  detail(range: DateRange, selection: MusicSelection): PublicMusicDetail | null {
+    const cacheKey = `${selection.kind}:${selection.key}:${range.start}:${range.end}`;
+    const cached = this.details.get(cacheKey);
+    if (cached) return { ...cached, stats: { ...cached.stats, lastCollection: this.snapshot.lastCollection } };
+    if (!this.entityIds) {
+      this.entityIds = new Map();
+      for (const kind of ["tracks", "artists", "albums"] as const) {
+        const table = kind === "tracks" ? "track_facts" : kind === "artists" ? "artist_facts" : "album_facts";
+        for (const row of this.db.prepare(`select distinct id from ${table}`).all()) {
+          this.entityIds.set(`${kind}:${musicEntityKey(kind, String(row.id))}`, { kind, id: String(row.id) });
+        }
+      }
+    }
+    const identity = this.entityIds.get(`${selection.kind}:${selection.key}`);
+    if (!identity) return null;
+    const where = selection.kind === "tracks" ? "p.track_id=?" : selection.kind === "albums" ? "coalesce(p.album_id,'unknown:'||p.track_id)=?"
+      : "exists(select 1 from json_each(p.artists_json) a left join artist_alias m on m.source_id=a.value->>'id' where coalesce(m.target_id,a.value->>'id')=?)";
+    const aliases = new Map(this.db.prepare("select * from artist_alias").all().map(row => [String(row.source_id), row]));
+    const artistProfiles = { ...this.snapshot.artistProfiles };
+    for (const row of aliases.values()) artistProfiles[String(row.target_id)] = { image: row.image as string | null, url: row.url as string | null };
+    const plays: MusicPlay[] = this.db.prepare(`select p.* from source_plays p where ${where}`).all(identity.id).map(row => ({
+      id: String(row.id), at: new Date(Number(row.at)).toISOString(), provider: row.provider as "spotify" | "apple",
+      actualMs: row.estimated ? null : Number(row.milliseconds), songLengthMs: row.estimated ? Number(row.milliseconds) : null,
+      streamCount: Number(row.stream_count), trackId: String(row.track_id), name: String(row.name),
+      artists: (JSON.parse(String(row.artists_json)) as {id:string;name:string}[]).map(artist => ({ ...artist, id: String(aliases.get(artist.id)?.target_id ?? artist.id) })),
+      albumId: row.album_id as string | null, album: row.album as string | null, url: row.url as string | null, artwork: row.artwork as string | null,
+    }));
+    const result = publicMusicDetail({ ...this.snapshot, artistProfiles, plays }, range, selection);
+    if (result) {
+      if (this.details.size >= 16) this.details.delete(this.details.keys().next().value!);
+      this.details.set(cacheKey, result);
+    }
+    return result;
   }
   close() { this.db.close(); }
   updateSnapshot(snapshot: MusicSnapshot) { this.snapshot = snapshot; }
@@ -156,7 +193,7 @@ export class MusicHistoryStore {
         from ${kind === "tracks" ? "track_facts" : "album_facts"} where day between ? and ? group by id`;
       return this.db.prepare(`with rows as (${sql}),ordered as (select *,row_number() over(order by milliseconds desc,name) t,row_number() over(order by count desc,name) s from rows)
         select id,name,detail,count,milliseconds,artwork,url from ordered where t<=200 or s<=200 order by milliseconds desc,name`).all(...args).map((r, index) => ({
-          id: String(r.id).startsWith("unknown:") || /^[a-f0-9]{64}$/.test(String(r.id)) ? `unmatched-${index}` : String(r.id), name: String(r.name), detail: String(r.detail),
+          key: musicEntityKey(kind, String(r.id)), id: String(r.id).startsWith("unknown:") || /^[a-f0-9]{64}$/.test(String(r.id)) ? `unmatched-${index}` : String(r.id), name: String(r.name), detail: String(r.detail),
           count: Number(r.count), milliseconds: Number(r.milliseconds), artwork: r.artwork as string | null, url: r.url as string | null }));
     };
     const result: PublicMusicStats = { today: dayKey(new Date()), earliest: this.earliest, range, lastCollection: this.snapshot.lastCollection,

@@ -5,6 +5,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { MusicHistoryStore } from "../src/lib/music-history-store.ts";
+import { musicEntityKey } from "../src/lib/music-entity-key.ts";
 
 const artist = { id: "catalog:artist:example", name: "Example band" };
 const trackId = `spotify:track:${"a".repeat(22)}`;
@@ -59,4 +60,23 @@ test("namesake artist IDs do not force historical generic credits onto either pr
     assert.equal(historical.rankings.artists[0].id, artist.id);
     assert.equal(historical.rankings.artists[0].artwork, null);
   } finally { store.close(); }
+}));
+
+test("detail queries use the same reconciled export, Apple and canonical artist facts as rankings", () => fixture(file => {
+  const store = new MusicHistoryStore(file, snapshot([base, { ...base, id: "later", at: "2026-10-15T12:00:00Z" },
+    { ...base, id: "apple", provider: "apple", at: "2026-10-13T12:00:00Z", actualMs: 20000, streamCount: 0 }]));
+  const range = { start: "2026-10-14", end: "2026-10-14" };
+  const row = store.stats(range).rankings.artists[0];
+  const detail = store.detail(range, { kind: "artists", key: row.key });
+  assert.equal(detail.stats.summary.streams, row.count);
+  assert.equal(detail.stats.summary.milliseconds, row.milliseconds);
+  assert.equal(detail.lifetime.streams, 2);
+  assert.equal(detail.lifetime.milliseconds, 240000);
+  const track = detail.stats.rankings.tracks[0];
+  assert.equal(store.detail(range, { kind: "tracks", key: track.key }).stats.summary.milliseconds, 40000);
+  const album = detail.stats.rankings.albums[0];
+  assert.equal(store.detail(range, { kind: "albums", key: album.key }).stats.summary.milliseconds, 40000);
+  assert.equal(store.detail(range, { kind: "tracks", key: musicEntityKey("tracks", "absent") }), null);
+  assert.equal(JSON.stringify(detail).includes('"source"'), false);
+  return store;
 }));
